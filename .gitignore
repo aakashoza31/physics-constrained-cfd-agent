@@ -1,0 +1,17 @@
+﻿.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+*.key
+*.pem
+runs/
+results/
+artifacts/
+processor*/
+postProcessing/
+VTK/
+log.*
+*.zip
+*.bak
+*.backup_*

@@ -1,0 +1,472 @@
+version: '2.0'
+name: Physics-Constrained CFD Reasoning Policy
+scope:
+  governing_equations: compressible Euler
+  gas_model: calorically perfect gas
+  fluid: air
+  geometry_class: axisymmetric converging-diverging nozzle
+  supported_nozzle_families:
+  - conical
+  - smooth_cosine
+  - bell
+  boundaries:
+    inlet_count: 1
+    outlet_count: 1
+    wall_model: adiabatic slip
+purpose: 'Guide an AI agent in diagnosing, improving, and accepting CFD simulations from structured solver,
+  conservation, stationarity, physical, boundary, mesh, flow-feature, and visual evidence.
+
+  '
+authority_hierarchy:
+- priority: 1
+  source: deterministic_measurements
+  rule: 'Quantities extracted deterministically from OpenFOAM, Gmsh, mesh diagnostics, probes, patches,
+    or post-processing are authoritative.
+
+    '
+- priority: 2
+  source: hard_physics_and_numerical_invariants
+  rule: 'Conservation, positivity, solver-health, stationarity, boundary consistency, and validated domain
+    constraints cannot be overridden by visual appearance or LLM preference.
+
+    '
+- priority: 3
+  source: structured_visual_evidence
+  rule: 'Standardized CFD images may help localize gradients, shocks, asymmetries, hotspots, and candidate
+    under-resolved regions.
+
+    '
+- priority: 4
+  source: llm_inference
+  rule: 'The LLM may form hypotheses and choose among permitted actions, but it may not invent unmeasured
+    CFD quantities.
+
+    '
+- priority: 5
+  source: analytical_or_reference_solution
+  rule: 'Analytical theory, reference CFD, experiment, or benchmark data are reserved for external research
+    evaluation and must not control the autonomous theory-blind decision loop.
+
+    '
+hard_invariants:
+- id: H001
+  rule: Normal solver termination does not imply convergence.
+- id: H002
+  rule: checkMesh PASS does not imply adequate spatial resolution.
+- id: H003
+  rule: Positive pressure, temperature, and density are necessary but not sufficient for a trustworthy
+    CFD state.
+- id: H004
+  rule: A CFD state that fails configured stationarity criteria may not be classified as ACCEPTABLE.
+- id: H005
+  rule: A CFD state that violates configured conservation criteria may not be classified as ACCEPTABLE.
+- id: H006
+  rule: A severe unresolved numerical anomaly may not be accepted because outlet-averaged quantities appear
+    stationary.
+- id: H007
+  rule: Visual appearance alone may never justify ACCEPT.
+- id: H008
+  rule: The LLM may not fabricate exact pressure, temperature, velocity, density, Mach number, mass flow,
+    or mesh metrics.
+- id: H009
+  rule: Geometry modification is forbidden until the CFD state used to judge geometry is trustworthy.
+- id: H010
+  rule: A numerical or boundary-condition failure must not automatically trigger mesh refinement.
+- id: H011
+  rule: Low cell count alone is not evidence of inadequate resolution.
+- id: H012
+  rule: 'Mesh refinement must be justified by a relationship between a physically or numerically important
+    flow feature and inadequate local resolution.
+
+    '
+- id: H013
+  rule: 'Failure of a corrective action does not justify repeating the same action indefinitely without
+    new evidence.
+
+    '
+- id: H014
+  rule: 'When evidence cannot distinguish among plausible hypotheses, request additional diagnostics rather
+    than guessing.
+
+    '
+- id: H015
+  rule: 'Analytical theory is not permitted as autonomous decision evidence. It may be used only in post-hoc
+    researcher evaluation.
+
+    '
+- id: H016
+  rule: 'After remeshing, mapFields or equivalent field inheritance may only be used when the source CFD
+    state has passed the configured source-state trust gate.
+
+    '
+- id: H017
+  rule: 'If the source CFD state is untrusted, use a clean physics-consistent initialization rather than
+    inheriting the previous field.
+
+    '
+- id: H018
+  rule: 'A mapped state must be re-evaluated after transfer because mapping itself can introduce or expose
+    a transient.
+
+    '
+- id: H019
+  rule: 'Static pressure above nominal inlet total pressure in an isolated cell is not by itself sufficient
+    to declare impossibility. Spatial extent, time trend, local velocity, density, boundary location,
+    and numerical behavior must be considered.
+
+    '
+- id: H020
+  rule: 'Sustained growth of local pressure/density combined with increasing reverse velocity is strong
+    evidence of a numerical or inherited-state anomaly and requires investigation.
+
+    '
+- id: H026
+  rule: 'Before repeating CONTINUE_RUN after a previous continuation, compare available internal extrema
+    histories, localized anomaly indicators, and boundary-flow evidence across iterations. Improving outlet
+    stationarity or global mass conservation alone does not justify another continuation when localized
+    internal quantities are worsening. When global and local evidence conflict, request the smallest deterministic
+    localized diagnostic needed to distinguish the competing hypotheses before continuing blindly.
+
+    '
+- id: H027
+  rule: Strong pressure, Mach, velocity, or temperature gradients at a converging-diverging nozzle throat
+    are expected physical behavior and are not by themselves evidence of mesh underresolution.
+- id: H028
+  rule: REFINE_THROAT or REFINE_GRADIENT_REGION requires explicit quantitative deterministic resolution
+    evidence. A localized physical gradient, visual sharpness, or an unconverged state alone is insufficient.
+- id: H029
+  rule: For a numerically healthy same-mesh continuation, substantial ongoing improvement in conservation
+    is evidence that the transient is still settling. Do not remesh solely because stationarity has not
+    yet been reached while this improvement persists.
+- id: H030
+  rule: If convergence progress genuinely stalls but quantitative resolution evidence is absent or competing
+    hypotheses remain unresolved, select REQUEST_DIAGNOSTIC before any mesh modification.
+
+- id: H031
+  rule: >-
+    If mass-conservation error worsens materially across two
+    consecutive same-mesh continuations and deterministic
+    provenance confirms that no remeshing or field mapping
+    occurred, CONTINUE_RUN is prohibited. The next action
+    must be REQUEST_DIAGNOSTIC before advancing the solver.
+
+evidence_groups:
+  solver_health:
+    inspect:
+    - normal_completion
+    - courant_number
+    - timestep_behavior
+    - NaN
+    - Inf
+    - fatal_solver_errors
+  conservation:
+    inspect:
+    - inlet_mass_flow
+    - outlet_mass_flow
+    - mass_imbalance
+    - mass_imbalance_trend
+  stationarity:
+    inspect:
+    - mass_flow_history
+    - outlet_pressure_history
+    - outlet_temperature_history
+    - outlet_velocity_history
+    - pressure_extrema_history
+    - temperature_extrema_history
+    - density_extrema_history
+  physical_admissibility:
+    inspect:
+    - pressure_positivity
+    - temperature_positivity
+    - density_positivity
+    - localized_state_anomalies
+  boundary_behavior:
+    inspect:
+    - inlet_flow_direction
+    - outlet_flow_direction
+    - inlet_reverse_flow
+    - outlet_reverse_flow
+    - patch_flux_consistency
+    - localized_boundary_anomalies
+  mesh:
+    inspect:
+    - checkMesh
+    - non_orthogonality
+    - skewness
+    - aspect_ratio
+    - local_cell_quality
+    - local_resolution_near_flow_features
+  flow_features:
+    inspect:
+    - pressure_gradient_location
+    - velocity_gradient_location
+    - Mach_gradient_location
+    - density_gradient_location
+    - sonic_transition
+    - shock_candidates
+    - candidate_underresolved_regions
+  visual:
+    inspect:
+    - pressure_center_slice
+    - Mach_center_slice
+    - velocity_center_slice
+    - mesh_center_slice
+    - mesh_feature_zoom
+    - anomaly_closeup
+visual_evidence_policy:
+  role: secondary diagnostic and localization evidence
+  standardized_comparison_requirements:
+  - same physical field
+  - same slice definition
+  - same camera orientation
+  - same geometry coordinate convention
+  - same or explicitly documented color scale
+  - time/state labels must be known
+  visual_evidence_may:
+  - localize strong gradients
+  - identify candidate shocks or compression structures
+  - identify visible asymmetry
+  - identify localized hotspots
+  - compare coarse and refined spatial resolution
+  - support candidate refinement-region selection
+  visual_evidence_may_not:
+  - override failed conservation
+  - override failed stationarity
+  - override solver failure
+  - override nonphysical negative thermodynamic states
+  - prove convergence
+  - prove quantitative accuracy
+  - alone justify ACCEPT
+  conflict_rule: 'If visual evidence conflicts with deterministic numerical evidence, deterministic evidence
+    has priority and the agent should request additional diagnostics when needed.
+
+    '
+expert_knowledge:
+  compressible_flow:
+  - 'A converging-diverging nozzle can contain subsonic, sonic, supersonic, compression-wave, expansion-wave,
+    or shock-containing regions depending on geometry and operating conditions.
+
+    '
+  - 'Important flow features should be spatially resolved where pressure, density, velocity, or Mach gradients
+    are concentrated.
+
+    '
+  - 'Sonic transition near a minimum-area region can be physically plausible, but its exact location must
+    be measured from the CFD, not assumed from analytical theory.
+
+    '
+  - 'Strong local gradients do not automatically imply numerical failure; determine whether they represent
+    a physically plausible flow feature, a shock candidate, a boundary artifact, or insufficient resolution.
+
+    '
+  - 'Multidimensional Euler CFD may exhibit effects that are not represented by quasi-one-dimensional
+    analytical relations.
+
+    '
+  mesh_adaptation:
+  - 'Refine where important flow features are insufficiently resolved, not simply where the mesh is globally
+    coarse.
+
+    '
+  - 'Prefer localized refinement over indiscriminate global refinement when evidence identifies a localized
+    deficiency.
+
+    '
+  - 'A high-gradient region that is already well resolved does not automatically require additional refinement.
+
+    '
+  - 'A mesh quality problem requires distinguishing poor element quality from inadequate local resolution.
+
+    '
+  - 'After refinement, improvement must be verified by rerunning CFD and comparing numerical trust metrics
+    rather than assuming success.
+
+    '
+  solver_reasoning:
+  - 'When a solution is evolving but otherwise healthy, CONTINUE_RUN may be more appropriate than changing
+    the mesh.
+
+    '
+  - 'When local quantities diverge while outlet averages appear stationary, investigate localized instability
+    before acceptance.
+
+    '
+  - 'Rapid timestep collapse, NaN/Inf, or solver failure indicates a numerical problem and should not
+    be diagnosed as mesh under-resolution without supporting evidence.
+
+    '
+  boundary_conditions:
+  - 'Reverse flow can be physically meaningful at some boundaries under some conditions, but sustained
+    or growing unexpected reverse flow, especially near the inlet, requires investigation.
+
+    '
+  - 'Boundary-condition anomalies should be distinguished from internal spatial-resolution problems before
+    modifying the mesh.
+
+    '
+diagnostic_protocol:
+- step: 1
+  name: solver_health
+  question: Did the numerical solve remain computationally healthy?
+- step: 2
+  name: physical_admissibility
+  question: Are thermodynamic states admissible and free of obvious runaway behavior?
+- step: 3
+  name: conservation
+  question: Does the solution satisfy configured conservation requirements?
+- step: 4
+  name: stationarity
+  question: Are monitored global and local indicators sufficiently stationary?
+- step: 5
+  name: boundary_behavior
+  question: Are inlet/outlet behavior and patch fluxes consistent?
+- step: 6
+  name: mesh_quality
+  question: Is the mesh geometrically valid and locally healthy?
+- step: 7
+  name: flow_feature_localization
+  question: Where are the important gradients or suspicious structures?
+- step: 8
+  name: mesh_feature_relationship
+  question: Is local resolution inadequate relative to an important feature?
+- step: 9
+  name: competing_hypotheses
+  question: Which plausible diagnosis best explains the complete evidence?
+- step: 10
+  name: action_selection
+  question: What is the safest informative permitted next action?
+diagnoses:
+  ACCEPTABLE:
+    meaning: 'The simulation passes configured trust checks and there is no unresolved numerical concern
+      requiring action.
+
+      '
+  UNCONVERGED:
+    meaning: 'The run appears numerically healthy but has not reached required stationarity or conservation
+      behavior.
+
+      '
+  MESH_RESOLUTION:
+    meaning: 'Evidence indicates that an important localized flow feature is inadequately resolved spatially.
+
+      '
+  MESH_QUALITY:
+    meaning: 'Element quality, topology, or local geometric mesh quality is compromising the simulation.
+
+      '
+  NUMERICAL_FAILURE:
+    meaning: 'Solver behavior, timestep behavior, divergence, NaN/Inf, or another numerical mechanism
+      prevents trustworthy interpretation.
+
+      '
+  BOUNDARY_ANOMALY:
+    meaning: 'Boundary behavior or boundary-condition interaction is the dominant suspected source of
+      the problem.
+
+      '
+  SUSPECT_NUMERICAL_ANOMALY:
+    meaning: 'A localized state or trend appears suspicious but available evidence is insufficient to
+      identify the mechanism confidently.
+
+      '
+  INSUFFICIENT_EVIDENCE:
+    meaning: 'Multiple plausible hypotheses remain and additional diagnostics are required.
+
+      '
+  OUTSIDE_VALIDATED_DOMAIN:
+    meaning: 'The requested case is outside the supported physics or geometry scope.
+
+      '
+actions:
+  ACCEPT:
+    requires:
+    - solver healthy
+    - physical admissibility passes
+    - configured conservation criteria pass
+    - configured stationarity criteria pass
+    - no unresolved severe boundary anomaly
+    - no unresolved severe local numerical anomaly
+  CONTINUE_RUN:
+    appropriate_when:
+    - simulation is numerically healthy
+    - state is still evolving
+    - evidence does not yet justify remeshing
+  REQUEST_DIAGNOSTIC:
+    appropriate_when:
+    - evidence is insufficient
+    - localized anomaly needs investigation
+    - boundary behavior requires more measurements
+    - competing hypotheses cannot yet be separated
+  REFINE_THROAT:
+    requires:
+    - important flow feature is localized near throat
+    - local resolution is judged inadequate
+    - dominant evidence does not indicate numerical or boundary failure
+  REFINE_GRADIENT_REGION:
+    requires:
+    - important high-gradient region identified
+    - region is inadequately resolved
+    - region target can be specified
+  REPAIR_MESH:
+    requires:
+    - mesh-quality defect is demonstrated
+  RESTART_CLEAN:
+    requires:
+    - current initialization or inherited state is untrusted
+  REJECT_OUTSIDE_DOMAIN:
+    requires:
+    - requested physics or geometry lies outside validated scope
+competing_hypothesis_protocol:
+  minimum_expected_hypotheses_when_nontrivial: 2
+  common_hypotheses:
+  - insufficient_run_time
+  - local_mesh_underresolution
+  - mesh_quality_failure
+  - boundary_condition_anomaly
+  - inherited_state_instability
+  - generic_numerical_instability
+  - physically_valid_strong_gradient
+  rules:
+  - 'The LLM must identify evidence supporting and contradicting plausible hypotheses before selecting
+    a diagnosis for a nontrivial failure.
+
+    '
+  - 'Absence of evidence for an alternative is not equivalent to proof that the selected diagnosis is
+    correct.
+
+    '
+  - 'If two materially different hypotheses remain plausible, use REQUEST_DIAGNOSTIC.
+
+    '
+initialization_policy:
+  first_run:
+    action: clean_initialization
+  after_mesh_change:
+    map_only_if_source_trusted:
+    - solver_healthy
+    - physical_admissibility_passes
+    - no_unresolved_local_anomaly
+    - no_unresolved_boundary_anomaly
+    - trust_evaluation_passes
+    otherwise:
+      action: clean_initialization
+  post_mapping:
+    requirement: 'Re-evaluate solver health, local extrema, boundary behavior, conservation, and stationarity
+      before treating the transferred solution as trustworthy.
+
+      '
+llm_output_requirements:
+  required_fields:
+  - diagnosis
+  - evidence_used
+  - competing_hypotheses
+  - reasoning_summary
+  - action
+  - confidence
+  optional_fields:
+  - target_region
+  - requested_diagnostic
+  prohibition:
+  - do not output invented CFD measurements
+  - do not use analytical theory as hidden decision evidence
+  - do not claim an action guarantees improvement

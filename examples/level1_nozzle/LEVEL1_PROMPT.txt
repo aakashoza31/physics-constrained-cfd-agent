@@ -1,0 +1,26 @@
+Simulate compressible inviscid air flow through an axisymmetric conical converging-diverging nozzle.
+
+Geometry:
+inlet radius = 50 mm
+throat radius = 32.6 mm
+outlet radius = 35.4 mm
+inlet straight length = 50 mm
+converging length = 100 mm
+throat length = 10 mm
+diverging length = 120 mm
+outlet straight length = 50 mm
+
+Operating conditions:
+inlet stagnation pressure = 200 kPa
+inlet stagnation temperature = 300 K
+downstream back pressure = 30 kPa
+
+Use calorically perfect air with gamma = 1.4 and R = 287 J/(kg K).
+
+Use inviscid Euler physics with adiabatic slip walls.
+
+Autonomously determine the flow regime, choose regime-consistent boundary conditions and initialization, generate and validate the mesh, execute OpenFOAM, diagnose the CFD using numerical and visual evidence, and take only scientifically validated corrective actions.
+
+Do not expose analytical solution target values to the CFD reasoning agent.
+
+Prioritize physical reliability, conservation, numerical stability, and traceable scientific decision-making.
