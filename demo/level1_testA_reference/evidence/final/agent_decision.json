@@ -1,0 +1,37 @@
+{
+  "diagnosis": "UNCONVERGED",
+  "evidence_used": [
+    "Solver completed normally with no NaN, Inf, or timestep collapse.",
+    "Thermodynamic states remain strictly positive and physically admissible.",
+    "Stationarity criteria are not yet satisfied (passes_stationarity is false), though monitored ranges and drift continue to settle.",
+    "Mass imbalance percentage is approximately 1.08%, showing stability relative to previous iterations.",
+    "Execution provenance confirms this is a same-mesh continuation from iteration 2 without any remeshing or mapping performed."
+  ],
+  "competing_hypotheses": [
+    {
+      "hypothesis": "insufficient_run_time",
+      "evidence_for": [
+        "The solver is computationally healthy and stable.",
+        "Stationarity criteria have not yet been fully met, but historical extrema and window metrics show ongoing evolution toward steady state.",
+        "No severe numerical or boundary failure flags are present."
+      ],
+      "evidence_against": [
+        "Mass conservation imbalance remains slightly above the strict target threshold."
+      ]
+    },
+    {
+      "hypothesis": "local_mesh_underresolution",
+      "evidence_for": [
+        "Strong pressure, Mach, and velocity gradients are concentrated near the throat."
+      ],
+      "evidence_against": [
+        "checkMesh passed successfully and no quantitative evidence of local resolution deficiency has been demonstrated."
+      ]
+    }
+  ],
+  "reasoning_summary": "The simulation remains numerically stable, physically admissible, and completed normally on the same mesh. Although stationarity checks have not yet passed, the solution is still settling and health metrics remain good without degradation or divergence across continuations. Therefore, continuing the run is justified.",
+  "action": "CONTINUE_RUN",
+  "target_region": null,
+  "requested_diagnostic": null,
+  "confidence": "high"
+}

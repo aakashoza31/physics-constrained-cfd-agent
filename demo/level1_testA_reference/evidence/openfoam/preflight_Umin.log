@@ -1,0 +1,52 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 14-7b05503f98a8
+Exec   : foamPostProcess -time 0 -func cellMinMag(U)
+Date   : Sep 06 2026
+Time   : 21:47:02
+Host   : "LAPTOP-3NTOMT3D"
+PID    : 1296
+I/O    : uncollated
+Case   : /home/aakash/nozzle_test_A/case
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+
+Constructing functionObjects from system/functions
+    Selecting volFieldValue with name cellMinMag(U)
+        number of cells = 63747
+        volume = 0.001592934157
+        operation = minMag
+Time = 0s
+
+Reading fields:
+    volVectorFields: UUsing dynamicCode for coded U at line 11 in "/home/aakash/nozzle_test_A/case/0/U!internalField"
+Creating new library in "dynamicCode/U/platforms/linux64GccDPInt32Opt/lib/libU_c2c02ed6e693e74f42b284aea3f02379f13b27bc.so"
+    Copying "/opt/openfoam14/etc/codeTemplates/dynamicCode/codedDimensionedFieldFunctionTemplate.C" to "/home/aakash/nozzle_test_A/case/dynamicCode/U/codedDimensionedFieldFunctionTemplate.C"
+    Copying "/opt/openfoam14/etc/codeTemplates/dynamicCode/codedDimensionedFieldFunctionTemplate.H" to "/home/aakash/nozzle_test_A/case/dynamicCode/U/codedDimensionedFieldFunctionTemplate.H"
+wmake libso /home/aakash/nozzle_test_A/case/dynamicCode/U
+    ln: ./lnInclude
+    wmkdep: codedDimensionedFieldFunctionTemplate.C
+    Ctoo: codedDimensionedFieldFunctionTemplate.C
+    ld: /home/aakash/nozzle_test_A/case/dynamicCode/U/../platforms/linux64GccDPInt32Opt/lib/libU_c2c02ed6e693e74f42b284aea3f02379f13b27bc.so
+
+
+Executing functionObjects
+volFieldValue cellMinMag(U) write:
+    minMag(all) of U = 88.23339028 at location (0.0451156827 -0.002209615503 0.02556435747) in cell 51
+
+
+End
+

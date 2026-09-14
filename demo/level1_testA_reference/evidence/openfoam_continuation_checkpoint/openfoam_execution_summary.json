@@ -1,0 +1,74 @@
+{
+  "status": "solver_completed",
+  "overall_ok": true,
+  "run_solver_requested": true,
+  "execution_mode": {
+    "parallel": false,
+    "mpi_ranks": 1
+  },
+  "openfoam": {
+    "distro": "Ubuntu-24.04",
+    "bashrc": "/opt/openfoam14/etc/bashrc",
+    "runtime_case": "$HOME/llm_guided_meshing_openfoam_runtime"
+  },
+  "return_codes": {
+    "stage": 0,
+    "gmshToFoam": 0,
+    "wall_patch_fix": 0,
+    "checkMesh": 0,
+    "setFields": 0,
+    "decomposePar": 0,
+    "foamRun": 0,
+    "reconstructPar": 0,
+    "sync_back": 0
+  },
+  "conversion_ok": true,
+  "wall_patch_ok": true,
+  "check_mesh": {
+    "mesh_ok": true,
+    "fatal_error": false,
+    "cells": 63747,
+    "points": 12517,
+    "faces": 130848,
+    "max_aspect_ratio": 4.645835517,
+    "max_non_orthogonality": 57.57001781,
+    "average_non_orthogonality": 15.31347361,
+    "max_skewness": 1.150350725
+  },
+  "solver": {
+    "completed": true,
+    "fatal_error": false,
+    "last_time": 0.0011,
+    "time_steps_reported": 3628,
+    "initial_residual_max": 0.0,
+    "initial_residual_last": 0.0,
+    "max_courant_seen": 0.04999158968,
+    "execution_time_s": 357.254402,
+    "timed_out": false,
+    "return_code": 0,
+    "parallel": false,
+    "mpi_ranks": 1
+  },
+  "logs": {
+    "stage": "log.stageToWSL",
+    "gmshToFoam": "log.gmshToFoam",
+    "wall_patch_fix": "log.wallPatchFix",
+    "checkMesh": "log.checkMesh",
+    "setFields": "log.setFields",
+    "decomposePar": null,
+    "foamRun": "log.foamRun",
+    "reconstructPar": null,
+    "sync_back": "log.syncFromWSL"
+  },
+  "tails": {
+    "stage": "",
+    "gmshToFoam": "Mesh source: existing constant/polyMesh\ngmshToFoam skipped for native OpenFOAM continuation\n",
+    "wall_patch_fix": "    walls\n    {\n        type            wall;\n        physicalType    patch;\n        nFaces          6393;\n        startFace       124140;\n    }\n",
+    "checkMesh": "Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)\nallowSystemOperations : Allowing user-supplied system call operations\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\nCreate time\n\nCreate mesh for time = 0\n\nTime = 0s\n\nMesh stats\n    points:           12517\n    faces:            130848\n    internal faces:   124140\n    cells:            63747\n    faces per cell:   4\n    boundary patches: 3\n    point zones:      0\n    face zones:       0\n    cell zones:       1\n\nOverall number of cells of each type:\n    hexahedra:     0\n    prisms:        0\n    wedges:        0\n    pyramids:      0\n    tet wedges:    0\n    tetrahedra:    63747\n    polyhedra:     0\n\nChecking topology...\n    Boundary definition OK.\n    Cell to face addressing OK.\n    Point usage OK.\n    Upper triangular ordering OK.\n    Face vertices OK.\n    Number of regions: 1 (OK).\n\nChecking patch topology for multiply connected surfaces...\n    Patch               Faces    Points   Surface topology                  \n    walls               6393     3224     ok (non-closed singly connected)  \n    inlet               206      120      ok (non-closed singly connected)  \n    outlet              109      67       ok (non-closed singly connected)  \n\nChecking geometry...\n    Overall domain bounding box (0 -0.05 -0.05) (0.33 0.05 0.05)\n    Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)\n    Mesh has 3 solution (non-empty) directions (1 1 1)\n    Max cell openness = 2.729897103e-16 OK.\n    Max aspect ratio = 4.645835517 OK.\n    Minimum face area = 8.000523076e-07. Maximum face area = 0.0001568915669.  Face area magnitudes OK.\n    Min volume = 4.717082302e-10. Max volume = 6.193904435e-07.  Total volume = 0.001592934157.  Cell volumes OK.\n    Mesh non-orthogonality Max: 57.57001781 average: 15.31347361\n    Non-orthogonality check OK.\n    Face pyramids OK.\n    Max skewness = 1.150350725 OK.\n    Coupled point location match (average 0) OK.\n\nMesh OK.\n\nEnd\n\n",
+    "setFields": "No setFields initialization requested\n",
+    "decomposePar": "",
+    "foamRun": "for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 356.457593 s  ClockTime = 357 s\n\nCourant Number mean: 0.005675176473 max: 0.04999154283\ndeltaT = 2.756339581e-08\nTime = 0.001099889746s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 356.566773 s  ClockTime = 357 s\n\nCourant Number mean: 0.005675176324 max: 0.04999155454\ndeltaT = 2.756339581e-08\nTime = 0.00109991731s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 356.664875 s  ClockTime = 357 s\n\nCourant Number mean: 0.005675176174 max: 0.04999156625\ndeltaT = 2.756339581e-08\nTime = 0.001099944873s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 356.774552 s  ClockTime = 357 s\n\nCourant Number mean: 0.005675176025 max: 0.04999157797\ndeltaT = 2.756339581e-08\nTime = 0.001099972437s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 356.901652 s  ClockTime = 358 s\n\nCourant Number mean: 0.005675175875 max: 0.04999158968\ndeltaT = 2.756339581e-08\nTime = 0.0011s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 357.254402 s  ClockTime = 358 s\n\nEnd\n\n",
+    "reconstructPar": "",
+    "sync_back": ""
+  }
+}

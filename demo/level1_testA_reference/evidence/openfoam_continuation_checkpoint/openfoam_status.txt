@@ -1,0 +1,12 @@
+stage=0
+convert=0
+wallPatchFix=0
+checkMesh=0
+setFields=0
+decomposePar=0
+solver=0
+reconstructPar=0
+sync=0
+parallel=False
+mpiRanks=1
+timedOut=False

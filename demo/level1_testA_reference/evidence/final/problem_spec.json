@@ -1,0 +1,24 @@
+{
+  "nozzle_family": "conical",
+  "geometry": {
+    "inlet_radius_m": 0.05,
+    "throat_radius_m": 0.0326,
+    "outlet_radius_m": 0.0354,
+    "inlet_length_m": 0.05,
+    "converging_length_m": 0.1,
+    "throat_length_m": 0.01,
+    "diverging_length_m": 0.12,
+    "outlet_length_m": 0.05
+  },
+  "operating_conditions": {
+    "inlet_total_pressure_pa": 200000.0,
+    "inlet_total_temperature_k": 300.0,
+    "outlet_static_pressure_pa": 30000.0,
+    "gas": "air",
+    "gamma": 1.4,
+    "gas_constant_j_kg_k": 287.0
+  },
+  "engineering_objective": "Obtain a numerically trustworthy compressible-Euler CFD solution, diagnosing and correcting numerical or mesh issues when the available evidence justifies an action.",
+  "physics_model": "compressible_euler",
+  "geometry_class": "axisymmetric_converging_diverging_nozzle"
+}

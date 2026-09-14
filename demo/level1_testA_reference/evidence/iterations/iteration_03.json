@@ -1,0 +1,877 @@
+{
+  "iteration": 3,
+  "physical_time_s": 0.0012,
+  "execution": {
+    "status": "solver_completed",
+    "overall_ok": true,
+    "run_solver_requested": true,
+    "execution_mode": {
+      "parallel": false,
+      "mpi_ranks": 1
+    },
+    "openfoam": {
+      "distro": "Ubuntu-24.04",
+      "bashrc": "/opt/openfoam14/etc/bashrc",
+      "runtime_case": "$HOME/llm_guided_meshing_openfoam_runtime"
+    },
+    "return_codes": {
+      "stage": 0,
+      "gmshToFoam": 0,
+      "wall_patch_fix": 0,
+      "checkMesh": 0,
+      "setFields": 0,
+      "decomposePar": 0,
+      "foamRun": 0,
+      "reconstructPar": 0,
+      "sync_back": 0
+    },
+    "conversion_ok": true,
+    "wall_patch_ok": true,
+    "check_mesh": {
+      "mesh_ok": true,
+      "fatal_error": false,
+      "cells": 63747,
+      "points": 12517,
+      "faces": 130848,
+      "max_aspect_ratio": 4.645835517,
+      "max_non_orthogonality": 57.57001781,
+      "average_non_orthogonality": 15.31347361,
+      "max_skewness": 1.150350725
+    },
+    "solver": {
+      "completed": true,
+      "fatal_error": false,
+      "last_time": 0.0012,
+      "time_steps_reported": 3630,
+      "initial_residual_max": 0.0,
+      "initial_residual_last": 0.0,
+      "max_courant_seen": 0.05000072657,
+      "execution_time_s": 332.667374,
+      "timed_out": false,
+      "return_code": 0,
+      "parallel": false,
+      "mpi_ranks": 1
+    },
+    "logs": {
+      "stage": "log.stageToWSL",
+      "gmshToFoam": "log.gmshToFoam",
+      "wall_patch_fix": "log.wallPatchFix",
+      "checkMesh": "log.checkMesh",
+      "setFields": "log.setFields",
+      "decomposePar": null,
+      "foamRun": "log.foamRun",
+      "reconstructPar": null,
+      "sync_back": "log.syncFromWSL"
+    },
+    "tails": {
+      "stage": "",
+      "gmshToFoam": "Mesh source: existing constant/polyMesh\ngmshToFoam skipped for native OpenFOAM continuation\n",
+      "wall_patch_fix": "    walls\n    {\n        type            wall;\n        physicalType    patch;\n        nFaces          6393;\n        startFace       124140;\n    }\n",
+      "checkMesh": "Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)\nallowSystemOperations : Allowing user-supplied system call operations\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\nCreate time\n\nCreate mesh for time = 0\n\nTime = 0s\n\nMesh stats\n    points:           12517\n    faces:            130848\n    internal faces:   124140\n    cells:            63747\n    faces per cell:   4\n    boundary patches: 3\n    point zones:      0\n    face zones:       0\n    cell zones:       1\n\nOverall number of cells of each type:\n    hexahedra:     0\n    prisms:        0\n    wedges:        0\n    pyramids:      0\n    tet wedges:    0\n    tetrahedra:    63747\n    polyhedra:     0\n\nChecking topology...\n    Boundary definition OK.\n    Cell to face addressing OK.\n    Point usage OK.\n    Upper triangular ordering OK.\n    Face vertices OK.\n    Number of regions: 1 (OK).\n\nChecking patch topology for multiply connected surfaces...\n    Patch               Faces    Points   Surface topology                  \n    walls               6393     3224     ok (non-closed singly connected)  \n    inlet               206      120      ok (non-closed singly connected)  \n    outlet              109      67       ok (non-closed singly connected)  \n\nChecking geometry...\n    Overall domain bounding box (0 -0.05 -0.05) (0.33 0.05 0.05)\n    Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)\n    Mesh has 3 solution (non-empty) directions (1 1 1)\n    Max cell openness = 2.729897103e-16 OK.\n    Max aspect ratio = 4.645835517 OK.\n    Minimum face area = 8.000523076e-07. Maximum face area = 0.0001568915669.  Face area magnitudes OK.\n    Min volume = 4.717082302e-10. Max volume = 6.193904435e-07.  Total volume = 0.001592934157.  Cell volumes OK.\n    Mesh non-orthogonality Max: 57.57001781 average: 15.31347361\n    Non-orthogonality check OK.\n    Face pyramids OK.\n    Max skewness = 1.150350725 OK.\n    Coupled point location match (average 0) OK.\n\nMesh OK.\n\nEnd\n\n",
+      "setFields": "No setFields initialization requested\n",
+      "decomposePar": "",
+      "foamRun": "or e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 331.994885 s  ClockTime = 335 s\n\nCourant Number mean: 0.005671730174 max: 0.04997118531\ndeltaT = 2.754820937e-08\nTime = 0.001199889807s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 332.100337 s  ClockTime = 335 s\n\nCourant Number mean: 0.005671730119 max: 0.04997118115\ndeltaT = 2.754820937e-08\nTime = 0.001199917355s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 332.211749 s  ClockTime = 335 s\n\nCourant Number mean: 0.005671730064 max: 0.04997117699\ndeltaT = 2.754820937e-08\nTime = 0.001199944904s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 332.308358 s  ClockTime = 335 s\n\nCourant Number mean: 0.005671730009 max: 0.04997117282\ndeltaT = 2.754820937e-08\nTime = 0.001199972452s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 332.387986 s  ClockTime = 335 s\n\nCourant Number mean: 0.005671729954 max: 0.04997116866\ndeltaT = 2.754820937e-08\nTime = 0.0012s\n\ndiagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0\ndiagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0\nExecutionTime = 332.667374 s  ClockTime = 336 s\n\nEnd\n\n",
+      "reconstructPar": "",
+      "sync_back": ""
+    },
+    "stability_supervisor": {
+      "mode": "continuation_recovery",
+      "attempts": [
+        {
+          "phase": "recovery",
+          "attempt": 1,
+          "max_co": 0.05,
+          "max_dt": 5e-08,
+          "status": "solver_completed",
+          "last_time": 0.0012
+        }
+      ],
+      "target_end_time": 0.0012,
+      "result": "COMPLETED"
+    }
+  },
+  "diagnostics": {
+    "case_wsl": "/home/aakash/llm_guided_meshing_openfoam_runtime",
+    "monitoring_window": {
+      "start_time_s": 0.001,
+      "end_time_s": 0.0012,
+      "saved_times_available": 44
+    },
+    "mesh": {
+      "mesh_ok": true,
+      "cells": 63747,
+      "max_aspect_ratio": 4.645835517,
+      "max_non_orthogonality": 57.57001781,
+      "average_non_orthogonality": 15.31347361,
+      "max_skewness": 1.150350725
+    },
+    "solver": {
+      "checked": true,
+      "failure_detected": false,
+      "failure_markers": [],
+      "completed_normally": true,
+      "log": "/mnt/c/Backup from one drive/Desktop/Research/LLM_guided_meshing/runs/20260913_132428_conical_nozzle/level1_testA_autonomous_replay/openfoam/log.foamRun"
+    },
+    "flow": {
+      "inlet_mass_flow_kg_s": -1.548243632,
+      "outlet_mass_flow_kg_s": 1.531572479,
+      "mass_imbalance_pct": 1.07677839943474,
+      "outlet_pressure_pa": 54725.18558,
+      "outlet_temperature_k": 208.1724336,
+      "outlet_velocity_vector_mps": [
+        430.3186741,
+        -0.1471585119,
+        -0.3474242227
+      ],
+      "outlet_velocity_mps": 430.318839511356,
+      "outlet_mach": 1.4879001385789523
+    },
+    "global_field_validity": {
+      "pressure": {
+        "min": {
+          "value": 47272.64654,
+          "location_m": [
+            0.2725389908,
+            -0.03307040039,
+            -0.007500734417
+          ],
+          "cell": 57504
+        },
+        "max": {
+          "value": 424850.3844,
+          "location_m": [
+            0.001005641152,
+            0.0294376622,
+            -0.03576988464
+          ],
+          "cell": 229
+        }
+      },
+      "temperature": {
+        "min": {
+          "value": 200.4817427,
+          "location_m": [
+            0.2994987898,
+            -0.001379523375,
+            0.002216651624
+          ],
+          "cell": 51764
+        },
+        "max": {
+          "value": 341.2633954,
+          "location_m": [
+            0.001005641152,
+            0.0294376622,
+            -0.03576988464
+          ],
+          "cell": 229
+        }
+      },
+      "density": {
+        "min": {
+          "value": 0.8194008325,
+          "location_m": [
+            0.2725389908,
+            -0.03307040039,
+            -0.007500734417
+          ],
+          "cell": 57504
+        },
+        "max": {
+          "value": 4.337745883,
+          "location_m": [
+            0.001005641152,
+            0.0294376622,
+            -0.03576988464
+          ],
+          "cell": 229
+        }
+      },
+      "positive_pressure": true,
+      "positive_temperature": true,
+      "positive_density": true
+    },
+    "stationarity": {
+      "enough_samples": true,
+      "checks": {
+        "mass_imbalance": false,
+        "outlet_mass_flow_stationary": true,
+        "outlet_pressure_stationary": true,
+        "outlet_temperature_stationary": true,
+        "outlet_velocity_stationary": true
+      },
+      "passes_all_monitored_metrics": false,
+      "outlet_mass_flow": {
+        "samples": 5,
+        "window_samples": 5,
+        "latest": 1.531572479,
+        "window_min": 1.531180985,
+        "window_max": 1.531878709,
+        "window_mean": 1.531594239,
+        "relative_range_pct": 0.04555540770742607,
+        "relative_drift_pct": -0.01782627497921361
+      },
+      "outlet_pressure": {
+        "samples": 5,
+        "window_samples": 5,
+        "latest": 54725.18558,
+        "window_min": 54680.92704,
+        "window_max": 54725.18558,
+        "window_mean": 54693.059392,
+        "relative_range_pct": 0.08092167542280328,
+        "relative_drift_pct": 0.06878162551575163
+      },
+      "outlet_temperature": {
+        "samples": 5,
+        "window_samples": 5,
+        "latest": 208.1724336,
+        "window_min": 208.1342838,
+        "window_max": 208.1724336,
+        "window_mean": 208.1503875,
+        "relative_range_pct": 0.01832799854865202,
+        "relative_drift_pct": 0.01069083867035871
+      },
+      "outlet_velocity": {
+        "samples": 5,
+        "window_samples": 5,
+        "latest": 430.318839511356,
+        "window_min": 430.318839511356,
+        "window_max": 430.6663178528456,
+        "window_mean": 430.53814198619204,
+        "relative_range_pct": 0.08070791124025242,
+        "relative_drift_pct": -0.07205224231599405
+      }
+    },
+    "throat": {
+      "geometry": {
+        "x_start_m": 0.15000000000000002,
+        "x_center_m": 0.15500000000000003,
+        "x_end_m": 0.16000000000000003,
+        "radius_m": 0.0326,
+        "exact_area_m2": 0.0033387590085290878
+      },
+      "latest_time_s": 0.0012,
+      "latest_planes": {
+        "start": {
+          "area_m2": 0.0033366882992789905,
+          "pressure_pa": 118269.71187605707,
+          "temperature_k": 258.23355597192966,
+          "velocity_vector_mps": [
+            288.8644087120238,
+            -0.09259104803163444,
+            -0.1536094484331867
+          ],
+          "speed_mps": 289.6546390384252,
+          "mach": 0.900059247219299,
+          "surface_points": 2679,
+          "surface_polygons": 3963,
+          "requested_time_s": 0.0012,
+          "actual_diagnostic_time_s": 0.0012,
+          "used_time_fallback": false,
+          "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.1500),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+          "x_m": 0.15000000000000002,
+          "area_error_pct_vs_exact_geometry": 0.062020326858199
+        },
+        "center": {
+          "area_m2": 0.0033369648952137395,
+          "pressure_pa": 97282.55485223036,
+          "temperature_k": 244.3365206695755,
+          "velocity_vector_mps": [
+            334.44436431119567,
+            0.047811309672444825,
+            -0.1089232761067866
+          ],
+          "speed_mps": 334.47068425559127,
+          "mach": 1.0692566935521362,
+          "surface_points": 2691,
+          "surface_polygons": 3966,
+          "requested_time_s": 0.0012,
+          "actual_diagnostic_time_s": 0.0012,
+          "used_time_fallback": false,
+          "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.15500),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+          "x_m": 0.15500000000000003,
+          "area_error_pct_vs_exact_geometry": 0.05373593334424796
+        },
+        "end": {
+          "area_m2": 0.003336688299279,
+          "pressure_pa": 91130.15471285758,
+          "temperature_k": 240.1993812637823,
+          "velocity_vector_mps": [
+            347.4199162767003,
+            0.17935962676916975,
+            0.07221478384654584
+          ],
+          "speed_mps": 347.49683235328166,
+          "mach": 1.1187588120718326,
+          "surface_points": 2684,
+          "surface_polygons": 3979,
+          "requested_time_s": 0.0012,
+          "actual_diagnostic_time_s": 0.0012,
+          "used_time_fallback": false,
+          "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.1600),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+          "x_m": 0.16000000000000003,
+          "area_error_pct_vs_exact_geometry": 0.062020326857913234
+        }
+      },
+      "sonic_transition": {
+        "detected": true,
+        "x_m": 0.15295337651208113,
+        "method": "linear_interpolation_between_area_averaged_cut_planes",
+        "bracket_x_m": [
+          0.15000000000000002,
+          0.15500000000000003
+        ],
+        "bracket_mach": [
+          0.900059247219299,
+          1.0692566935521362
+        ],
+        "interpolation_fraction": 0.5906753024162216,
+        "interpolated_state": {
+          "mach": 1.0,
+          "pressure_pa": 105873.1165541515,
+          "temperature_k": 250.0249204420227,
+          "speed_mps": 316.12637010017386,
+          "velocity_vector_mps": [
+            315.7873627696826,
+            -0.009658842934826897,
+            -0.12721443008046693
+          ]
+        }
+      },
+      "center_stationarity": {
+        "times_s": [
+          0.001,
+          0.00105,
+          0.0011,
+          0.00115,
+          0.0012
+        ],
+        "history": [
+          {
+            "time_s": 0.001,
+            "pressure_pa": 97262.3877630057,
+            "temperature_k": 244.335618980564,
+            "speed_mps": 334.4308730883446,
+            "mach": 1.069119334611447
+          },
+          {
+            "time_s": 0.00105,
+            "pressure_pa": 97272.08217592615,
+            "temperature_k": 244.3451984537585,
+            "speed_mps": 334.41918375775276,
+            "mach": 1.0690650684575382
+          },
+          {
+            "time_s": 0.0011,
+            "pressure_pa": 97257.59929172327,
+            "temperature_k": 244.33146832695178,
+            "speed_mps": 334.43280469077763,
+            "mach": 1.0691579349225488
+          },
+          {
+            "time_s": 0.00115,
+            "pressure_pa": 97255.34564554958,
+            "temperature_k": 244.3218450145502,
+            "speed_mps": 334.45010309412726,
+            "mach": 1.069234110584351
+          },
+          {
+            "time_s": 0.0012,
+            "pressure_pa": 97282.55485223036,
+            "temperature_k": 244.3365206695755,
+            "speed_mps": 334.47068425559127,
+            "mach": 1.0692566935521362
+          }
+        ],
+        "pressure": {
+          "samples": 5,
+          "latest": 97282.55485223036,
+          "minimum": 97255.34564554958,
+          "maximum": 97282.55485223036,
+          "mean": 97265.993945687,
+          "relative_range_pct": 0.027974018027282298,
+          "relative_drift_pct": 0.020734725610276162
+        },
+        "temperature": {
+          "samples": 5,
+          "latest": 244.3365206695755,
+          "minimum": 244.3218450145502,
+          "maximum": 244.3451984537585,
+          "mean": 244.33413028907998,
+          "relative_range_pct": 0.009557993056752648,
+          "relative_drift_pct": 0.00036903707091963346
+        },
+        "speed": {
+          "samples": 5,
+          "latest": 334.47068425559127,
+          "minimum": 334.41918375775276,
+          "maximum": 334.47068425559127,
+          "mean": 334.4407297773187,
+          "relative_range_pct": 0.015398990987967974,
+          "relative_drift_pct": 0.011904154326136592
+        },
+        "mach": {
+          "samples": 5,
+          "latest": 1.0692566935521362,
+          "minimum": 1.0690650684575382,
+          "maximum": 1.0692566935521362,
+          "mean": 1.0691666284256043,
+          "relative_range_pct": 0.017922846589412372,
+          "relative_drift_pct": 0.012847858629284429
+        }
+      },
+      "interpretation_guardrail": "The sonic transition is detected from area-averaged CFD cut planes. The interpolated sonic state is an estimate between sampled stations and must not be represented as an exact CFD root solve."
+    },
+    "thresholds": {
+      "mass_imbalance_pct_max": 1.0,
+      "outlet_mass_flow_relative_range_pct_max": 0.25,
+      "outlet_pressure_relative_range_pct_max": 0.5,
+      "outlet_temperature_relative_range_pct_max": 0.5,
+      "outlet_velocity_relative_range_pct_max": 0.5,
+      "minimum_stationarity_samples": 4,
+      "stationarity_window_samples": 5
+    },
+    "coverage": {
+      "global_field_validity_checked": true,
+      "throat_state_checked": true,
+      "note": "Global pressure, temperature, and density extrema are checked. When a geometry manifest is provided, throat entry, center, exit, sonic transition, and recent throat-center history are also extracted."
+    },
+    "status": "STABLE_UNCONVERGED"
+  },
+  "visualization": {
+    "status": "visualization_ready",
+    "case_dir": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam",
+    "latest_time": "0.0012",
+    "retained_openfoam_times": [
+      "0",
+      "1e-06",
+      "2e-06",
+      "3e-06",
+      "4e-06",
+      "5e-06",
+      "6e-06",
+      "7e-06",
+      "8e-06",
+      "9e-06",
+      "1e-05",
+      "1.1e-05",
+      "1.2e-05",
+      "1.3e-05",
+      "1.4e-05",
+      "1.5e-05",
+      "1.6e-05",
+      "1.7e-05",
+      "1.8e-05",
+      "1.9e-05",
+      "2e-05",
+      "5e-05",
+      "0.0001",
+      "0.00015",
+      "0.0002",
+      "0.00025",
+      "0.0003",
+      "0.00035",
+      "0.0004",
+      "0.00045",
+      "0.0005",
+      "0.00055",
+      "0.0006",
+      "0.00065",
+      "0.0007",
+      "0.00075",
+      "0.0008",
+      "0.00085",
+      "0.0009",
+      "0.00095",
+      "0.001",
+      "0.00105",
+      "0.0011",
+      "0.00115",
+      "0.0012"
+    ],
+    "latest_fields": [
+      "T",
+      "U",
+      "p",
+      "phi",
+      "rho"
+    ],
+    "recommended_demo_fields": [
+      "p",
+      "U",
+      "T",
+      "rho"
+    ],
+    "paraview_case_file": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\openfoam.foam",
+    "wsl_runtime": "$HOME/llm_guided_meshing_visualization_runtime",
+    "stage_return_code": 0,
+    "vtk_export_ok": true,
+    "vtk_return_code": 0,
+    "sync_return_code": 0,
+    "vtk_log": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\log.foamToVTK",
+    "vtk_directory": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK",
+    "vtk_files": [
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_0.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_10650.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_121.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_12405.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_14174.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_157.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_15958.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_17753.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_1809.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_193.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_19557.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_21367.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_229.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_23176.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_24988.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_265.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_26803.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_28617.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_301.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_30429.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_32242.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_337.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_34057.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_35872.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_3593.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_373.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_37686.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_39500.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_409.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_41315.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_43130.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_445.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_481.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_49.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_517.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_5375.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_553.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_589.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_625.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_661.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_697.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_7150.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_733.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_85.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\inlet\\inlet_8900.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_0.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_10650.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_121.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_12405.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_14174.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_157.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_15958.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_17753.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_1809.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_193.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_19557.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_21367.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_229.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_23176.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_24988.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_265.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_26803.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_28617.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_301.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_30429.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_32242.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_337.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_34057.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_35872.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_3593.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_373.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_37686.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_39500.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_409.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_41315.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_43130.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_445.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_481.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_49.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_517.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_5375.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_553.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_589.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_625.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_661.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_697.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_7150.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_733.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_85.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_8900.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_0.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_10650.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_121.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_12405.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_14174.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_157.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_15958.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_17753.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_1809.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_193.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_19557.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_21367.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_229.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_23176.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_24988.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_265.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_26803.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_28617.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_301.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_30429.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_32242.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_337.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_34057.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_35872.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_3593.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_373.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_37686.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_39500.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_409.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_41315.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_43130.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_445.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_481.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_49.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_517.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_5375.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_553.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_589.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_625.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_661.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_697.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_7150.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_733.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_85.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\outlet\\outlet_8900.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_0.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_10650.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_121.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_12405.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_14174.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_157.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_15958.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_17753.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_1809.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_193.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_19557.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_21367.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_229.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_23176.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_24988.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_265.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_26803.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_28617.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_301.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_30429.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_32242.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_337.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_34057.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_35872.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_3593.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_373.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_37686.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_39500.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_409.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_41315.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_43130.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_445.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_481.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_49.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_517.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_5375.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_553.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_589.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_625.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_661.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_697.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_7150.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_733.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_85.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\walls\\walls_8900.vtk"
+    ],
+    "volume_vtk_frames": [
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_0.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_49.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_85.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_121.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_157.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_193.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_229.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_265.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_301.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_337.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_373.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_409.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_445.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_481.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_517.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_553.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_589.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_625.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_661.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_697.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_733.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_1809.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_3593.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_5375.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_7150.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_8900.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_10650.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_12405.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_14174.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_15958.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_17753.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_19557.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_21367.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_23176.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_24988.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_26803.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_28617.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_30429.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_32242.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_34057.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_35872.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_37686.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_39500.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_41315.vtk",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_43130.vtk"
+    ],
+    "volume_vtk_frame_count": 45,
+    "primary_vtk": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\VTK\\llm_guided_meshing_visualization_runtime_43130.vtk",
+    "demo_assets": {
+      "ok": true,
+      "reason": "ok",
+      "vtk_frame_count": 45,
+      "static_images": {
+        "p": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\pressure_latest.png",
+        "U_mag": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\velocity_magnitude_latest.png",
+        "T": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\temperature_latest.png",
+        "rho": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\density_latest.png"
+      },
+      "static_errors": {},
+      "animations": {
+        "p": {
+          "created": true,
+          "reason": "ok",
+          "frame_count": 45,
+          "path": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\pressure_transient.gif",
+          "scalar_range": [
+            47526.55859375,
+            214521.5
+          ]
+        },
+        "U_mag": {
+          "created": true,
+          "reason": "ok",
+          "frame_count": 45,
+          "path": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\openfoam\\demo_visuals\\velocity_magnitude_transient.gif",
+          "scalar_range": [
+            61.87714385986328,
+            445.0107727050781
+          ]
+        }
+      },
+      "created_static_count": 4,
+      "created_animation_count": 2
+    },
+    "gmsh_preview": null
+  },
+  "standardized_images": {
+    "p": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\pressure.png",
+    "Mach": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\mach.png",
+    "VelocityMagnitude": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\velocity_magnitude.png",
+    "mesh": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\mesh.png"
+  },
+  "visual_observation": {
+    "pressure_observation": "The pressure field shows a clear localized V-shaped gradient pattern originating from the nozzle throat region, indicating a shock structure.",
+    "mach_observation": "The Mach number field shows an increase in velocity downstream of the throat, reaching supersonic levels with an X-shaped or oblique wave pattern clearly visible.",
+    "velocity_observation": "The velocity magnitude closely mirrors the Mach number distribution, demonstrating acceleration through the converging-diverging section with peak speeds downstream of the constriction.",
+    "mesh_observation": "The unstructured triangular mesh appears moderately fine, with localized refinement concentrated near the throat region where the strong flow gradients and shock structures occur.",
+    "suspected_regions": [
+      "nozzle throat",
+      "downstream diverging section shock region"
+    ],
+    "qualitative_anomalies": [
+      "slight asymmetry in the shock reflection pattern near the centerline"
+    ],
+    "visual_confidence": "high",
+    "status": "visual_observation_complete",
+    "images_examined": [
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\pressure.png",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\mach.png",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\velocity_magnitude.png",
+      "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\iterations\\iteration_03\\images\\mesh.png"
+    ]
+  },
+  "decision": {
+    "diagnosis": "UNCONVERGED",
+    "evidence_used": [
+      "Solver completed normally with no NaN, Inf, or timestep collapse.",
+      "Thermodynamic states remain strictly positive and physically admissible.",
+      "Stationarity criteria are not yet satisfied (passes_stationarity is false), though monitored ranges and drift continue to settle.",
+      "Mass imbalance percentage is approximately 1.08%, showing stability relative to previous iterations.",
+      "Execution provenance confirms this is a same-mesh continuation from iteration 2 without any remeshing or mapping performed."
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "insufficient_run_time",
+        "evidence_for": [
+          "The solver is computationally healthy and stable.",
+          "Stationarity criteria have not yet been fully met, but historical extrema and window metrics show ongoing evolution toward steady state.",
+          "No severe numerical or boundary failure flags are present."
+        ],
+        "evidence_against": [
+          "Mass conservation imbalance remains slightly above the strict target threshold."
+        ]
+      },
+      {
+        "hypothesis": "local_mesh_underresolution",
+        "evidence_for": [
+          "Strong pressure, Mach, and velocity gradients are concentrated near the throat."
+        ],
+        "evidence_against": [
+          "checkMesh passed successfully and no quantitative evidence of local resolution deficiency has been demonstrated."
+        ]
+      }
+    ],
+    "reasoning_summary": "The simulation remains numerically stable, physically admissible, and completed normally on the same mesh. Although stationarity checks have not yet passed, the solution is still settling and health metrics remain good without degradation or divergence across continuations. Therefore, continuing the run is justified.",
+    "action": "CONTINUE_RUN",
+    "target_region": null,
+    "requested_diagnostic": null,
+    "confidence": "high"
+  },
+  "raw_agent_action": "CONTINUE_RUN",
+  "effective_action": "CONTINUE_RUN",
+  "paper_safety_gate": {
+    "requested_action": "CONTINUE_RUN",
+    "effective_action": "CONTINUE_RUN",
+    "overridden": false,
+    "current_mass_imbalance_pct": 1.07677839943474,
+    "previous_mass_imbalance_pct": 1.0818814076672372,
+    "recent_mass_imbalance_series_pct": [
+      1.0591409298300951,
+      1.0818814076672372,
+      1.07677839943474
+    ],
+    "relative_improvement_pct": 0.47167907649881535,
+    "worsening_steps_pct": [
+      2.147068175411749,
+      -0.47167907649881535
+    ],
+    "two_consecutive_severe_worsenings": false,
+    "explicit_deterministic_resolution_failure": false,
+    "reason": "No higher-priority safety override required."
+  },
+  "deterministic_validation": {
+    "approved": true,
+    "reasons": [
+      "CONTINUE_RUN is permitted for a healthy evolving solution."
+    ]
+  },
+  "diagnostic_followup": null,
+  "theory_used_by_agent": false,
+  "resumed_after_external_quota_interrupt": true
+}

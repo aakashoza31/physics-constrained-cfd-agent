@@ -1,0 +1,15 @@
+{
+  "run_name": "level1_testA_autonomous_replay",
+  "results_directory": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final",
+  "report_markdown": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\CFD_REPORT.md",
+  "report_html": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\CFD_REPORT.html",
+  "primary_vtk": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\final_field.vtk",
+  "final_mesh": null,
+  "images": {
+    "p": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\images\\pressure.png",
+    "Mach": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\images\\mach.png",
+    "VelocityMagnitude": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\images\\velocity_magnitude.png",
+    "mesh": "C:\\Backup from one drive\\Desktop\\Research\\LLM_guided_meshing\\runs\\20260913_132428_conical_nozzle\\level1_testA_autonomous_replay\\final\\images\\mesh.png"
+  },
+  "visualization_error": null
+}

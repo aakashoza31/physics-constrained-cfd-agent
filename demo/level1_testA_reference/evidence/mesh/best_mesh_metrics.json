@@ -1,0 +1,13 @@
+{
+  "source": "historical_level1_testA",
+  "feasible": true,
+  "mesh_ok": true,
+  "cell_count": 63747,
+  "node_count": 12517,
+  "minimum_gmsh_quality": 0.349,
+  "max_nonorthogonality_deg": 57.57001781,
+  "max_skewness": 1.150350725,
+  "geometry_changed": false,
+  "mesh_changed_during_replay": false,
+  "note": "Saved Level-1 canonical verification mesh. No remeshing performed by this replay."
+}

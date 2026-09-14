@@ -1,0 +1,76 @@
+﻿{
+    "case":  "Level-1 Test-A canonical axisymmetric CD nozzle",
+    "final_status":  "UNCONVERGED_STRICT_THRESHOLD",
+    "scientific_claim":  "Strong preliminary Level-1 validation evidence; not a fully converged steady-state claim.",
+    "theory_blind_llm_reasoning":  true,
+    "theory_exit_targets_exposed_to_llm":  false,
+    "autonomous_solver_continuations":  2,
+    "solver":  {
+                   "framework":  "OpenFOAM Foundation",
+                   "version":  "14",
+                   "application":  "shockFluid",
+                   "physics":  "Euler / inviscid",
+                   "walls":  "adiabatic slip"
+               },
+    "case_conditions":  {
+                            "stagnation_pressure_pa":  200000,
+                            "stagnation_temperature_k":  300,
+                            "downstream_pressure_pa":  30000,
+                            "gamma":  1.4,
+                            "gas_constant_j_per_kg_k":  287
+                        },
+    "trajectory":  [
+                       {
+                           "time_s":  0.001,
+                           "llm_diagnosis":  "UNCONVERGED",
+                           "llm_action":  "CONTINUE_RUN",
+                           "llm_confidence":  "high",
+                           "deterministic_validator":  "APPROVED",
+                           "boundary_mass_flow_mismatch_percent":  1.05914
+                       },
+                       {
+                           "time_s":  0.0011,
+                           "llm_diagnosis":  "UNCONVERGED",
+                           "llm_action":  "CONTINUE_RUN",
+                           "llm_confidence":  "high",
+                           "deterministic_validator":  "APPROVED",
+                           "boundary_mass_flow_mismatch_percent":  1.081881
+                       },
+                       {
+                           "time_s":  0.0012,
+                           "boundary_mass_flow_mismatch_percent":  1.076778,
+                           "convergence_threshold_percent":  1,
+                           "final_acceptance":  "WITHHELD"
+                       }
+                   ],
+    "exit_comparison":  {
+                            "mach":  {
+                                         "cfd":  1.4879001,
+                                         "theory":  1.5044,
+                                         "error_percent":  -1.097
+                                     },
+                            "pressure_pa":  {
+                                                "cfd":  54725.186,
+                                                "theory":  54134,
+                                                "error_percent":  1.092
+                                            },
+                            "temperature_k":  {
+                                                  "cfd":  208.1724,
+                                                  "theory":  206.52,
+                                                  "error_percent":  0.8
+                                              },
+                            "velocity_m_per_s":  {
+                                                     "cfd":  430.3188,
+                                                     "theory":  433.361,
+                                                     "error_percent":  -0.702
+                                                 }
+                        },
+    "deterministic_checks":  {
+                                 "positivity":  "PASS",
+                                 "outlet_temporal_stationarity":  "PASS",
+                                 "boundary_mass_flow_acceptance":  "FAIL",
+                                 "false_accept_prevented":  true
+                             },
+    "conservation_note":  "The reported quantity is inlet/outlet boundary mass-flow mismatch. It should not automatically be interpreted as the complete transient conservation residual without including domain mass storage.",
+    "known_limitation":  "Localized inlet pressure and temperature overshoot remains. Inlet boundary-condition compatibility is a leading hypothesis, but causality has not been established."
+}

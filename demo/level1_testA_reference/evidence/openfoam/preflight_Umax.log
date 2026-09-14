@@ -1,0 +1,44 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 14-7b05503f98a8
+Exec   : foamPostProcess -time 0 -func cellMaxMag(U)
+Date   : Sep 06 2026
+Time   : 21:47:07
+Host   : "LAPTOP-3NTOMT3D"
+PID    : 1486
+I/O    : uncollated
+Case   : /home/aakash/nozzle_test_A/case
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+
+Constructing functionObjects from system/functions
+    Selecting volFieldValue with name cellMaxMag(U)
+        number of cells = 63747
+        volume = 0.001592934157
+        operation = maxMag
+Time = 0s
+
+Reading fields:
+    volVectorFields: UUsing dynamicCode for coded U at line 11 in "/home/aakash/nozzle_test_A/case/0/U!internalField"
+
+
+Executing functionObjects
+volFieldValue cellMaxMag(U) write:
+    maxMag(all) of U = 433.3612414 at location (0.3284320439 0.004021356394 0.03132366353) in cell 14
+
+
+End
+

@@ -1,0 +1,52 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 14-7b05503f98a8
+Exec   : foamPostProcess -time 0 -func cellMin(T)
+Date   : Sep 06 2026
+Time   : 21:46:57
+Host   : "LAPTOP-3NTOMT3D"
+PID    : 1104
+I/O    : uncollated
+Case   : /home/aakash/nozzle_test_A/case
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+
+Constructing functionObjects from system/functions
+    Selecting volFieldValue with name cellMin(T)
+        number of cells = 63747
+        volume = 0.001592934157
+        operation = min
+Time = 0s
+
+Reading fields:
+    volScalarFields: TUsing dynamicCode for coded T at line 11 in "/home/aakash/nozzle_test_A/case/0/T!internalField"
+Creating new library in "dynamicCode/T/platforms/linux64GccDPInt32Opt/lib/libT_071f85e6481f5316a388447e341cb7257ffeefab.so"
+    Copying "/opt/openfoam14/etc/codeTemplates/dynamicCode/codedDimensionedFieldFunctionTemplate.C" to "/home/aakash/nozzle_test_A/case/dynamicCode/T/codedDimensionedFieldFunctionTemplate.C"
+    Copying "/opt/openfoam14/etc/codeTemplates/dynamicCode/codedDimensionedFieldFunctionTemplate.H" to "/home/aakash/nozzle_test_A/case/dynamicCode/T/codedDimensionedFieldFunctionTemplate.H"
+wmake libso /home/aakash/nozzle_test_A/case/dynamicCode/T
+    ln: ./lnInclude
+    wmkdep: codedDimensionedFieldFunctionTemplate.C
+    Ctoo: codedDimensionedFieldFunctionTemplate.C
+    ld: /home/aakash/nozzle_test_A/case/dynamicCode/T/../platforms/linux64GccDPInt32Opt/lib/libT_071f85e6481f5316a388447e341cb7257ffeefab.so
+
+
+Executing functionObjects
+volFieldValue cellMin(T) write:
+    min(all) of T = 206.5196787 at location (0.3284320439 0.004021356394 0.03132366353) in cell 14
+
+
+End
+

@@ -1,0 +1,46 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 14-7b05503f98a8
+Exec   : foamPostProcess -solver shockFluid -latestTime -func MachNo
+Date   : Sep 06 2026
+Time   : 21:48:36
+Host   : "LAPTOP-3NTOMT3D"
+PID    : 1523
+I/O    : uncollated
+Case   : /home/aakash/nozzle_test_A/case
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 2e-05
+
+
+Constructing functionObjects from system/functions
+    Selecting MachNo with name MachNo
+Time = 2e-05s
+
+Selecting solver shockFluid
+
+Selecting thermodynamics package 
+{
+    type            hePsiThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleInternalEnergy;
+}
+Courant Number mean: 0.005717474114 max: 0.04947124782
+
+End
+

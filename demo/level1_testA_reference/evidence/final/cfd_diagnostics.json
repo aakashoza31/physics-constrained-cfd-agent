@@ -1,0 +1,348 @@
+{
+  "case_wsl": "/home/aakash/llm_guided_meshing_openfoam_runtime",
+  "monitoring_window": {
+    "start_time_s": 0.001,
+    "end_time_s": 0.0012,
+    "saved_times_available": 44
+  },
+  "mesh": {
+    "mesh_ok": true,
+    "cells": 63747,
+    "max_aspect_ratio": 4.645835517,
+    "max_non_orthogonality": 57.57001781,
+    "average_non_orthogonality": 15.31347361,
+    "max_skewness": 1.150350725
+  },
+  "solver": {
+    "checked": true,
+    "failure_detected": false,
+    "failure_markers": [],
+    "completed_normally": true,
+    "log": "/mnt/c/Backup from one drive/Desktop/Research/LLM_guided_meshing/runs/20260913_132428_conical_nozzle/level1_testA_autonomous_replay/openfoam/log.foamRun"
+  },
+  "flow": {
+    "inlet_mass_flow_kg_s": -1.548243632,
+    "outlet_mass_flow_kg_s": 1.531572479,
+    "mass_imbalance_pct": 1.07677839943474,
+    "outlet_pressure_pa": 54725.18558,
+    "outlet_temperature_k": 208.1724336,
+    "outlet_velocity_vector_mps": [
+      430.3186741,
+      -0.1471585119,
+      -0.3474242227
+    ],
+    "outlet_velocity_mps": 430.318839511356,
+    "outlet_mach": 1.4879001385789523
+  },
+  "global_field_validity": {
+    "pressure": {
+      "min": {
+        "value": 47272.64654,
+        "location_m": [
+          0.2725389908,
+          -0.03307040039,
+          -0.007500734417
+        ],
+        "cell": 57504
+      },
+      "max": {
+        "value": 424850.3844,
+        "location_m": [
+          0.001005641152,
+          0.0294376622,
+          -0.03576988464
+        ],
+        "cell": 229
+      }
+    },
+    "temperature": {
+      "min": {
+        "value": 200.4817427,
+        "location_m": [
+          0.2994987898,
+          -0.001379523375,
+          0.002216651624
+        ],
+        "cell": 51764
+      },
+      "max": {
+        "value": 341.2633954,
+        "location_m": [
+          0.001005641152,
+          0.0294376622,
+          -0.03576988464
+        ],
+        "cell": 229
+      }
+    },
+    "density": {
+      "min": {
+        "value": 0.8194008325,
+        "location_m": [
+          0.2725389908,
+          -0.03307040039,
+          -0.007500734417
+        ],
+        "cell": 57504
+      },
+      "max": {
+        "value": 4.337745883,
+        "location_m": [
+          0.001005641152,
+          0.0294376622,
+          -0.03576988464
+        ],
+        "cell": 229
+      }
+    },
+    "positive_pressure": true,
+    "positive_temperature": true,
+    "positive_density": true
+  },
+  "stationarity": {
+    "enough_samples": true,
+    "checks": {
+      "mass_imbalance": false,
+      "outlet_mass_flow_stationary": true,
+      "outlet_pressure_stationary": true,
+      "outlet_temperature_stationary": true,
+      "outlet_velocity_stationary": true
+    },
+    "passes_all_monitored_metrics": false,
+    "outlet_mass_flow": {
+      "samples": 5,
+      "window_samples": 5,
+      "latest": 1.531572479,
+      "window_min": 1.531180985,
+      "window_max": 1.531878709,
+      "window_mean": 1.531594239,
+      "relative_range_pct": 0.04555540770742607,
+      "relative_drift_pct": -0.01782627497921361
+    },
+    "outlet_pressure": {
+      "samples": 5,
+      "window_samples": 5,
+      "latest": 54725.18558,
+      "window_min": 54680.92704,
+      "window_max": 54725.18558,
+      "window_mean": 54693.059392,
+      "relative_range_pct": 0.08092167542280328,
+      "relative_drift_pct": 0.06878162551575163
+    },
+    "outlet_temperature": {
+      "samples": 5,
+      "window_samples": 5,
+      "latest": 208.1724336,
+      "window_min": 208.1342838,
+      "window_max": 208.1724336,
+      "window_mean": 208.1503875,
+      "relative_range_pct": 0.01832799854865202,
+      "relative_drift_pct": 0.01069083867035871
+    },
+    "outlet_velocity": {
+      "samples": 5,
+      "window_samples": 5,
+      "latest": 430.318839511356,
+      "window_min": 430.318839511356,
+      "window_max": 430.6663178528456,
+      "window_mean": 430.53814198619204,
+      "relative_range_pct": 0.08070791124025242,
+      "relative_drift_pct": -0.07205224231599405
+    }
+  },
+  "throat": {
+    "geometry": {
+      "x_start_m": 0.15000000000000002,
+      "x_center_m": 0.15500000000000003,
+      "x_end_m": 0.16000000000000003,
+      "radius_m": 0.0326,
+      "exact_area_m2": 0.0033387590085290878
+    },
+    "latest_time_s": 0.0012,
+    "latest_planes": {
+      "start": {
+        "area_m2": 0.0033366882992789905,
+        "pressure_pa": 118269.71187605707,
+        "temperature_k": 258.23355597192966,
+        "velocity_vector_mps": [
+          288.8644087120238,
+          -0.09259104803163444,
+          -0.1536094484331867
+        ],
+        "speed_mps": 289.6546390384252,
+        "mach": 0.900059247219299,
+        "surface_points": 2679,
+        "surface_polygons": 3963,
+        "requested_time_s": 0.0012,
+        "actual_diagnostic_time_s": 0.0012,
+        "used_time_fallback": false,
+        "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.1500),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+        "x_m": 0.15000000000000002,
+        "area_error_pct_vs_exact_geometry": 0.062020326858199
+      },
+      "center": {
+        "area_m2": 0.0033369648952137395,
+        "pressure_pa": 97282.55485223036,
+        "temperature_k": 244.3365206695755,
+        "velocity_vector_mps": [
+          334.44436431119567,
+          0.047811309672444825,
+          -0.1089232761067866
+        ],
+        "speed_mps": 334.47068425559127,
+        "mach": 1.0692566935521362,
+        "surface_points": 2691,
+        "surface_polygons": 3966,
+        "requested_time_s": 0.0012,
+        "actual_diagnostic_time_s": 0.0012,
+        "used_time_fallback": false,
+        "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.15500),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+        "x_m": 0.15500000000000003,
+        "area_error_pct_vs_exact_geometry": 0.05373593334424796
+      },
+      "end": {
+        "area_m2": 0.003336688299279,
+        "pressure_pa": 91130.15471285758,
+        "temperature_k": 240.1993812637823,
+        "velocity_vector_mps": [
+          347.4199162767003,
+          0.17935962676916975,
+          0.07221478384654584
+        ],
+        "speed_mps": 347.49683235328166,
+        "mach": 1.1187588120718326,
+        "surface_points": 2684,
+        "surface_polygons": 3979,
+        "requested_time_s": 0.0012,
+        "actual_diagnostic_time_s": 0.0012,
+        "used_time_fallback": false,
+        "cut_plane_vtk_path": "postProcessing/cutPlaneSurface(point=(0.1600),normal=(100),fields=(pTU))/0.0012/cutPlane.vtk",
+        "x_m": 0.16000000000000003,
+        "area_error_pct_vs_exact_geometry": 0.062020326857913234
+      }
+    },
+    "sonic_transition": {
+      "detected": true,
+      "x_m": 0.15295337651208113,
+      "method": "linear_interpolation_between_area_averaged_cut_planes",
+      "bracket_x_m": [
+        0.15000000000000002,
+        0.15500000000000003
+      ],
+      "bracket_mach": [
+        0.900059247219299,
+        1.0692566935521362
+      ],
+      "interpolation_fraction": 0.5906753024162216,
+      "interpolated_state": {
+        "mach": 1.0,
+        "pressure_pa": 105873.1165541515,
+        "temperature_k": 250.0249204420227,
+        "speed_mps": 316.12637010017386,
+        "velocity_vector_mps": [
+          315.7873627696826,
+          -0.009658842934826897,
+          -0.12721443008046693
+        ]
+      }
+    },
+    "center_stationarity": {
+      "times_s": [
+        0.001,
+        0.00105,
+        0.0011,
+        0.00115,
+        0.0012
+      ],
+      "history": [
+        {
+          "time_s": 0.001,
+          "pressure_pa": 97262.3877630057,
+          "temperature_k": 244.335618980564,
+          "speed_mps": 334.4308730883446,
+          "mach": 1.069119334611447
+        },
+        {
+          "time_s": 0.00105,
+          "pressure_pa": 97272.08217592615,
+          "temperature_k": 244.3451984537585,
+          "speed_mps": 334.41918375775276,
+          "mach": 1.0690650684575382
+        },
+        {
+          "time_s": 0.0011,
+          "pressure_pa": 97257.59929172327,
+          "temperature_k": 244.33146832695178,
+          "speed_mps": 334.43280469077763,
+          "mach": 1.0691579349225488
+        },
+        {
+          "time_s": 0.00115,
+          "pressure_pa": 97255.34564554958,
+          "temperature_k": 244.3218450145502,
+          "speed_mps": 334.45010309412726,
+          "mach": 1.069234110584351
+        },
+        {
+          "time_s": 0.0012,
+          "pressure_pa": 97282.55485223036,
+          "temperature_k": 244.3365206695755,
+          "speed_mps": 334.47068425559127,
+          "mach": 1.0692566935521362
+        }
+      ],
+      "pressure": {
+        "samples": 5,
+        "latest": 97282.55485223036,
+        "minimum": 97255.34564554958,
+        "maximum": 97282.55485223036,
+        "mean": 97265.993945687,
+        "relative_range_pct": 0.027974018027282298,
+        "relative_drift_pct": 0.020734725610276162
+      },
+      "temperature": {
+        "samples": 5,
+        "latest": 244.3365206695755,
+        "minimum": 244.3218450145502,
+        "maximum": 244.3451984537585,
+        "mean": 244.33413028907998,
+        "relative_range_pct": 0.009557993056752648,
+        "relative_drift_pct": 0.00036903707091963346
+      },
+      "speed": {
+        "samples": 5,
+        "latest": 334.47068425559127,
+        "minimum": 334.41918375775276,
+        "maximum": 334.47068425559127,
+        "mean": 334.4407297773187,
+        "relative_range_pct": 0.015398990987967974,
+        "relative_drift_pct": 0.011904154326136592
+      },
+      "mach": {
+        "samples": 5,
+        "latest": 1.0692566935521362,
+        "minimum": 1.0690650684575382,
+        "maximum": 1.0692566935521362,
+        "mean": 1.0691666284256043,
+        "relative_range_pct": 0.017922846589412372,
+        "relative_drift_pct": 0.012847858629284429
+      }
+    },
+    "interpretation_guardrail": "The sonic transition is detected from area-averaged CFD cut planes. The interpolated sonic state is an estimate between sampled stations and must not be represented as an exact CFD root solve."
+  },
+  "thresholds": {
+    "mass_imbalance_pct_max": 1.0,
+    "outlet_mass_flow_relative_range_pct_max": 0.25,
+    "outlet_pressure_relative_range_pct_max": 0.5,
+    "outlet_temperature_relative_range_pct_max": 0.5,
+    "outlet_velocity_relative_range_pct_max": 0.5,
+    "minimum_stationarity_samples": 4,
+    "stationarity_window_samples": 5
+  },
+  "coverage": {
+    "global_field_validity_checked": true,
+    "throat_state_checked": true,
+    "note": "Global pressure, temperature, and density extrema are checked. When a geometry manifest is provided, throat entry, center, exit, sonic transition, and recent throat-center history are also extracted."
+  },
+  "status": "STABLE_UNCONVERGED"
+}
