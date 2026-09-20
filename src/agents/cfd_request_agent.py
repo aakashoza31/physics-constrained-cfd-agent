@@ -362,6 +362,61 @@ def deterministic_fallback(
             match.group(1)
         )
 
+
+    # LEVEL1_CANONICAL_BC_ALIAS_FIX
+    # Accept physically equivalent terminology used by the canonical
+    # Level-1 engineering prompt and normalize pressure units to Pa.
+
+    def _pressure_value_pa(pattern: str):
+        quantity_match = re.search(
+            pattern
+            + r"[^0-9]*([0-9.]+)\s*(mpa|kpa|pa)?",
+            text,
+        )
+
+        if not quantity_match:
+            return None
+
+        value = float(quantity_match.group(1))
+        unit = (
+            quantity_match.group(2) or "pa"
+        ).lower()
+
+        scale = {
+            "pa": 1.0,
+            "kpa": 1.0e3,
+            "mpa": 1.0e6,
+        }[unit]
+
+        return value * scale
+
+    canonical_inlet_pressure = _pressure_value_pa(
+        r"inlet\s+(?:total|stagnation)\s+pressure"
+    )
+
+    if canonical_inlet_pressure is not None:
+        inlet_pressure = canonical_inlet_pressure
+
+    canonical_outlet_pressure = _pressure_value_pa(
+        r"(?:outlet\s+static\s+pressure|"
+        r"downstream\s+back\s+pressure|"
+        r"back\s+pressure)"
+    )
+
+    if canonical_outlet_pressure is not None:
+        outlet_pressure = canonical_outlet_pressure
+
+    canonical_temperature = re.search(
+        r"inlet\s+(?:total|stagnation)\s+temperature"
+        r"[^0-9]*([0-9.]+)",
+        text,
+    )
+
+    if canonical_temperature:
+        inlet_temperature = float(
+            canonical_temperature.group(1)
+        )
+
     priority_regions: list[str] = []
 
     region_terms = {
@@ -421,9 +476,17 @@ def deterministic_fallback(
                         outlet_pressure
                     ),
                     wall_velocity_condition=(
-                        "no_slip"
-                        if "no-slip" in text
-                        or "no slip" in text
+                        "slip"
+                        if (
+                            "slip" in text
+                            and "no-slip" not in text
+                            and "no slip" not in text
+                        )
+                        else "no_slip"
+                        if (
+                            "no-slip" in text
+                            or "no slip" in text
+                        )
                         else None
                     ),
                     wall_thermal_condition=(

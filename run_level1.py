@@ -1,5 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
+import getpass
+import os
 import re
 import subprocess
 import sys
@@ -8,6 +10,75 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 CORE_RUNNER = ROOT / "scripts" / "run_autonomous_cfd.py"
+
+
+def ensure_gemini_credentials() -> None:
+    """
+    Ensure Gemini credentials are available for this process.
+
+    If GEMINI_API_KEY is not already configured, ask the user for
+    their own key using hidden terminal input. The key is kept only
+    in process memory and is never written to the repository.
+    """
+    if not os.getenv("GEMINI_API_KEY"):
+        print()
+        print("=" * 70)
+        print("GEMINI CREDENTIALS")
+        print("=" * 70)
+        print()
+        print("No GEMINI_API_KEY was found in the current environment.")
+        print("Enter your own Gemini API key below.")
+        print("Input is hidden and the key will NOT be saved to disk.")
+        print()
+
+        api_key = getpass.getpass(
+            "Gemini API key: "
+        ).strip()
+
+        if not api_key:
+            raise SystemExit(
+                "No Gemini API key was provided."
+            )
+
+        os.environ["GEMINI_API_KEY"] = api_key
+
+    if not os.getenv("GEMINI_MODEL"):
+        os.environ["GEMINI_MODEL"] = (
+            "gemini-3.5-flash-lite"
+        )
+
+    print()
+    print("PASS: Gemini credentials are active for this run.")
+    print(
+        "Model:",
+        os.environ["GEMINI_MODEL"],
+    )
+
+
+def run_preflight() -> None:
+    print()
+    print("Running production preflight...")
+    print()
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(CORE_RUNNER),
+            "--preflight",
+        ],
+        cwd=ROOT,
+        stdin=subprocess.DEVNULL,
+        check=False,
+    )
+
+    if completed.returncode != 0:
+        raise SystemExit(
+            "Production preflight failed. "
+            "Resolve the reported environment issue before running CFD."
+        )
+
+    print()
+    print("PASS: production preflight completed.")
 
 
 def normalize(text: str) -> str:
@@ -58,7 +129,10 @@ def read_prompt() -> str:
     print("LEVEL-1 CANONICAL NOZZLE VALIDATION")
     print("=" * 70)
     print()
-    print("Paste the supplied Level-1 prompt.")
+    print("Copy the canonical prompt from:")
+    print("examples/level1_nozzle/LEVEL1_PROMPT.txt")
+    print()
+    print("Paste the complete prompt below.")
     print("When finished, type END on a new line.")
     print()
 
@@ -81,6 +155,9 @@ def read_prompt() -> str:
 
 
 def main() -> int:
+    ensure_gemini_credentials()
+    run_preflight()
+
     if not CORE_RUNNER.exists():
         raise SystemExit(f"Core CFD runner not found: {CORE_RUNNER}")
 

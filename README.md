@@ -1,4 +1,4 @@
-﻿# Physics-Constrained CFD Agent
+# Physics-Constrained CFD Agent
 
 Physics-constrained autonomous CFD research prototype coupling multimodal
 LLM reasoning with deterministic scientific and numerical validation.
@@ -184,3 +184,35 @@ commercial CFD software.
 
 The current canonical nozzle result is strong preliminary Level-1
 verification, not a claim of fully converged steady-state validation.
+
+## One-command Level-1 reproduction
+
+For the canonical Level-1 experiment, run:
+
+    python .\run_level1.py
+
+If `GEMINI_API_KEY` is not already configured, the program securely asks
+for the user's own Gemini API key using hidden terminal input. The key is
+kept only in process memory for that run and is not written to the
+repository.
+
+The program then runs the OpenFOAM/Gemini production preflight and asks
+the user to paste the canonical prompt supplied at:
+
+    examples\level1_nozzle\LEVEL1_PROMPT.txt
+
+After pasting the complete prompt, type:
+
+    END
+
+on a new line.
+
+The intended reviewer workflow is therefore:
+
+    git clone <repository>
+    cd physics-constrained-cfd-agent
+    python -m pip install -r requirements.txt
+    python .\run_level1.py
+
+The user supplies their own API credential. No API credential is stored
+in this repository.
