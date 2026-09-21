@@ -1,0 +1,43 @@
+case_id: nozzle_A_reference
+description: Canonical validated reference nozzle
+
+physics:
+  model: internal_axisymmetric_euler
+  gas: ideal_air
+  gamma: 1.4
+  R_j_per_kgK: 287.0
+  walls: adiabatic_slip
+
+geometry_m:
+  inlet_radius: 0.0500
+  throat_radius: 0.0326
+  exit_radius: 0.0354
+
+  inlet_straight: 0.050
+  converging: 0.100
+  throat: 0.010
+  diverging: 0.120
+  outlet_straight: 0.050
+
+reservoir:
+  total_pressure_pa: 200000.0
+  total_temperature_K: 300.0
+
+environment:
+  ambient_pressure_pa: 30000.0
+  ambient_imposed_at_exit: false
+
+expected_regime:
+  outlet_branch: supersonic
+  external_interpretation: underexpanded
+
+numerics:
+  recipe: validated_reference_v1
+  scale: 1.0
+  wedge_angle_deg: 5.0
+  maxCo: 0.4
+  end_time_s: 0.006
+  startup_perturbation: 0.0
+
+validation:
+  profile: validated_reference_v1

@@ -1,21 +1,34 @@
-﻿# Known Limitations
+# Limitations
 
-The Level-1 validation result should be described as strong preliminary
-canonical verification rather than a fully converged steady-state
-solution.
+This repository is a research prototype with a deliberately narrow validated domain.
 
-The strict 1.0 percent boundary mass-flow mismatch criterion remained
-slightly unsatisfied at the final monitored state.
+## Physics limitations
 
-A localized inlet pressure and temperature overshoot was also observed.
+The demonstrated solver path is restricted to internal axisymmetric inviscid nozzle flow with calorically perfect air and adiabatic slip walls. It does not validate turbulence, boundary layers, viscosity, heat transfer, real-gas effects, external jets, arbitrary shock-containing back-pressure branches, or general three-dimensional geometries.
 
-The strongest current evidence points toward an inlet-boundary
-compatibility issue, but causality has not yet been proven.
+## Transfer limitations
 
-The fully fresh prompt-to-CFD execution path is still less robust than
-the validated Test-A replay and continuation workflow.
+The software scope gate permits a wider numerical envelope than the three demonstrated cases. Those bounds are safety/transfer guardrails, not proof of validated accuracy everywhere inside the box.
 
-The current validated LLM provider is Gemini.
+Only the following nearby changes were directly demonstrated in the public A/B/C campaign:
 
-Alternative providers such as Claude are planned through a common
-provider interface but are not yet claimed as validated backends.
+- exit radius 35.4 mm -> 37.0 mm
+- reservoir total pressure 200 kPa -> 220 kPa
+
+## Single-grid transfer cases
+
+B and C are `PASS_SINGLE_MESH` results. They do not independently repeat the canonical grid-convergence, timestep, wedge-angle, and startup-sensitivity studies.
+
+## LLM limitations
+
+The LLM proposes high-level actions and can make incorrect interpretations. Deterministic scope, action, and scientific validators therefore remain mandatory.
+
+Visual observations are qualitative. The model is explicitly forbidden from declaring convergence from images or reading precise physical values from colormaps.
+
+## Feedback-action validation
+
+The architecture supports multiple actions, but the demonstrated multi-iteration public trajectory specifically exercises `CONTINUE_RUN -> ACCEPT` in Case A. Refinement, diagnostic requests, and clean restart are implemented/guarded pathways, but should be described as supported mechanisms unless separately exercised and archived in a dedicated experiment.
+
+## Numerical-reference interpretation
+
+The canonical campaign is a numerically verified reference, not experimental validation and not a formal exact-solution proof. Quasi-1D theory is a useful screening/reference model for this problem but is not exact truth for the finite-angle multidimensional nozzle.

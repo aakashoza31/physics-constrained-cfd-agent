@@ -1,0 +1,67 @@
+{
+  "campaign": "closed_loop_multimodal_nozzle_demo",
+  "cases": [
+    {
+      "case": "A",
+      "label": "case_A_reference",
+      "status": "ACCEPTED",
+      "iterations": 2,
+      "trace": [
+        {
+          "iteration": 1,
+          "action": "CONTINUE_RUN",
+          "approved": true,
+          "deterministic_status": "FAIL",
+          "failed_checks": [
+            "steady_mass_balance",
+            "monitors_stationary",
+            "fields_stationary"
+          ],
+          "visual_status": "visual_observation_complete"
+        },
+        {
+          "iteration": 2,
+          "action": "ACCEPT",
+          "approved": true,
+          "deterministic_status": "PASS_SINGLE_MESH",
+          "failed_checks": [],
+          "visual_status": "visual_observation_complete"
+        }
+      ]
+    },
+    {
+      "case": "B",
+      "label": "case_B_geometry",
+      "status": "ACCEPTED",
+      "iterations": 1,
+      "trace": [
+        {
+          "iteration": 1,
+          "action": "ACCEPT",
+          "approved": true,
+          "deterministic_status": "PASS_SINGLE_MESH",
+          "failed_checks": [],
+          "visual_status": "visual_observation_complete"
+        }
+      ]
+    },
+    {
+      "case": "C",
+      "label": "case_C_conditions",
+      "status": "ACCEPTED",
+      "iterations": 1,
+      "trace": [
+        {
+          "iteration": 1,
+          "action": "ACCEPT",
+          "approved": true,
+          "deterministic_status": "PASS_SINGLE_MESH",
+          "failed_checks": [],
+          "visual_status": "visual_observation_complete"
+        }
+      ]
+    }
+  ],
+  "all_accepted": true,
+  "authority_note": "LLM actions are advisory until approved by deterministic action and scientific validators. Published evidence intentionally excludes local runtime paths and provider/model labels."
+}

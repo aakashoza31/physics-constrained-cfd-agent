@@ -1,4 +1,4 @@
-﻿.venv/
+.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -15,3 +15,19 @@ log.*
 *.zip
 *.bak
 *.backup_*
+
+# End-to-end nozzle CFD runtime data
+runs/nozzle_e2e/
+artifacts/nozzle_e2e/
+*.OpenFOAM
+processor*/
+postProcessing/
+
+demo/runs/
+
+*.patch
+demo/nozzle_e2e/
+demo/nozzle_feedback/
+demo/nozzle_feedback_final/
+demo/nozzle_feedback_v2/
+demo/nozzle_feedback_v2_hotfix/

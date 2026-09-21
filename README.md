@@ -1,218 +1,232 @@
-# Physics-Constrained CFD Agent
+# Physics-Constrained Multimodal CFD Agent
 
-Physics-constrained autonomous CFD research prototype coupling multimodal
-LLM reasoning with deterministic scientific and numerical validation.
+A reproducible research prototype that couples an LLM with deterministic CFD tools for compressible internal nozzle flow.
 
-## Level-1 validation case
+The core design principle is simple:
 
-The current validated reference problem is an axisymmetric conical
-converging-diverging nozzle with compressible inviscid air flow.
+> **LLM reasoning, deterministic scientific authority.**
 
-Physics envelope:
+The LLM interprets an engineering request, reviews mesh evidence, examines numerical CFD diagnostics and field images, diagnoses the current simulation state, and proposes the next action. Deterministic code decides whether that action is allowed and whether the CFD result is scientifically acceptable.
 
+This repository is intentionally scoped. It is not a universal CFD agent. The demonstrated domain is axisymmetric, inviscid, compressible flow through a converging-diverging nozzle using OpenFOAM Foundation v14.
+
+## What is demonstrated
+
+Three cases use the same parameterized agent pipeline:
+
+| Case | Change | Feedback behavior | Final deterministic result |
+| --- | --- | --- | --- |
+| A | Canonical geometry, p0 = 200 kPa | `CONTINUE_RUN -> ACCEPT` | `PASS_SINGLE_MESH` after 2 CFD iterations |
+| B | Exit radius 35.4 mm -> 37.0 mm | `ACCEPT` | `PASS_SINGLE_MESH` after 1 CFD iteration |
+| C | Reservoir total pressure 200 -> 220 kPa | `ACCEPT` | `PASS_SINGLE_MESH` after 1 CFD iteration |
+
+Case A is deliberately started at 0.001 s in the feedback demonstration so that the first state is physically healthy but not yet stationary. The LLM identifies the incomplete convergence, proposes `CONTINUE_RUN`, the deterministic action gate approves it, and the existing OpenFOAM solution is continued to 0.006 s. The second reasoning step accepts only after the deterministic checks pass.
+
+Cases B and C demonstrate that the same workflow can handle a nearby geometry change and a nearby operating-condition change without hand-editing the OpenFOAM case.
+
+See [`docs/CASES.md`](docs/CASES.md) and [`demo/published_campaign/CAMPAIGN_SUMMARY.json`](demo/published_campaign/CAMPAIGN_SUMMARY.json).
+
+## Agent architecture
+
+```mermaid
+flowchart TD
+    A[Natural-language engineering request] --> B[LLM case interpretation]
+    B --> C[Deterministic scope gate]
+    C --> D[Parameterized mesh generation]
+    D --> E[checkMesh + deterministic mesh gate]
+    E --> F[LLM mesh review]
+    F --> G[OpenFOAM setup + verified initialization]
+    G --> H[OpenFOAM shockFluid execution]
+    H --> I[Deterministic numerical diagnostics]
+    I --> J[Native CFD field images]
+    J --> K[Multimodal LLM reasoning]
+    I --> K
+    K --> L[Proposed action]
+    L --> M[Deterministic action validator]
+    M -->|approved non-ACCEPT action| N[Deterministic action executor]
+    N --> H
+    M -->|approved ACCEPT| O[Deterministic scientific validator]
+    O --> P[Engineering report]
+```
+
+The LLM can propose high-level actions such as:
+
+- `ACCEPT`
+- `CONTINUE_RUN`
+- `REQUEST_DIAGNOSTIC`
+- `REFINE_THROAT`
+- `REFINE_GRADIENT_REGION`
+- `RESTART_CLEAN`
+
+The LLM does **not** directly edit OpenFOAM dictionaries, invent mesh counts, override conservation thresholds, or declare a failed CFD state acceptable.
+
+See [`docs/architecture.md`](docs/architecture.md).
+
+## Physics and numerical method
+
+Current supported physics:
+
+- internal axisymmetric converging-diverging nozzle
 - calorically perfect air
 - gamma = 1.4
 - R = 287 J/(kg K)
-- Euler / inviscid flow
+- inviscid compressible Euler equations
 - adiabatic slip walls
-- OpenFOAM Foundation v14
-- axisymmetric converging-diverging nozzle
-- theory-blind LLM CFD diagnosis
+- reservoir total-pressure / total-temperature inlet
+- pressure-free computational outlet
+- structured axisymmetric wedge mesh
+- OpenFOAM Foundation v14 `shockFluid`
+- Kurganov fluxes
+- Minmod reconstruction
+- Euler time integration
+- adjustable timestep with maxCo = 0.4 in the demonstrated cases
 
-The LLM proposes interpretations and actions. It does not have final
-authority over CFD correctness or convergence.
+The nominal 30 kPa downstream pressure is **external-environment metadata** for regime interpretation. It is not imposed as a fixed static pressure at the computational outlet when the computed outlet is fully supersonic.
 
-Deterministic Python logic evaluates solver health, positivity,
-conservation, stationarity, mesh quality, provenance, boundary behavior,
-and action permissions before an action can reach OpenFOAM.
+See [`docs/PHYSICS_SCOPE.md`](docs/PHYSICS_SCOPE.md), [`docs/NUMERICAL_METHOD.md`](docs/NUMERICAL_METHOD.md), and [`docs/REFERENCE_VALIDATION.md`](docs/REFERENCE_VALIDATION.md).
 
-## User workflow
+## Quick reproduction on Windows + WSL2
 
-First install the Python dependencies:
+Validated development environment:
 
-    python -m pip install -r requirements.txt
+- Windows
+- Python 3.13 on the host, Python 3.11+ expected
+- WSL2 with Ubuntu 24.04
+- OpenFOAM Foundation v14 at `/opt/openfoam14/etc/bashrc`
+- Python 3 + NumPy available inside WSL
+- a Gemini API key for the current LLM backend
+
+Create a host virtual environment and install dependencies:
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Configure the LLM backend for the current PowerShell session:
+
+```powershell
+$env:GEMINI_API_KEY = "YOUR_API_KEY"
+$env:GEMINI_MODEL = "gemini-3.5-flash-lite"
+```
 
 Check the environment:
 
-    python .\scripts\check_environment.py
+```powershell
+python .\scripts\check_environment.py
+```
 
-Start the Level-1 interface:
+Run the complete demonstrated campaign:
 
-    python .\run_level1.py
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_repro_campaign.ps1
+```
 
-The program asks the user to paste the canonical Level-1 engineering
-prompt.
+That command runs:
 
-The prompt is supplied separately at:
+1. Case A with a deliberately short first CFD horizon to exercise the feedback loop.
+2. Case B with the changed exit radius.
+3. Case C with the changed reservoir pressure.
+4. A sanitized combined campaign summary.
 
-    examples\level1_nozzle\LEVEL1_PROMPT.txt
+Runtime outputs are written under `demo/runs/` and are ignored by Git.
 
-The program does not silently insert the validation prompt.
+For Linux-host instructions and manual per-case commands, see [`docs/reproducibility.md`](docs/reproducibility.md).
 
-The current Level-1 interface intentionally rejects unrelated engineering
-prompts because this repository snapshot is scoped to the canonical
-validation problem actually studied.
+## Try your own nearby nozzle request
 
-## Scientific loop
+The natural-language prompt is the real entry point. Start from:
 
-User prompt
--> engineering interpretation
--> geometry
--> mesh
--> deterministic mesh validation
--> OpenFOAM
--> numerical diagnostics
--> CFD visualizations
--> multimodal LLM reasoning
--> proposed scientific action
--> deterministic Python validator
--> approved action only
--> OpenFOAM continuation / diagnostic / safe stop
--> post-hoc analytical comparison
+[`examples/nozzle_e2e/PROMPT_TEMPLATE.txt`](examples/nozzle_e2e/PROMPT_TEMPLATE.txt)
 
-## Validated autonomous trajectory
+and fill in geometry and operating conditions.
 
-The canonical Test-A case was autonomously continued through:
+The deterministic scope gate currently enforces explicit software bounds on geometry, pressure, temperature, area ratio, pressure ratio, mesh scale, wedge angle, integration horizon, and Courant limit. Those bounds are **guardrails**, not a claim that every point inside them has been experimentally validated.
 
-    1.000 ms
-    -> Gemini: UNCONVERGED / CONTINUE_RUN
-    -> deterministic validator: APPROVED
+The demonstrated transfer evidence is local:
 
-    1.100 ms
-    -> Gemini: UNCONVERGED / CONTINUE_RUN
-    -> deterministic validator: APPROVED
+- exit radius: 35.4 mm -> 37.0 mm
+- reservoir total pressure: 200 kPa -> 220 kPa
 
-    1.200 ms
-    -> strict convergence criterion remained marginally unsatisfied
-    -> no false ACCEPT
+See [`docs/PARAMETER_GUIDE.md`](docs/PARAMETER_GUIDE.md) before trying a new case.
 
-No human boundary-condition edit, remeshing, or restart occurred during
-these continuation iterations.
+Example custom **closed-loop** prompt:
 
-## Level-1 result at 1.2 ms
+```powershell
+python .\scripts\run_nozzle_feedback.py `
+    --prompt-file .\examples\nozzle_e2e\PROMPT_TEMPLATE.txt `
+    --out .\demo\runs\custom_nozzle `
+    --end-time 0.006 `
+    --max-end-time 0.020 `
+    --feedback-increment 0.005 `
+    --max-iterations 4 `
+    --max-diagnostic-requests 2 `
+    --require-visuals
+```
 
-Exit Mach:
+The LLM interprets the new values, the deterministic scope gate checks them, and the same feedback controller is used if the case is admitted.
 
-    CFD       1.48790
-    Theory    1.50440
-    Error    -1.10 %
+## Scientific acceptance
 
-Exit pressure:
+Final acceptance is deterministic. The validator checks, among other items:
 
-    CFD       54.725 kPa
-    Theory    54.134 kPa
-    Error    +1.09 %
+- solver completed normally
+- mesh is valid
+- initialization was verified by read-back
+- no fatal solver errors / NaNs / infinities
+- pressure, temperature, and density remain positive and finite
+- Courant limit is respected
+- requested physical time is reached
+- outlet flow is outward and supersonic
+- inlet behavior is admissible
+- reservoir conditions are respected
+- throat is sonic within the declared criterion
+- mass conservation passes
+- transient continuity passes
+- monitor stationarity passes
+- full-field stationarity passes
+- stagnation enthalpy consistency passes
+- numerical and physical fluxes are consistent
 
-Exit temperature:
+The LLM sees a theory-blind evidence packet for its CFD decision. Analytical/quasi-1D targets are withheld from the autonomous decision loop and may be used only for initialization where documented and for post-hoc comparison.
 
-    CFD       208.172 K
-    Theory    206.520 K
-    Error    +0.80 %
+## Repository map
 
-Exit velocity:
+The most important entry points are:
 
-    CFD       430.319 m/s
-    Theory    433.361 m/s
-    Error    -0.70 %
+```text
+scripts/run_nozzle_feedback.py   closed-loop multimodal agent
+scripts/run_nozzle_e2e.py        one-pass parameterized A/B/C pipeline
+scripts/run_repro_campaign.ps1   complete demonstrated campaign
+src/pipeline/nozzle/             deterministic nozzle CFD pipeline
+src/reasoning/                   evidence, scope and action guards
+src/agents/                      LLM interpretation/reasoning components
+validation/canonical_reference/  frozen numerical reference campaign
+examples/nozzle_e2e/             natural-language prompts
+configs/nozzles/                 three declared case specifications
+tests/nozzle_e2e/                regression and scientific-equivalence tests
+demo/published_campaign/         compact public result summary
+```
 
-The configured boundary mass-flow mismatch criterion was 1.0 percent.
+For a file-by-file explanation, see [`docs/REPO_GUIDE.md`](docs/REPO_GUIDE.md).
 
-The final measured mismatch was approximately 1.077 percent.
+## Tests
 
-Therefore the autonomous system correctly withheld a fully converged
-steady-state ACCEPT decision.
+Run:
 
-## Theory-blind reasoning
+```powershell
+python -m pytest -q
+python .\validation\canonical_reference\test_validation.py
+```
 
-The analytical exit targets are not supplied to the CFD reasoning agent.
+The clean package was assembled from the working closed-loop code after the demonstrated A/B/C campaign and its unit/regression suite passed locally.
 
-Quasi-1D theory is used only where explicitly documented, including the
-validated initialization strategy and post-hoc verification.
+## Scope and limitations
 
-The analytical exit comparison is revealed after the autonomous agent
-decision.
+This repository provides strong numerical evidence for the declared nozzle problem, but it does not establish universal CFD reliability. It does not currently validate viscous boundary layers, turbulence, heat transfer, arbitrary back-pressure branches, external jets, real-gas effects, or general three-dimensional geometries.
 
-## LLM backend
+Case B and Case C are single-grid transfer demonstrations, not new grid-convergence studies. The canonical reference campaign contains the mesh and numerical-control sensitivity evidence.
 
-The validated initial implementation uses Gemini.
-
-The CFD physics, numerical policy, diagnostics, action validation, and
-scientific authority are intentionally separate from the LLM.
-
-A provider abstraction for alternative multimodal models such as Claude
-is planned so that changing the reasoning model does not change the
-deterministic CFD validation rules.
-
-## Reference environment
-
-The current validated development environment is:
-
-- Windows
-- Python 3.13
-- WSL2
-- Ubuntu 24.04
-- OpenFOAM Foundation v14
-- Gmsh 4.15.x
-
-API credentials must be supplied through environment variables.
-
-Example:
-
-    $env:GEMINI_API_KEY = "your-key"
-    $env:GEMINI_MODEL = "gemini-3.5-flash-lite"
-
-Never commit API keys.
-
-## Current reproducibility status
-
-The repository contains the cleaned scientific code required by the
-Level-1 workflow and the canonical prompt interface.
-
-The successful Test-A replay and autonomous continuation constitute the
-current validated reference trajectory.
-
-Fresh prompt-to-CFD execution is still being hardened and should
-currently be treated as experimental rather than universally reliable.
-
-## Scope
-
-This repository demonstrates a physics-constrained autonomous CFD
-research prototype.
-
-It is not a universal CFD agent and is not claimed as a replacement for
-commercial CFD software.
-
-The current canonical nozzle result is strong preliminary Level-1
-verification, not a claim of fully converged steady-state validation.
-
-## One-command Level-1 reproduction
-
-For the canonical Level-1 experiment, run:
-
-    python .\run_level1.py
-
-If `GEMINI_API_KEY` is not already configured, the program securely asks
-for the user's own Gemini API key using hidden terminal input. The key is
-kept only in process memory for that run and is not written to the
-repository.
-
-The program then runs the OpenFOAM/Gemini production preflight and asks
-the user to paste the canonical prompt supplied at:
-
-    examples\level1_nozzle\LEVEL1_PROMPT.txt
-
-After pasting the complete prompt, type:
-
-    END
-
-on a new line.
-
-The intended reviewer workflow is therefore:
-
-    git clone <repository>
-    cd physics-constrained-cfd-agent
-    python -m pip install -r requirements.txt
-    python .\run_level1.py
-
-The user supplies their own API credential. No API credential is stored
-in this repository.
+See [`docs/limitations.md`](docs/limitations.md).

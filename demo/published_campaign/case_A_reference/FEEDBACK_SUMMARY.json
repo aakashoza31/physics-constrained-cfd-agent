@@ -1,0 +1,40 @@
+{
+  "case": "A",
+  "label": "case_A_reference",
+  "status": "ACCEPTED",
+  "iterations": 2,
+  "trace": [
+    {
+      "iteration": 1,
+      "action": "CONTINUE_RUN",
+      "approved": true,
+      "deterministic_status": "FAIL",
+      "failed_checks": [
+        "steady_mass_balance",
+        "monitors_stationary",
+        "fields_stationary"
+      ],
+      "visual_status": "visual_observation_complete"
+    },
+    {
+      "iteration": 2,
+      "action": "ACCEPT",
+      "approved": true,
+      "deterministic_status": "PASS_SINGLE_MESH",
+      "failed_checks": [],
+      "visual_status": "visual_observation_complete"
+    }
+  ],
+  "published_visuals": [
+    "visuals/iteration_01/mach_field.png",
+    "visuals/iteration_01/mesh_cells.png",
+    "visuals/iteration_01/pressure_field.png",
+    "visuals/iteration_01/speed_field.png",
+    "visuals/iteration_01/temperature_field.png",
+    "visuals/iteration_02/mach_field.png",
+    "visuals/iteration_02/mesh_cells.png",
+    "visuals/iteration_02/pressure_field.png",
+    "visuals/iteration_02/speed_field.png",
+    "visuals/iteration_02/temperature_field.png"
+  ]
+}

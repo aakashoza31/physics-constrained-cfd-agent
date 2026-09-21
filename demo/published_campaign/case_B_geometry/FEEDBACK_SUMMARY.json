@@ -1,0 +1,23 @@
+{
+  "case": "B",
+  "label": "case_B_geometry",
+  "status": "ACCEPTED",
+  "iterations": 1,
+  "trace": [
+    {
+      "iteration": 1,
+      "action": "ACCEPT",
+      "approved": true,
+      "deterministic_status": "PASS_SINGLE_MESH",
+      "failed_checks": [],
+      "visual_status": "visual_observation_complete"
+    }
+  ],
+  "published_visuals": [
+    "visuals/iteration_01/mach_field.png",
+    "visuals/iteration_01/mesh_cells.png",
+    "visuals/iteration_01/pressure_field.png",
+    "visuals/iteration_01/speed_field.png",
+    "visuals/iteration_01/temperature_field.png"
+  ]
+}
