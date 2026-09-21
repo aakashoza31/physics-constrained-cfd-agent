@@ -1,4 +1,4 @@
-﻿# Known Limitations
+# Known Limitations
 
 The Level-1 validation result should be described as strong preliminary
 canonical verification rather than a fully converged steady-state
@@ -17,5 +17,5 @@ the validated Test-A replay and continuation workflow.
 
 The current validated LLM provider is Gemini.
 
-Alternative providers such as Claude are planned through a common
+Alternative model providers can be integrated through a common
 provider interface but are not yet claimed as validated backends.

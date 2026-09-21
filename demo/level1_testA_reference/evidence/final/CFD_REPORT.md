@@ -80,7 +80,7 @@ The compact table below records every scalar diagnostic stored by the CFD diagno
 
 | Diagnostic | Value |
 |---|---|
-| `case_wsl` | /home/aakash/llm_guided_meshing_openfoam_runtime |
+| `case_wsl` | /home/user/llm_guided_meshing_openfoam_runtime |
 | `monitoring_window.start_time_s` | 0.0010 |
 | `monitoring_window.end_time_s` | 0.0012 |
 | `monitoring_window.saved_times_available` | 44.0000 |

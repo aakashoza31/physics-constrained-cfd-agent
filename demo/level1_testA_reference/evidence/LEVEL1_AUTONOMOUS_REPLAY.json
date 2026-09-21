@@ -66,7 +66,7 @@
     ]
   },
   "diagnostics": {
-    "case_wsl": "/home/aakash/nozzle_test_A/case",
+    "case_wsl": "/home/user/nozzle_test_A/case",
     "monitoring_window": {
       "start_time_s": 0.0008,
       "end_time_s": 0.001,

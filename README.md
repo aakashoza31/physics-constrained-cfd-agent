@@ -139,7 +139,7 @@ The validated initial implementation uses Gemini.
 The CFD physics, numerical policy, diagnostics, action validation, and
 scientific authority are intentionally separate from the LLM.
 
-A provider abstraction for alternative multimodal models such as Claude
+A provider abstraction for alternative multimodal models
 is planned so that changing the reasoning model does not change the
 deterministic CFD validation rules.
 

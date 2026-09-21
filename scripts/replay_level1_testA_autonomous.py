@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import os
@@ -33,7 +33,7 @@ SOURCE_RUN = (
 )
 
 WSL_TEST_A = (
-    "/home/aakash/nozzle_test_A/case"
+    "/home/user/nozzle_test_A/case"
 )
 
 REPLAY_ROOT = (
@@ -146,7 +146,7 @@ dest_wsl = windows_path_to_wsl(
 )
 
 copy_command = (
-    "cd /home/aakash"
+    "cd ~"
     " && "
     f"test -d {shlex.quote(WSL_TEST_A)}"
     " && "
@@ -657,4 +657,3 @@ print(
 print(
     "Analytical targets were introduced only AFTER the agent decision."
 )
-

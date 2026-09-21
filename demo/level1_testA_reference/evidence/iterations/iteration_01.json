@@ -16,7 +16,7 @@
     },
     "openfoam": {
       "distro": "Ubuntu-24.04",
-      "runtime_case": "/home/aakash/nozzle_test_A/case"
+      "runtime_case": "/home/user/nozzle_test_A/case"
     },
     "provenance": {
       "current_state_origin": "saved_historical_level1_testA",
@@ -28,7 +28,7 @@
     }
   },
   "diagnostics": {
-    "case_wsl": "/home/aakash/nozzle_test_A/case",
+    "case_wsl": "/home/user/nozzle_test_A/case",
     "monitoring_window": {
       "start_time_s": 0.0008,
       "end_time_s": 0.001,

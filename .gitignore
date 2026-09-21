@@ -15,3 +15,10 @@ log.*
 *.zip
 *.bak
 *.backup_*
+
+# End-to-end nozzle CFD runtime data
+runs/nozzle_e2e/
+artifacts/nozzle_e2e/
+*.OpenFOAM
+processor*/
+postProcessing/

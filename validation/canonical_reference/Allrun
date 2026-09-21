@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -eo pipefail
+cd "$(dirname "$0")"
+source "${FOAM_BASHRC:-/opt/openfoam14/etc/bashrc}"
+set -u
+test "$WM_PROJECT_VERSION" = 14 || { echo 'Foundation OpenFOAM 14 required'; exit 2; }
+root="${1:-${XDG_CACHE_HOME:-$HOME/.cache}/manual-nozzle-reference/$(date -u +%Y%m%dT%H%M%SZ)}"
+root="$(realpath -m "$root")"
+mkdir -p "$root"
+source_dir="$PWD"
+mkdir -p "$root/code"
+cp -- *.py *.sh Allrun Allverify README.md RunReference.ps1 "$root/code/"
+cd "$root/code"
+printf '%s\n' "$WM_PROJECT_VERSION" > "$root/openfoam-version.txt"
+python3 -c 'import numpy; print(numpy.__version__)' > "$root/numpy-version.txt"
+sha256sum "$FOAM_APP/modules/shockFluid/fluxPredictor.C" "$FOAM_APP/modules/shockFluid/thermophysicalPredictor.C" > "$root/solver-source-sha256.txt"
+level=0
+for scale in 1 1.5 2 2.5; do
+ level=$((level+1))
+ case="$root/mesh$level"
+ python3 build.py "$case" --scale "$scale"
+ bash run_case.sh "$case"
+ python3 validate.py "$case"
+done
+bash run_sensitivity.sh "$root"
+python3 validate.py --study "$root"
+python3 package.py "$root" "$source_dir/results/$(basename "$root")"
+echo "Results: $root"

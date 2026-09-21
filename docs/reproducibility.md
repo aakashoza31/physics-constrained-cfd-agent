@@ -1,32 +1,20 @@
 ﻿# Reproducibility
 
-The public Level-1 interface is:
+Requirements:
+- OpenFOAM Foundation v14
+- Python 3
+- NumPy
+- Windows with WSL or Linux
 
-    python .\run_level1.py
+Windows / WSL:
+    .\validation\canonical_reference\RunReference.ps1
 
-The program waits for the user to paste the supplied canonical
-engineering prompt.
+Linux:
+    bash validation/canonical_reference/Allrun
 
-The supplied prompt is located at:
+Revalidation:
+    bash validation/canonical_reference/Allverify /absolute/path/to/campaign
 
-    examples\level1_nozzle\LEVEL1_PROMPT.txt
+The deterministic CFD layer owns geometry generation, meshing, initialization, solver execution, diagnostics, and scientific acceptance.
 
-The prompt is intentionally not silently loaded by the program.
-
-Before running:
-
-    python .\scripts\check_environment.py
-
-Python dependencies are pinned in:
-
-    requirements.txt
-
-Large solver outputs, VTK files, transient OpenFOAM result directories,
-API credentials, virtual environments, and temporary run artifacts are
-excluded from Git.
-
-Every scientific claim should distinguish between:
-
-1. the validated Test-A reference trajectory,
-2. live LLM reasoning replay on saved CFD evidence,
-3. experimental fully fresh prompt-to-CFD execution.
+Higher-level agent logic may construct supported inputs and interpret evidence, but it does not override deterministic acceptance.

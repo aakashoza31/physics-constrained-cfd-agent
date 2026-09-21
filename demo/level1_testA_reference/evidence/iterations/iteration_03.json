@@ -91,7 +91,7 @@
     }
   },
   "diagnostics": {
-    "case_wsl": "/home/aakash/llm_guided_meshing_openfoam_runtime",
+    "case_wsl": "/home/user/llm_guided_meshing_openfoam_runtime",
     "monitoring_window": {
       "start_time_s": 0.001,
       "end_time_s": 0.0012,
