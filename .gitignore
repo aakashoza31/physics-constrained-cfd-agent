@@ -1,4 +1,4 @@
-﻿.venv/
+.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -22,3 +22,12 @@ artifacts/nozzle_e2e/
 *.OpenFOAM
 processor*/
 postProcessing/
+
+demo/runs/
+
+*.patch
+demo/nozzle_e2e/
+demo/nozzle_feedback/
+demo/nozzle_feedback_final/
+demo/nozzle_feedback_v2/
+demo/nozzle_feedback_v2_hotfix/

@@ -1,98 +1,96 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import importlib
 import os
-import shutil
-import subprocess
 import sys
 
+from src.pipeline.foam_runtime import FoamRuntime
 
-def status(name: str, ok: bool, details: str = "") -> None:
+
+def status(name: str, ok: bool, details: str = "") -> bool:
     label = "PASS" if ok else "FAIL"
     suffix = f" - {details}" if details else ""
     print(f"{label:4}  {name}{suffix}")
+    return ok
 
 
-print()
-print("=" * 70)
-print("PHYSICS-CONSTRAINED CFD AGENT - ENVIRONMENT CHECK")
-print("=" * 70)
-print()
+def main() -> int:
+    print()
+    print("=" * 70)
+    print("PHYSICS-CONSTRAINED CFD AGENT - ENVIRONMENT CHECK")
+    print("=" * 70)
+    print()
 
-status(
-    "Python",
-    sys.version_info >= (3, 11),
-    sys.version.split()[0],
-)
+    required_ok = True
+    required_ok &= status(
+        "Python",
+        sys.version_info >= (3, 11),
+        sys.version.split()[0],
+    )
 
-modules = {
-    "NumPy": "numpy",
-    "Pydantic": "pydantic",
-    "PyYAML": "yaml",
-    "Gmsh": "gmsh",
-    "Pillow": "PIL",
-    "PyVista": "pyvista",
-    "Google GenAI": "google.genai",
-}
+    modules = {
+        "NumPy": "numpy",
+        "Pydantic": "pydantic",
+        "PyYAML": "yaml",
+        "Google GenAI": "google.genai",
+        "Pillow": "PIL",
+        "Matplotlib": "matplotlib",
+    }
 
-for label, module in modules.items():
+    # These are retained research dependencies, but the validated blockMesh
+    # nozzle path does not require them for every run.
+    optional_modules = {
+        "Gmsh (optional for current blockMesh path)": "gmsh",
+        "PyVista (optional for current feedback path)": "pyvista",
+    }
+
+    for label, module in modules.items():
+        try:
+            mod = importlib.import_module(module)
+            version = getattr(mod, "__version__", "available")
+            required_ok &= status(label, True, str(version))
+        except Exception as exc:
+            required_ok &= status(label, False, str(exc))
+
+    for label, module in optional_modules.items():
+        try:
+            mod = importlib.import_module(module)
+            version = getattr(mod, "__version__", "available")
+            status(label, True, str(version))
+        except Exception as exc:
+            status(label, False, str(exc))
+
+    runtime = FoamRuntime.detect()
     try:
-        importlib.import_module(module)
-        status(label, True)
+        preflight = runtime.preflight()
+        required_ok &= status(
+            "OpenFOAM Foundation v14 runtime",
+            bool(preflight.get("ok")),
+            (
+                f"mode={preflight.get('mode')}, "
+                f"version={preflight.get('openfoam_version')}, "
+                f"numpy={preflight.get('numpy')}"
+                if preflight.get("ok")
+                else preflight.get("reason", preflight.get("raw", "unavailable"))
+            ),
+        )
     except Exception as exc:
-        status(label, False, str(exc))
+        required_ok &= status("OpenFOAM Foundation v14 runtime", False, str(exc))
 
-wsl = shutil.which("wsl")
-
-status(
-    "WSL executable",
-    wsl is not None,
-    wsl or "not found",
-)
-
-distro = os.getenv("OPENFOAM_WSL_DISTRO", "Ubuntu-24.04")
-bashrc = os.getenv(
-    "OPENFOAM_BASHRC",
-    "/opt/openfoam14/etc/bashrc",
-)
-
-if wsl:
-
-    command = (
-        f'source "{bashrc}" >/dev/null 2>&1 '
-        '&& command -v foamRun '
-        '&& foamVersion'
+    api_key = bool(os.getenv("GEMINI_API_KEY"))
+    required_ok &= status(
+        "GEMINI_API_KEY",
+        api_key,
+        "configured" if api_key else "not configured",
     )
 
-    result = subprocess.run(
-        [
-            "wsl",
-            "-d",
-            distro,
-            "--",
-            "bash",
-            "-lc",
-            command,
-        ],
-        capture_output=True,
-        text=True,
-    )
+    model = os.getenv("GEMINI_MODEL", "<code default>")
+    status("GEMINI_MODEL", True, model)
 
-    status(
-        "OpenFOAM in WSL",
-        result.returncode == 0,
-        result.stdout.strip() or result.stderr.strip(),
-    )
+    print()
+    print("The API key check never prints the key itself.")
+    return 0 if required_ok else 2
 
-api_key = bool(os.getenv("GEMINI_API_KEY"))
 
-status(
-    "GEMINI_API_KEY",
-    api_key,
-    "configured" if api_key else "not configured",
-)
-
-print()
-print(
-    "The API key check does not print the key."
-)
+if __name__ == "__main__":
+    raise SystemExit(main())

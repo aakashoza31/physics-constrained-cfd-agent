@@ -1,0 +1,71 @@
+{
+  "status": "PASS_SINGLE_MESH",
+  "case_id": "nozzle_exit_0p0370",
+  "checks": {
+    "solver_completed": true,
+    "mesh_ok": true,
+    "initialized": true,
+    "no_fatal": true,
+    "positive_finite": true,
+    "courant": true,
+    "physical_time": true,
+    "outlet_all_supersonic": true,
+    "inlet_subsonic_inflow": true,
+    "reservoir_conditions": true,
+    "sonic_throat": true,
+    "underexpanded_exit": true,
+    "no_internal_normal_shock": true,
+    "steady_mass_balance": true,
+    "transient_continuity": true,
+    "monitors_stationary": true,
+    "fields_stationary": true,
+    "stagnation_enthalpy": true,
+    "theory_consistency": true,
+    "physical_numerical_flux_consistency": true
+  },
+  "final": {
+    "time": 0.006,
+    "throat_M": 1.0290209269667911,
+    "outlet_p": 43294.93156151626,
+    "outlet_T": 194.10634695406662,
+    "outlet_U": 461.24159382624725,
+    "outlet_M": 1.651669303545174,
+    "outlet_normal_M_min": 1.5696637760647831,
+    "inlet_mdot": 1.5413173866506416,
+    "outlet_mdot": 1.5410596792162605,
+    "boundary_mismatch_pct": 0.01671994597692,
+    "max_window_mismatch_pct": 0.0421699532228174,
+    "p_min": 37483.540256622,
+    "p_max": 194831.55270025,
+    "T_min": 186.01348625314,
+    "T_max": 297.83030026233,
+    "rho_min": 0.7021243444135
+  },
+  "max_Co": 0.40003999117515,
+  "timesteps": 30470,
+  "final_dt": 1.9698397210003021e-07,
+  "median_dt_last_100": 1.9698397210003021e-07,
+  "max_transient_continuity_pct": 3.119801584380737e-08,
+  "drift_fraction_last_2ms": {
+    "outlet_p": 0.00023914851286041338,
+    "outlet_T": 9.261980601780834e-05,
+    "outlet_U": 8.277179851872903e-05,
+    "outlet_M": 9.909383189243904e-05,
+    "throat_M": 0.00048099490085332363,
+    "domain_mass": 5.177390430506136e-05,
+    "inlet_mdot": 0.0006252883173981383,
+    "outlet_mdot": 0.00047941345519069984
+  },
+  "field_L2_change_last_2ms": {
+    "p": 0.0007558154765491172,
+    "T": 0.0002497806962341763,
+    "rho": 0.0005713938224059299,
+    "U": 0.001269543565779418
+  },
+  "all_time_min_p_T_rho": [
+    36770.389126173,
+    184.945699792955,
+    0.692740984151719
+  ],
+  "scope_note": "Single-grid verification at the declared resolution. Grid-convergence, timestep, wedge-angle and startup sensitivity remain properties of the frozen canonical reference campaign and are not re-established per case."
+}
