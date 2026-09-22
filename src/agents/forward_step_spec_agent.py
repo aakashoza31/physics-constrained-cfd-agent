@@ -66,7 +66,22 @@ class ForwardStepRequest(BaseModel):
     height: Optional[float] = Field(default=None)
     pressure: Optional[float] = Field(default=None)
     temperature: Optional[float] = Field(default=None)
-    end_time: Optional[float] = Field(default=None)
+    end_time: Optional[float] = Field(
+        default=None,
+        description=(
+            "End time for the FIRST CFD execution. If the request qualifies a "
+            "horizon as initial or first, put it here only."
+        ),
+    )
+    final_target_end_time: Optional[float] = Field(
+        default=None,
+        description=(
+            "The FINAL physical horizon the user wants the simulation to "
+            "reach. Null unless the request states a final horizon. An "
+            "instruction about the initial or first execution does not set "
+            "this."
+        ),
+    )
     max_co: Optional[float] = Field(default=None)
     nx: Optional[int] = Field(default=None)
     ny: Optional[int] = Field(default=None)
@@ -143,17 +158,43 @@ Rules:
    three-dimensional or spanwise effects, imported CAD, a different solver, or
    different numerical schemes.
 
-7. nx and ny are mesh resolution counts across the full channel length and
+7. TWO HORIZONS, and the difference matters.
+
+     end_time               what the FIRST execution should run to
+     final_target_end_time  what the finished simulation should reach
+
+   Decide by how the request qualifies the number:
+
+     "for the initial CFD execution, use an end time of 0.5"
+     "start with a short run to t = 0.5"
+       An initial execution horizon only.
+       -> end_time = 0.5, final_target_end_time = null
+
+     "simulate to t = 2"
+     "run the case out to t = 2.5"
+       One unqualified horizon: it is both the first execution and the goal.
+       -> end_time = 2, final_target_end_time = 2
+
+     "start at t = 0.5 and build up to t = 3"
+       Both stated.
+       -> end_time = 0.5, final_target_end_time = 3
+
+   Null final_target_end_time means the registered family horizon applies.
+   Never copy an initial-execution horizon into final_target_end_time: doing
+   so tells the workflow the science is finished as soon as the warm-up run
+   ends.
+
+8. nx and ny are mesh resolution counts across the full channel length and
    height. Only set them if the request asks for a specific resolution.
 
-8. Do not predict results. Do not state shock angles, pressure ratios or any
+9. Do not predict results. Do not state shock angles, pressure ratios or any
    expected answer. This forbids you from ANSWERING an assessment question; it
    does not forbid the user from ASKING one. Record the question in
    reporting_objectives and leave it unanswered.
 
-9. case_name is a short lowercase identifier such as mach2p5_step0p15.
+10. case_name is a short lowercase identifier such as mach2p5_step0p15.
 
-10. Do not use Markdown. Return only the structured JSON object.
+11. Do not use Markdown. Return only the structured JSON object.
 """
 
 
@@ -206,6 +247,17 @@ def to_spec(
                 else _clean(value)
             )
             stated.append(name)
+
+    # The final scientific horizon is not a family default that gets filled in
+    # here. It is resolved by the spec itself: stated means the request named
+    # a final horizon, unstated means the registered family horizon applies.
+    # Writing end_time into it would be the exact conflation that made an
+    # instruction about the FIRST execution look like the whole ambition.
+    if request.final_target_end_time is not None:
+        data["final_target_end_time"] = _clean(request.final_target_end_time)
+        stated.append("final_target_end_time")
+    else:
+        inferred.append("final_target_end_time")
 
     provenance = {
         "stated_by_user": sorted(stated),

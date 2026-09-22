@@ -29,7 +29,7 @@ import json
 import math
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 FAMILY = "forward_step_2d"
 PHYSICS = "inviscid_euler"
@@ -52,6 +52,16 @@ CANONICAL_CELLS = 16128
 # guard, not a physical criterion.
 MAX_CELLS = 200_000
 
+# The registered reference horizon for this family. This is not a number
+# invented to force iteration: it is the endTime of the vendored tutorial
+# controlDict at src/pipeline/forward_step/template/system/controlDict, the
+# same horizon the canonical case is solved to and the horizon every piece of
+# reference evidence for this family is stated at. A run that stops short of it
+# is a partial realization of the registered benchmark, whatever its numerical
+# health. It applies only when the request does not state a final horizon of
+# its own.
+FAMILY_REFERENCE_HORIZON = 4.0
+
 
 @dataclass(frozen=True)
 class ForwardStep2DSpec:
@@ -73,10 +83,33 @@ class ForwardStep2DSpec:
     pressure: float = 1.0
     temperature: float = 1.0
 
-    # run control
+    # Run control.
+    #
+    # THREE HORIZONS, DELIBERATELY DISTINCT. Conflating them is what made a
+    # healthy iterative run stop early: an instruction to run the FIRST
+    # execution to t = 0.5 was read as a statement that 0.5 was the whole
+    # scientific ambition, so the workflow had nothing left to aim at.
+    #
+    #   end_time
+    #       The horizon of the NEXT solver execution, and the value written to
+    #       controlDict. An approved EXTEND_END_TIME advances it.
+    #   initial_execution_end_time
+    #       What end_time was when the case was first built. Immutable
+    #       provenance: it records what the user asked the first run to do and
+    #       survives every extension.
+    #   final_target_end_time
+    #       The horizon final scientific acceptance requires. Defaults to the
+    #       registered family reference horizon; a request that names its own
+    #       final horizon overrides it.
     end_time: float = 4.0
     max_co: float = 0.2
     write_interval: float = 0.1
+
+    # Resolved in __post_init__ when left unset, so an older spec.json that
+    # predates this distinction still loads and is interpreted the same way a
+    # request without an explicit final horizon would be.
+    final_target_end_time: Optional[float] = None
+    initial_execution_end_time: Optional[float] = None
 
     # fixed family identity
     family: str = FAMILY
@@ -85,10 +118,33 @@ class ForwardStep2DSpec:
     # ------------------------------------------------------------------
 
     def __post_init__(self) -> None:
+        # Resolve the two derived horizons before anything is validated. The
+        # dataclass is frozen, so this is the one place they may be written.
+        if self.final_target_end_time is None:
+            # An unstated final target means the request qualified only an
+            # execution horizon ("for the initial run, use 0.5"), so the
+            # registered family horizon is what acceptance aims at. The max()
+            # keeps the invariant end_time <= final_target for a request that
+            # asks to run PAST the family horizon: clamping that back to 4
+            # would silently shorten what was asked for, and the scope gate,
+            # not this constructor, is where an out-of-envelope horizon is
+            # refused. A request naming its own final horizon sets this field
+            # explicitly and neither branch applies.
+            object.__setattr__(
+                self,
+                "final_target_end_time",
+                float(max(FAMILY_REFERENCE_HORIZON, self.end_time)),
+            )
+        if self.initial_execution_end_time is None:
+            object.__setattr__(
+                self, "initial_execution_end_time", float(self.end_time)
+            )
+
         for key in [
             "length", "height", "step_x", "step_height", "span",
             "mach", "pressure", "temperature",
             "end_time", "max_co", "write_interval",
+            "final_target_end_time", "initial_execution_end_time",
         ]:
             value = getattr(self, key)
             if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -116,6 +172,19 @@ class ForwardStep2DSpec:
             )
         if self.write_interval > self.end_time:
             raise ValueError("write_interval must not exceed end_time")
+
+        if self.end_time > self.final_target_end_time + 1e-12:
+            raise ValueError(
+                f"end_time {self.end_time:g} exceeds the final target horizon "
+                f"{self.final_target_end_time:g}. The execution horizon advances "
+                "toward the final target, never past it; state a larger final "
+                "target if that is what is wanted."
+            )
+        if self.initial_execution_end_time > self.end_time + 1e-12:
+            raise ValueError(
+                "initial_execution_end_time must not exceed the current "
+                "end_time; the execution horizon only advances."
+            )
 
         if self.family != FAMILY or self.physics != PHYSICS:
             raise ValueError(
