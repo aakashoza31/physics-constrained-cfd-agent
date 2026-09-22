@@ -170,18 +170,34 @@ def main() -> int:
         logs = out / "logs"
         logs.mkdir(exist_ok=True)
 
-        # Every warning and every error-shaped line, with context. This is the
-        # part of a multi-megabyte log a reader actually needs, and it is small.
-        extract = runtime.bash(
-            f"grep -n -A 6 -E "
-            f"'(Warning|WARNING|FOAM FATAL|error|Error|Segmentation|"
-            f"core dumped|bounding|Bounding)' "
+        # Every warning and error-shaped line, with context: the part of a
+        # multi-megabyte log a reader actually needs. Counted first, because
+        # solver-side field bounding can recur every timestep and an
+        # unbounded context extract would then be larger than the log.
+        pattern = (
+            "Warning|WARNING|FOAM FATAL|Segmentation|core dumped|"
+            "bounding|Bounding|Floating point"
+        )
+        counts = runtime.bash(
+            f"grep -c -E {shlex.quote(pattern)} "
             f"{shlex.quote(str(case))}/log.foamRun || true",
+            foam=False,
+            timeout=600,
+        )
+        anomaly_lines = int(counts.stdout.strip() or 0) if counts.ok else -1
+        extract = runtime.bash(
+            f"grep -n -A 6 -E {shlex.quote(pattern)} "
+            f"{shlex.quote(str(case))}/log.foamRun 2>/dev/null "
+            f"| head -c 400000 || true",
             foam=False,
             timeout=600,
         )
         (logs / "log.foamRun.anomalies").write_text(
             extract.stdout or "", encoding="utf-8"
+        )
+        summary["solver_log"]["anomaly_lines"] = anomaly_lines
+        summary["solver_log"]["anomaly_extract_truncated"] = (
+            len(extract.stdout or "") >= 400000
         )
 
         if 0 < log_bytes <= MAX_FULL_LOG_BYTES:
@@ -196,7 +212,7 @@ def main() -> int:
         s.ok(
             ev.DIAGNOSTICS,
             f"Solver log archived ({summary['solver_log']['archived']}); "
-            "anomaly extract written.",
+            f"{anomaly_lines} warning/anomaly line(s) extracted.",
         )
 
         # --- stage the CURRENT pipeline -----------------------------------
