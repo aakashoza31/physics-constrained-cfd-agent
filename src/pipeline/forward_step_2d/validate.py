@@ -108,6 +108,20 @@ def validate(d: Dict[str, Any]) -> Dict[str, Any]:
         },
         # ---------------- measured, not graded ------------------------
         "measured": {
+            "fatal_scan": {
+                "status": "MEASURED",
+                "data": {
+                    "fatal_error": bool(d["fatal_error"]),
+                    "hits": d.get("fatal_error_evidence", []),
+                    "scan": d.get("fatal_scan", {}),
+                },
+                "note": (
+                    "Specific OpenFOAM fatal signatures, searched on the raw "
+                    "solver log only. The FOAM_SIGFPE startup banner announces "
+                    "that exception trapping is enabled and is excluded: it is "
+                    "normal Foundation startup output, not a trapped exception."
+                ),
+            },
             "courant": {
                 "status": "MEASURED",
                 "data": d["Co"],

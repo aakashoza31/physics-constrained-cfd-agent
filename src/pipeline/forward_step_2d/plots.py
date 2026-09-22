@@ -190,7 +190,10 @@ def make_plots(case, out, spec, layout, data: Dict[str, np.ndarray]) -> Dict[str
         if front.size and np.isfinite(front[:, 1:]).any():
             fig, ax = plt.subplots(figsize=(10, 4.2), layout="constrained")
             ax.plot(front[:, 0], front[:, 1], label="lower front x")
-            ax.plot(front[:, 2 if front.shape[1] > 2 else 1], ":", alpha=0)
+            # A leftover single-argument plot here drew an invisible series
+            # against its own index, which stretched the time axis to the
+            # sample count (0-40) instead of the solved interval (0-4) and
+            # made a settled front look like it stopped early.
             if front.shape[1] > 2:
                 ax.plot(front[:, 0], front[:, 2], label="upper stem x")
             ax.set(xlabel="time", ylabel="x position (normalized)")

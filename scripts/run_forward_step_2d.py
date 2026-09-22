@@ -167,6 +167,22 @@ class ForwardStepRun:
         self.provenance["llm_interpretation"] = raw.model_dump()
         self.provenance["field_provenance"] = spec_prov
 
+        # Reporting objectives are questions about the finished run. They are
+        # recorded and answered by the reporting stage; they are never an
+        # input to the deterministic scope gate, which rules on simulation
+        # requirements only.
+        objectives = list(getattr(raw, "reporting_objectives", []) or [])
+        self.result["reporting_objectives"] = objectives
+        self.provenance["reporting_objectives"] = objectives
+        if objectives:
+            s.emit(
+                ev.ORCHESTRATOR,
+                f"{len(objectives)} reporting objective(s) recorded for the "
+                "final summary; these do not affect case setup or the scope "
+                "gate.",
+                data={"reporting_objectives": objectives},
+            )
+
         if raw.requests_unsupported_physics:
             s.fail(
                 ev.LLM,
@@ -348,6 +364,9 @@ class ForwardStepRun:
             )
             runtime.fetch(case / "execution.json", self.out / "execution.json")
             runtime.fetch_tail(case / "log.foamRun", logs / "log.foamRun.tail")
+            # The head carries the startup banner and any pre-time-loop
+            # dictionary error, so both ends of the log come back.
+            runtime.fetch_head(case / "log.foamRun", logs / "log.foamRun.head")
 
             execution = []
             if (self.out / "execution.json").exists():

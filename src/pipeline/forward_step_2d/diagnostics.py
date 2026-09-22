@@ -34,6 +34,155 @@ IMPERMEABLE = ["bottom", "top", "obstacle"]
 
 
 # ----------------------------------------------------------------------
+# fatal-error detection
+#
+# SCOPE CONTRACT. Everything in this section reads RAW OpenFOAM output only:
+# the text the solver itself wrote to log.foamRun. It is never pointed at a
+# generated agent summary, a validation document, an LLM diagnosis or a
+# previous error description. Those legitimately contain the words "fatal
+# error" while describing a healthy run, and feeding them back into the
+# scanner makes the classification recursive and self-confirming: the agent
+# would then be reacting to its own prose rather than to the solver.
+#
+# The signatures below are specific strings OpenFOAM, the C++ runtime or the
+# shell emit on an actual failure, matched case-sensitively. A broad
+# case-insensitive substring search is not used, because the benign startup
+# banner
+#
+#     sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+#
+# contains the phrase "floating point exception" and announces only that
+# trapping is switched ON. It is normal Foundation startup output on every
+# run, including blockMesh and checkMesh, and it is not evidence that an
+# exception occurred.
+# ----------------------------------------------------------------------
+
+#: The signal-handler configuration banner, removed before any search. A real
+#: trapped signal does not print this line: it prints a
+#: ``Foam::sigFpe::sigHandler`` stack frame, which survives this removal and
+#: is matched by the signatures below.
+BENIGN_SIGNAL_BANNER = re.compile(
+    r"^[ \t]*sig(?:Fpe|Segv|Int|Quit)[ \t]*:[ \t]*(?:En|Dis)abling\b.*$",
+    re.M,
+)
+
+#: Ordered (name, pattern) pairs. Case-sensitive by design.
+FATAL_SIGNATURES = (
+    ("foam_fatal_io_error", re.compile(r"FOAM FATAL IO ERROR")),
+    ("foam_fatal_error", re.compile(r"FOAM FATAL ERROR")),
+    ("foam_error_stack", re.compile(r"Foam::error::printStack")),
+    ("sigfpe_trapped", re.compile(r"Foam::sigFpe::sigHandler")),
+    ("sigsegv_trapped", re.compile(r"Foam::sigSegv::sigHandler")),
+    ("floating_point_exception", re.compile(r"Floating point exception")),
+    ("segmentation_fault", re.compile(r"Segmentation fault|SIGSEGV")),
+    ("core_dumped", re.compile(r"core dumped")),
+    ("abnormal_termination", re.compile(
+        r"^Aborted\b|terminate called|std::bad_alloc", re.M
+    )),
+    # C++ iostreams write non-finite values lowercase. Requiring a delimiter
+    # on both sides keeps this off words and paths that merely contain the
+    # letters, while still catching "Courant Number mean: nan max: nan".
+    ("non_finite_value", re.compile(
+        r"(?:^|[\s=:(,\[])[-+]?(?:nan|inf)(?=[\s,;)\]]|$)", re.M
+    )),
+)
+
+#: Executor statuses where the bounded executor stopped the solver on purpose.
+#: These are not crashes. They are graded by reached_requested_end_time and by
+#: the per-step positivity monitor, and an approved CONTINUE_RUN is the
+#: designed response, so they must not raise the fatal flag.
+EXECUTOR_HALTED = {"TIMED_OUT", "STALLED", "NONPHYSICAL"}
+
+#: Shell-reported deaths by signal: SIGABRT, SIGFPE, SIGSEGV.
+CRASH_RETURNCODES = {134, 136, 139}
+
+
+#: Filenames the fatal scanner will accept. OpenFOAM writes log.foamRun; a
+#: continuation or a fetched excerpt keeps that prefix.
+RAW_SOLVER_LOG_PREFIX = "log.foamRun"
+
+
+def read_raw_solver_log(path) -> str:
+    """Read a raw OpenFOAM solver log, refusing any generated document.
+
+    This is a structural guard on the scope contract above. Pointing the fatal
+    scanner at SCIENTIFIC_SUMMARY.md, validation.json, agent_decision.json or
+    an events log would let a description of a failure be counted as the
+    failure, and would make a corrected run re-fail on the text of its own
+    previous error report. Refusing by filename is checkable; sniffing content
+    is not.
+    """
+    path = Path(path)
+    if not path.name.startswith(RAW_SOLVER_LOG_PREFIX):
+        raise ValueError(
+            f"Refusing to scan {path.name!r} for fatal errors: this detector "
+            f"accepts raw OpenFOAM solver logs only ({RAW_SOLVER_LOG_PREFIX}*). "
+            "Generated summaries, validation documents and LLM text can "
+            "contain the words 'fatal error' while describing a healthy run."
+        )
+    return path.read_text(errors="replace")
+
+
+def _matched_line(text: str, start: int, end: int) -> str:
+    left = text.rfind("\n", 0, start) + 1
+    right = text.find("\n", end)
+    return text[left : right if right != -1 else len(text)].strip()[:300]
+
+
+def scan_fatal_signatures(raw_log: str) -> list:
+    """Find genuine fatal signatures in a RAW OpenFOAM solver log.
+
+    ``raw_log`` must be text OpenFOAM wrote. See the scope contract above.
+    Returns one record per matching signature, each carrying the exact line
+    that matched, so a future false positive is diagnosable from the evidence
+    alone instead of requiring the regex to be re-derived.
+    """
+    text = BENIGN_SIGNAL_BANNER.sub("", raw_log)
+    hits = []
+    for name, pattern in FATAL_SIGNATURES:
+        match = pattern.search(text)
+        if match:
+            hits.append(
+                {
+                    "signature": name,
+                    "source": "solver_log",
+                    "line": _matched_line(text, match.start(), match.end()),
+                }
+            )
+    return hits
+
+
+def scan_process_failure(execution: list) -> list:
+    """Abnormal termination as reported by the executor, not by log text.
+
+    A nonzero or signal return code is a genuine failure. A run the executor
+    itself halted (wall-clock, stall, non-physical extremum) is not: it is
+    bounded control flow, recorded with its own status and graded elsewhere.
+    """
+    hits = []
+    for index, record in enumerate(execution or []):
+        status = record.get("status")
+        if status in EXECUTOR_HALTED:
+            continue
+        code = record.get("returncode")
+        crashed = isinstance(code, int) and (
+            code < 0 or code in CRASH_RETURNCODES
+        )
+        if status == "FAILED" or crashed or (isinstance(code, int) and code != 0):
+            hits.append(
+                {
+                    "signature": "solver_returncode",
+                    "source": "execution_record",
+                    "line": (
+                        f"solver run {index + 1}: status={status} "
+                        f"returncode={code}"
+                    ),
+                }
+            )
+    return hits
+
+
+# ----------------------------------------------------------------------
 # native readers
 # ----------------------------------------------------------------------
 
@@ -338,13 +487,18 @@ def diagnose(case, output, spec=None, reference: Optional[str] = None):
             ]
         )
 
-    log = (case / "log.foamRun").read_text()
+    # Raw solver output. Nothing generated by the agent is read here; see the
+    # scope contract above scan_fatal_signatures.
+    solver_log_path = case / "log.foamRun"
+    log = read_raw_solver_log(solver_log_path)
     mesh_log = (case / "log.checkMesh").read_text()
 
     execution = json.loads((case / "execution.json").read_text(encoding="utf-8-sig"))
     if isinstance(execution, dict):
         execution = [execution]
     mesh_steps = json.loads((case / "mesh_steps.json").read_text(encoding="utf-8-sig"))
+
+    fatal_hits = scan_fatal_signatures(log) + scan_process_failure(execution)
 
     result: Dict[str, Any] = {
         "spec": spec.to_dict(),
@@ -364,9 +518,17 @@ def diagnose(case, output, spec=None, reference: Optional[str] = None):
         "mesh_ok": "Mesh OK" in mesh_log,
         "two_solution_directions": "2 solution (non-empty) directions" in mesh_log,
         "mesh_failed_step": mesh_steps.get("failed_step") or None,
-        "fatal_error": bool(
-            re.search(r"FOAM FATAL|Floating point exception|\bnan\b", log, re.I)
-        ),
+        "fatal_error": bool(fatal_hits),
+        "fatal_error_evidence": fatal_hits,
+        "fatal_scan": {
+            "solver_log": solver_log_path.name,
+            "solver_log_bytes": len(log),
+            "solver_log_complete": True,
+            "signatures_checked": [name for name, _ in FATAL_SIGNATURES],
+            "benign_excluded": (
+                "FOAM_SIGFPE / sigSegv / sigInt / sigQuit startup banner"
+            ),
+        },
         "finite_all_saved": bool(finite),
         "positive_all_saved": bool(positive),
         "ranges_all_saved": ranges,
