@@ -93,8 +93,20 @@ def validate(d: Dict[str, Any]) -> Dict[str, Any]:
         # and the tolerance is a floating-point scale, not a tuned band
         "impermeable_walls": d["mass"]["impermeable_flux_max_abs"]
         < 1e-10 * abs(d["mass"]["final_inlet"] or 1.0),
-        # discrete storage balance closes to round-off for an explicit update
-        "transient_mass_closure": d["mass"]["relative_residual_max"] < 1e-6,
+        # Discrete storage balance closes to round-off for an explicit update,
+        # AND every restart seam is shown to have continued the same state.
+        # The 1e-6 bound is unchanged; the seam condition is an additional
+        # requirement, never a relaxation. A restart that did not continue the
+        # solution is a mass discontinuity, which is a conservation failure
+        # whatever the within-segment residuals look like.
+        "transient_mass_closure": (
+            d["mass"]["relative_residual_max"] < 1e-6
+            and bool(
+                d["mass"]
+                .get("restart_continuity", {})
+                .get("all_seams_continuous", True)
+            )
+        ),
     }
 
     # A compression system must exist for supersonic flow over a step. This is
