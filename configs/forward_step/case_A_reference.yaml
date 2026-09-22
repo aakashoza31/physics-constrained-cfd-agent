@@ -1,0 +1,17 @@
+family: forward_step_3d
+physics: inviscid_euler
+span_bc: cyclic
+length: 3.0
+height: 1.0
+step_x: 0.6
+step_height: 0.2
+span: 0.1
+nx: 240
+ny: 80
+nz: 8
+mach: 3.0
+pressure: 1.0
+temperature: 1.0
+end_time: 4.0
+max_co: 0.2
+write_interval: 0.1
