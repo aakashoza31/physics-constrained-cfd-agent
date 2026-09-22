@@ -179,6 +179,22 @@ def make_plots(case, out, spec, layout, data: Dict[str, np.ndarray]) -> Dict[str
             axes[0].set(xlabel="time", ylabel="relative discrete mass residual")
             axes[1].plot(balance[:, 0], balance[:, 5])
             axes[1].set(xlabel="time", ylabel="cumulative mass defect")
+            # Mark restart seams. A reader comparing these figures against the
+            # residual statistics needs to see where one solver execution
+            # ended and the next began, because no residual is defined there.
+            if balance.shape[1] > 6:
+                for seam in balance[balance[:, 6] == 1, 0]:
+                    for ax in axes:
+                        ax.axvline(
+                            seam, color="0.4", linestyle="--", linewidth=1
+                        )
+                if (balance[:, 6] == 1).any():
+                    axes[0].legend(
+                        [axes[0].lines[0], axes[0].lines[-1]],
+                        ["within-segment residual", "restart boundary"],
+                        loc="upper left",
+                        fontsize=9,
+                    )
             path = figures / "transient_conservation.png"
             fig.savefig(path)
             plt.close(fig)

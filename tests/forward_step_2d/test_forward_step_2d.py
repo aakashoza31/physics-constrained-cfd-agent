@@ -237,7 +237,10 @@ def test_transient_balance_is_exact_for_a_consistent_history():
     assert summary["relative_residual_max"] == pytest.approx(0.0, abs=1e-12)
     assert summary["impermeable_flux_max_abs"] == 0.0
     assert summary["final_inlet"] == pytest.approx(0.5)
-    assert table.shape[1] == 6
+    # time, mass, net flux, residual, relative residual, cumulative defect,
+    # is_restart_boundary
+    assert table.shape[1] == 7
+    assert not table[:, 6].any()  # a single segment has no restart boundary
 
 
 def test_storage_is_not_confused_with_a_steady_mismatch():

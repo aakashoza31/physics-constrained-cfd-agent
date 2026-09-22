@@ -23,7 +23,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -312,46 +312,274 @@ class Layout:
 # ----------------------------------------------------------------------
 
 
-def transient_balance(time, mass, fluxes: Dict[str, np.ndarray]):
-    """Discrete storage balance dM/dt + sum(phi), matching the Euler update."""
-    t = np.asarray(time)
-    m = np.asarray(mass)
+# ----------------------------------------------------------------------
+# restart-aware transient mass closure
+#
+# WHY THIS IS NOT A PLAIN FINITE DIFFERENCE
+#
+# The discrete balance dM/dt + sum(phi) is a statement about ONE timestep of
+# ONE solver execution. A continued run is several executions, and OpenFOAM's
+# function objects write a record at the restart time whose flux is evaluated
+# on the restarted state, at the beginning of the new segment. Differencing
+# straight through that record pairs a mass increment taken from the previous
+# segment's timeline with a flux taken from the next segment's, which is not a
+# timestep of anything.
+#
+# Case H made this visible. At the t = 1 seam of a 0.5 -> 1 -> 2 run:
+#
+#   t = 0.99944  m = 0.4332749512167377  net = -0.1079100485239115   (segment 2)
+#   t = 1.00000  m = 0.4333350147443190  net = -0.1083002922915611   (segment 3)
+#   t = 1.00059  m = 0.4333990977575122  net = -0.1083002922915611   (segment 3)
+#
+# dM/dt across the seam is 0.108108, a perfectly ordinary number. The flux it
+# is differenced against is the next segment's, one timestep of flux evolution
+# away (the seam and the step after it carry the same value to all 16 digits),
+# and the mismatch lands as a 1.9e-4 residual. Every genuine within-segment
+# residual in the same run is ~1e-11.
+#
+# The earlier t = 0.5 seam of the same run produced no spike at all, because
+# the flux happened to be flat there. That is the argument for handling this
+# structurally rather than by widening a tolerance: whether a seam shows up is
+# an accident of where the flux derivative happens to be.
+#
+# So: residuals are formed only between samples of the SAME segment. The seam
+# measurement is kept, labelled, and reported. A seam may be excluded from the
+# physical statistics only if state continuity across it is independently
+# demonstrated; if it is not, the seam counts and the check fails.
+# ----------------------------------------------------------------------
+
+#: A restart must reproduce the stored mass integral to round-off. The fields
+#: are written with writePrecision 16, so the round trip is exact to double
+#: precision, and the volume integral over 16,128 cells has a summation
+#: round-off floor near N * eps = 3.6e-12. This bound sits three orders above
+#: that floor: loose enough that ordinary summation order cannot trip it,
+#: tight enough that any real reinitialization is caught. It is a continuity
+#: test on the restart, not a conservation tolerance: the conservation
+#: threshold in validate.py is unchanged.
+RESTART_MASS_CONTINUITY_TOL = 1e-9
+
+PHYSICAL_STEP = "PHYSICAL_TIMESTEP"
+RESTART_BOUNDARY = "RESTART_BOUNDARY_MEASUREMENT"
+
+
+def _segment_stats(residual, scale, mask) -> Dict[str, float]:
+    """Residual statistics over a selected subset of consecutive pairs."""
+    if not np.any(mask):
+        return {"samples": 0, "relative_residual_max": 0.0,
+                "relative_residual_p99": 0.0}
+    relative = abs(residual[mask] / scale[mask])
+    return {
+        "samples": int(mask.sum()),
+        "relative_residual_max": float(np.max(relative)),
+        "relative_residual_p99": float(np.quantile(relative, 0.99)),
+    }
+
+
+def transient_balance(
+    time,
+    mass,
+    fluxes: Dict[str, np.ndarray],
+    segments=None,
+):
+    """Discrete storage balance dM/dt + sum(phi), matching the Euler update.
+
+    ``segments`` labels which solver execution produced each monitor sample.
+    Pairs that straddle two labels are restart-boundary measurements: they are
+    computed and reported, never differenced as physics. With ``segments``
+    omitted every sample is one segment and the result is the plain balance.
+    """
+    t = np.asarray(time, dtype=float)
+    m = np.asarray(mass, dtype=float)
+    seg = (
+        np.zeros(len(t), dtype=int)
+        if segments is None
+        else np.asarray(segments, dtype=int)
+    )
+    if len(seg) != len(t):
+        raise ValueError("Segment labels must match the monitor sample count")
+
+    within = seg[1:] == seg[:-1]
     dt = np.diff(t)
-    if np.any(dt <= 0):
-        raise ValueError("Monitor times must increase strictly")
+    if np.any(dt[within] <= 0):
+        raise ValueError("Monitor times must increase strictly inside a segment")
 
     net = sum(fluxes.values())
     scale = np.maximum(
         np.maximum(abs(fluxes["inlet"]), abs(fluxes["outlet"])), 1e-300
-    )
-    residual = np.diff(m) / dt + net[1:]
-    cumulative = m[1:] - m[0] + np.cumsum(dt * net[1:])
+    )[1:]
 
-    summary = {
+    # The seam pair has no meaningful dt. It is computed with a guarded
+    # denominator purely so the raw measurement can be reported; it is never
+    # used as a physical residual.
+    safe_dt = np.where(dt == 0, np.nan, dt)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        residual = np.diff(m) / safe_dt + net[1:]
+    residual = np.nan_to_num(residual, nan=0.0, posinf=0.0, neginf=0.0)
+    relative = residual / scale
+
+    # Cumulative defect accrues inside a segment and is not carried across a
+    # seam, where the increment is not a timestep.
+    cumulative = np.zeros(len(residual))
+    per_segment: List[Dict[str, Any]] = []
+    running = 0.0
+    for label in np.unique(seg):
+        rows = np.flatnonzero(seg == label)
+        first, last = rows[0], rows[-1]
+        steps = np.arange(first + 1, last + 1) - 1  # residual indices
+        if steps.size:
+            drift = (
+                m[first + 1 : last + 1]
+                - m[first]
+                + np.cumsum(dt[steps] * net[first + 1 : last + 1])
+            )
+            cumulative[steps] = running + drift
+            running = cumulative[steps][-1]
+        per_segment.append(
+            {
+                "segment": int(label),
+                "start_time": float(t[first]),
+                "end_time": float(t[last]),
+                "samples": int(rows.size),
+                "start_mass": float(m[first]),
+                "end_mass": float(m[last]),
+                "cumulative_defect_fraction_initial_mass": (
+                    float(drift[-1] / m[first]) if steps.size else 0.0
+                ),
+                **_segment_stats(residual, scale, seg[1:] == label),
+            }
+        )
+
+    boundaries = np.flatnonzero(~within)
+    seam_rows = []
+    for i in boundaries:
+        entry: Dict[str, Any] = {
+            "classification": RESTART_BOUNDARY,
+            "time": float(t[i + 1]),
+            "from_segment": int(seg[i]),
+            "to_segment": int(seg[i + 1]),
+            "mass_before_restart": float(m[i]),
+            "mass_after_restart": float(m[i + 1]),
+            "mass_jump_across_seam": float(m[i + 1] - m[i]),
+            "dt_across_seam": float(dt[i]),
+            "note": (
+                "Both executions record this instant. The pair spans two "
+                "solver invocations, so no timestep separates them and no "
+                "physical residual is defined across it."
+            ),
+        }
+        # The measurement a naive concatenation produces, preserved verbatim.
+        # Collapsing the two seam records to one and differencing straight
+        # through is what reported -1.93e-4 at t = 1 in Case H: a mass
+        # increment from the ending segment paired with a flux written on the
+        # restarted state, one timestep of flux evolution away. Keeping the
+        # number here means the historical reading can be audited rather than
+        # taken on trust.
+        if i >= 1 and t[i] > t[i - 1]:
+            span = t[i + 1] - t[i - 1]
+            naive = (m[i + 1] - m[i - 1]) / span + net[i + 1]
+            entry["naive_deduplicated_residual"] = float(naive)
+            entry["naive_deduplicated_relative_residual"] = float(
+                naive / scale[i]
+            )
+            entry["naive_note"] = (
+                "What a reader that keeps one record per time and differences "
+                "across the seam would report. Not a physical residual."
+            )
+        seam_rows.append(entry)
+
+    raw = _segment_stats(residual, scale, np.ones(len(residual), dtype=bool))
+    aware = _segment_stats(residual, scale, within)
+
+    summary: Dict[str, Any] = {
         "final_inlet": float(-fluxes["inlet"][-1]),
         "final_outlet": float(fluxes["outlet"][-1]),
         "instantaneous_mismatch_fraction": float(net[-1] / scale[-1]),
-        "relative_residual_max": float(np.max(abs(residual / scale[1:]))),
-        "relative_residual_p99": float(
-            np.quantile(abs(residual / scale[1:]), 0.99)
-        ),
-        "cumulative_defect_fraction_initial_mass": float(cumulative[-1] / m[0]),
-        "cumulative_defect_max_abs_fraction": float(
-            np.max(abs(cumulative)) / m[0]
-        ),
         "impermeable_flux_max_abs": float(
             max(np.max(abs(fluxes[k])) for k in IMPERMEABLE)
         ),
+        "segments": per_segment,
+        "restart_boundaries": seam_rows,
+        # A. every consecutive pair, seams included: what a naive reading sees.
+        "raw": {
+            **raw,
+            "includes_restart_boundaries": True,
+            "cumulative_defect_fraction_initial_mass": float(
+                (m[-1] - m[0] + np.sum(dt * net[1:])) / m[0]
+            ),
+        },
+        # B. within-segment pairs only: the physical statistic.
+        "restart_aware": {
+            **aware,
+            "restart_boundaries_excluded": len(seam_rows),
+            "cumulative_defect_fraction_initial_mass": float(
+                cumulative[-1] / m[0]
+            ) if len(cumulative) else 0.0,
+            "cumulative_defect_max_abs_fraction": float(
+                np.max(abs(cumulative)) / m[0]
+            ) if len(cumulative) else 0.0,
+        },
         "note": (
             "Mass closure only. shockFluid's momentum/energy boundary fluxes "
             "are local predictor temporaries, so no momentum or energy closure "
             "is claimed."
         ),
     }
+
+    # Headline keys default to the within-segment statistics. With no seam
+    # present the two sets are identical and this is the plain balance;
+    # select_conservation_basis revises them when a seam exists and its
+    # continuity has been tested.
+    summary["conservation_basis"] = "restart_aware"
+    summary["relative_residual_max"] = aware["relative_residual_max"]
+    summary["relative_residual_p99"] = aware["relative_residual_p99"]
+    summary["cumulative_defect_fraction_initial_mass"] = summary[
+        "restart_aware"
+    ]["cumulative_defect_fraction_initial_mass"]
+    summary["cumulative_defect_max_abs_fraction"] = summary["restart_aware"][
+        "cumulative_defect_max_abs_fraction"
+    ]
+
+    classification = np.where(within, 0.0, 1.0)
     table = np.c_[
-        t[1:], m[1:], net[1:], residual, residual / scale[1:], cumulative
+        t[1:], m[1:], net[1:], residual, relative, cumulative, classification
     ]
     return summary, table
+
+
+def select_conservation_basis(
+    summary: Dict[str, Any], continuity: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Promote one statistic set to the headline keys. Fails closed.
+
+    A restart boundary may be dropped from the physical statistics only when
+    the restart is independently shown to have continued the same state. If
+    any seam is unverified the raw statistics stand, seam spike included, and
+    the conservation check fails on them. Both sets remain in the record
+    either way.
+    """
+    seams_ok = bool(continuity.get("all_seams_continuous", True))
+    basis = "restart_aware" if seams_ok else "raw"
+    chosen = summary[basis]
+
+    summary["restart_continuity"] = continuity
+    summary["conservation_basis"] = basis
+    summary["conservation_basis_reason"] = (
+        "Restart boundaries excluded: every seam independently verified to "
+        "continue the same solution."
+        if seams_ok
+        else "Restart boundaries retained: state continuity across at least "
+        "one seam is not demonstrated, so no seam may be excluded."
+    )
+    summary["relative_residual_max"] = chosen["relative_residual_max"]
+    summary["relative_residual_p99"] = chosen["relative_residual_p99"]
+    summary["cumulative_defect_fraction_initial_mass"] = chosen.get(
+        "cumulative_defect_fraction_initial_mass", 0.0
+    )
+    summary["cumulative_defect_max_abs_fraction"] = chosen.get(
+        "cumulative_defect_max_abs_fraction",
+        abs(chosen.get("cumulative_defect_fraction_initial_mass", 0.0)),
+    )
+    return summary
 
 
 # ----------------------------------------------------------------------
@@ -447,21 +675,150 @@ def shock_metrics(layout: Layout, data: Dict[str, np.ndarray], spec) -> Dict[str
 # ----------------------------------------------------------------------
 
 
-def _monitor(case: Path, name: str) -> np.ndarray:
+def _monitor_segments(case: Path, name: str) -> List[Tuple[float, np.ndarray]]:
+    """Per-execution monitor tables, oldest first.
+
+    OpenFOAM writes ``postProcessing/<function>/<startTime>/`` once per solver
+    invocation, so the directory names ARE the segment boundaries. That is
+    runtime evidence of where one execution ended and the next began, and it
+    is what makes a restart seam identifiable without guessing from the data.
+    """
     directory = case / "postProcessing" / name
-    files = sorted(directory.rglob("*.dat"))
-    if not files:
+    if not directory.is_dir():
         raise ValueError(f"Missing monitor output: {name}")
-    rows = [
-        np.loadtxt(f, comments="#", ndmin=2) for f in files
-    ]
-    table = np.vstack([r for r in rows if r.size])
+
+    segments: List[Tuple[float, np.ndarray]] = []
+    for sub in sorted(
+        (d for d in directory.iterdir() if d.is_dir()),
+        key=lambda d: float(d.name),
+    ):
+        rows = [np.loadtxt(f, comments="#", ndmin=2) for f in sorted(sub.rglob("*.dat"))]
+        rows = [r for r in rows if r.size]
+        if not rows:
+            continue
+        table = np.vstack(rows)
+        table = table[np.argsort(table[:, 0], kind="stable")]
+        # Duplicates WITHIN one execution keep the last record. Duplicates
+        # ACROSS executions are the seam and are deliberately not collapsed:
+        # both sides are needed to verify the restart continued the state.
+        _, keep = np.unique(table[:, 0][::-1], return_index=True)
+        keep = len(table) - 1 - keep
+        segments.append((float(sub.name), table[np.sort(keep)]))
+
+    if not segments:
+        raise ValueError(f"Missing monitor output: {name}")
+    return segments
+
+
+def _monitor_concatenated(case: Path, name: str) -> Tuple[np.ndarray, np.ndarray]:
+    """(rows, segment_label_per_row) across every execution, in time order."""
+    segments = _monitor_segments(case, name)
+    tables = [table for _, table in segments]
+    labels = [np.full(len(table), i, dtype=int) for i, table in enumerate(tables)]
+    return np.vstack(tables), np.concatenate(labels)
+
+
+def _monitor(case: Path, name: str) -> np.ndarray:
+    """Flattened monitor history, one record per time. Order preserved."""
+    table, _ = _monitor_concatenated(case, name)
     order = np.argsort(table[:, 0], kind="stable")
     table = table[order]
-    # A continuation re-writes the restart time; keep the last record per time.
     _, keep = np.unique(table[:, 0][::-1], return_index=True)
     keep = len(table) - 1 - keep
     return table[np.sort(keep)]
+
+
+def restart_continuity(
+    case: Path,
+    mass_segments: List[Tuple[float, np.ndarray]],
+    execution: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Independently verify that each restart continued the same solution.
+
+    A restart boundary earns exclusion from the physical conservation
+    statistics only by passing every one of these, which are checked against
+    different evidence so that no single artefact can carry the conclusion:
+
+      stored mass    the segment that ended and the segment that resumed
+                     report the same domain mass at the seam time
+      latestTime     controlDict resumes from the last written state rather
+                     than re-reading the initial condition
+      continuation   the executor recorded the run as a continuation
+      saved state    the time directory the restart read from exists
+
+    Anything short of all four leaves the seam in the ordinary residual
+    series, where it will fail the closure check. Fail closed.
+    """
+    control = ""
+    control_path = case / "system/controlDict"
+    if control_path.is_file():
+        control = control_path.read_text(errors="replace")
+    start_from_latest = bool(
+        re.search(r"^\s*startFrom\s+latestTime\s*;", control, re.M)
+    )
+
+    continuations = [bool(r.get("continuation")) for r in (execution or [])]
+
+    seams: List[Dict[str, Any]] = []
+    for index in range(1, len(mass_segments)):
+        start_label, table = mass_segments[index]
+        _, previous = mass_segments[index - 1]
+
+        time_before, mass_before = float(previous[-1, 0]), float(previous[-1, 1])
+        time_after, mass_after = float(table[0, 0]), float(table[0, 1])
+        times_match = abs(time_after - time_before) <= 1e-9 * max(
+            1.0, abs(time_before)
+        )
+        jump = abs(mass_after - mass_before) / max(abs(mass_before), 1e-300)
+
+        # The executor record for the segment that resumed. Missing records
+        # are treated as unverified, not as verified.
+        recorded = (
+            continuations[index] if index < len(continuations) else False
+        )
+        saved_state = (case / f"{start_label:g}").is_dir() or (
+            case / f"{time_before:g}"
+        ).is_dir()
+
+        checks = {
+            "stored_mass_continuous": bool(jump <= RESTART_MASS_CONTINUITY_TOL),
+            "seam_times_match": bool(times_match),
+            "start_from_latest_time": start_from_latest,
+            "recorded_as_continuation": bool(recorded),
+            "restart_state_present": bool(saved_state),
+        }
+        seams.append(
+            {
+                "classification": RESTART_BOUNDARY,
+                "seam_time": time_after,
+                "from_segment": index - 1,
+                "to_segment": index,
+                "mass_before_restart": mass_before,
+                "mass_after_restart": mass_after,
+                "absolute_mass_jump": float(mass_after - mass_before),
+                "relative_mass_jump": float(jump),
+                "tolerance": RESTART_MASS_CONTINUITY_TOL,
+                "checks": checks,
+                "continuous": all(checks.values()),
+                "fields_reinitialized": not (
+                    checks["stored_mass_continuous"]
+                    and checks["start_from_latest_time"]
+                ),
+            }
+        )
+
+    return {
+        "seam_count": len(seams),
+        "seams": seams,
+        "all_seams_continuous": all(s["continuous"] for s in seams),
+        "controlDict_start_from_latest_time": start_from_latest,
+        "basis": (
+            "A restart boundary is excluded from the physical conservation "
+            "statistics only when the stored mass, the restart directive, the "
+            "executor record and the saved state all agree that the same "
+            "solution was continued."
+        ),
+    }
 
 
 def diagnose(case, output, spec=None, reference: Optional[str] = None):
@@ -628,15 +985,25 @@ def diagnose(case, output, spec=None, reference: Optional[str] = None):
         m = re.search(pattern, mesh_log)
         result[key] = float(m[1]) if m else None
 
-    mass = _monitor(case, "mass")
+    # Segment-aware monitor history. The seam records are kept rather than
+    # collapsed, so the restart can be verified from both sides of it.
+    mass_segments = _monitor_segments(case, "mass")
+    mass, mass_labels = _monitor_concatenated(case, "mass")
     fluxes = {}
     for patch in FLUX_PATCHES:
-        table = _monitor(case, "flux_" + patch)
-        if not np.array_equal(table[:, 0], mass[:, 0]):
-            raise ValueError(f"Monitor times differ for flux_{patch}")
+        table, labels = _monitor_concatenated(case, "flux_" + patch)
+        if not np.array_equal(table[:, 0], mass[:, 0]) or not np.array_equal(
+            labels, mass_labels
+        ):
+            raise ValueError(f"Monitor segments differ for flux_{patch}")
         fluxes[patch] = table[:, 1]
 
-    result["mass"], balance_table = transient_balance(mass[:, 0], mass[:, 1], fluxes)
+    balance, balance_table = transient_balance(
+        mass[:, 0], mass[:, 1], fluxes, segments=mass_labels
+    )
+    result["mass"] = select_conservation_basis(
+        balance, restart_continuity(case, mass_segments, execution)
+    )
     result["minima_every_step"] = dict(
         zip(["rho", "p", "T"], _monitor(case, "minima")[:, 1:].min(axis=0).tolist())
     )
@@ -669,13 +1036,35 @@ def diagnose(case, output, spec=None, reference: Optional[str] = None):
         header="time,mass,momentum_x,momentum_y,momentum_z,total_energy",
         comments="",
     )
+    # is_restart_boundary is appended last so existing column positions are
+    # unchanged for anything already reading this file.
     np.savetxt(
         out / "transient_mass.csv",
         balance_table,
         delimiter=",",
-        header="time,mass,net_outward_flux,residual,relative_residual,cumulative_defect",
+        header=(
+            "time,mass,net_outward_flux,residual,relative_residual,"
+            "cumulative_defect,is_restart_boundary"
+        ),
         comments="",
     )
+    # The seam measurements again, named rather than flagged, so a reviewer
+    # can read what happened at each restart without decoding a column.
+    seam_lines = [
+        "time,from_segment,to_segment,mass_before_restart,mass_after_restart,"
+        "mass_jump_across_seam,naive_deduplicated_relative_residual,classification"
+    ]
+    for seam in result["mass"].get("restart_boundaries", []):
+        naive = seam.get("naive_deduplicated_relative_residual")
+        seam_lines.append(
+            f"{seam['time']:.18e},{seam['from_segment']},{seam['to_segment']},"
+            f"{seam['mass_before_restart']:.18e},"
+            f"{seam['mass_after_restart']:.18e},"
+            f"{seam['mass_jump_across_seam']:.18e},"
+            + (f"{naive:.18e}," if naive is not None else "nan,")
+            + f"{seam['classification']}"
+        )
+    (out / "restart_boundaries.csv").write_text("\n".join(seam_lines) + "\n")
     np.savetxt(
         out / "shock_front_history.csv",
         np.asarray(front_history, dtype=float),

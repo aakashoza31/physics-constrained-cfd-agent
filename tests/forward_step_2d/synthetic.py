@@ -13,6 +13,7 @@ passing here means the parsing logic is right.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, List
 
@@ -124,14 +125,50 @@ def _poly_mesh(case: Path, spec: ForwardStep2DSpec) -> None:
     )
 
 
-def _monitor(case: Path, name: str, times: np.ndarray, values: np.ndarray) -> None:
-    directory = case / "postProcessing" / name / "0"
-    directory.mkdir(parents=True, exist_ok=True)
-    rows = np.c_[times, values]
+def _monitor(
+    case: Path,
+    name: str,
+    times: np.ndarray,
+    values: np.ndarray,
+    restart_at: float = None,
+    seam_offset: float = 0.0,
+) -> None:
+    """Write a monitor history, optionally split across two executions.
+
+    ``seam_offset`` shifts the SECOND execution's values only, including its
+    own record of the seam time. That is what a restart which did not
+    continue the same state looks like from the monitors: the segment that
+    ended and the segment that resumed disagree about the domain at the same
+    instant. Shifting a single concatenated array instead would put the jump
+    inside one segment, which is a different defect.
+
+    OpenFOAM names one postProcessing subdirectory per solver invocation,
+    after the time that invocation started. With ``restart_at`` set, the
+    history is split the way a continued run really lays it out: the first
+    execution's directory ends AT the seam time, and the second execution's
+    directory begins at the same time with its own record of it. Both records
+    of the seam exist, which is what makes the restart auditable.
+    """
+    rows = np.c_[times, np.asarray(values)]
     header = "# Forward-step synthetic monitor\n# Time\tvalue\n"
-    directory.joinpath("volFieldValue.dat").write_text(
-        header + "\n".join("\t".join(f"{v:.12g}" for v in row) for row in rows) + "\n"
-    )
+
+    if restart_at is None:
+        blocks = [(0.0, rows)]
+    else:
+        cut = int(np.searchsorted(times, restart_at, side="right"))
+        first, second = rows[:cut].copy(), rows[cut - 1 :].copy()
+        if seam_offset:
+            second[:, 1:] = second[:, 1:] + seam_offset
+        blocks = [(0.0, first), (float(restart_at), second)]
+
+    for start, block in blocks:
+        directory = case / "postProcessing" / name / f"{start:g}"
+        directory.mkdir(parents=True, exist_ok=True)
+        directory.joinpath("volFieldValue.dat").write_text(
+            header
+            + "\n".join("\t".join(f"{v:.16g}" for v in row) for row in block)
+            + "\n"
+        )
 
 
 def make_case(
@@ -141,6 +178,8 @@ def make_case(
     save_times=(0.1, 0.2, 0.3),
     completed: bool = True,
     mesh_ok: bool = True,
+    restart_at: float = None,
+    seam_mass_jump: float = 0.0,
     two_directions: bool = True,
     positive: bool = True,
     reached_end: bool = True,
@@ -186,12 +225,14 @@ def make_case(
     walls = np.zeros_like(steps)
     net = inlet + outlet
     mass = 0.63 - np.concatenate([[0.0], np.cumsum(np.diff(steps) * net[1:])])
-    _monitor(case, "mass", steps, mass)
+    # A non-zero seam_mass_jump is a restart that did NOT continue the same
+    # state: the resumed segment reports a different domain mass at the seam.
+    _monitor(case, "mass", steps, mass, restart_at, seam_offset=seam_mass_jump)
     _monitor(case, "minima", steps, np.c_[
         np.full_like(steps, 0.05), np.full_like(steps, 0.02), np.full_like(steps, 0.7)
-    ])
+    ], restart_at)
     for patch, values in zip(FLUX_PATCHES, [inlet, outlet, walls, walls, walls]):
-        _monitor(case, "flux_" + patch, steps, values)
+        _monitor(case, "flux_" + patch, steps, values, restart_at)
 
     final = float(save_times[-1]) if reached_end else float(save_times[-1])
     log = ["Starting time loop\n"]
@@ -212,15 +253,38 @@ def make_case(
         + ("Mesh OK.\nEnd\n" if mesh_ok else "***Failed 1 mesh checks.\nEnd\n")
     )
 
-    (case / "execution.json").write_text(json.dumps([{
+    records = [{
         "status": "COMPLETED" if completed else "TIMED_OUT",
         "returncode": 0 if completed else 3,
         "wall_seconds": 12.5,
-        "last_observed_time": final,
-        "requested_end_time": spec.end_time,
+        "last_observed_time": restart_at if restart_at is not None else final,
+        "requested_end_time": restart_at if restart_at is not None else spec.end_time,
         "continuation": False,
         "command": f"foamRun -case {case}",
-    }], indent=2))
+    }]
+    if restart_at is not None:
+        # A genuine continuation: resumed from latestTime, recorded as such,
+        # with the state it restarted from still on disk.
+        records.append({
+            "status": "COMPLETED" if completed else "TIMED_OUT",
+            "returncode": 0 if completed else 3,
+            "wall_seconds": 9.0,
+            "last_observed_time": final,
+            "requested_end_time": spec.end_time,
+            "continuation": True,
+            "command": f"foamRun -case {case}",
+        })
+        control = case / "system/controlDict"
+        control.write_text(
+            re.sub(
+                r"^startFrom\s+[^;]+;",
+                "startFrom       latestTime;",
+                control.read_text(),
+                flags=re.M,
+            )
+        )
+        (case / f"{float(restart_at):g}").mkdir(exist_ok=True)
+    (case / "execution.json").write_text(json.dumps(records, indent=2))
 
     (case / "mesh_steps.json").write_text(json.dumps({
         "case": str(case),
