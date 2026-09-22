@@ -73,9 +73,23 @@ class ForwardStepRequest(BaseModel):
 
     requests_unsupported_physics: bool = Field(
         default=False,
-        description="True if the request asks for physics outside inviscid 2D Euler.",
+        description=(
+            "True only if the request asks for the SIMULATION ITSELF to model "
+            "physics outside inviscid 2D Euler. A question about how the "
+            "finished result should be assessed or reported is not physics "
+            "and must not set this flag."
+        ),
     )
     unsupported_notes: List[str] = Field(default_factory=list)
+    reporting_objectives: List[str] = Field(
+        default_factory=list,
+        description=(
+            "Questions the user wants answered ABOUT the completed run, such "
+            "as whether a feature is resolved or whether the result is "
+            "trustworthy. These are reporting requests, not simulation "
+            "requirements, and they do not change the case setup."
+        ),
+    )
     notes: List[str] = Field(default_factory=list)
 
 
@@ -108,20 +122,38 @@ Rules:
    the request asks for subsonic or incompressible flow, set
    requests_unsupported_physics true and explain in unsupported_notes.
 
-5. Set requests_unsupported_physics true, with a note, for anything outside the
-   family: turbulence, viscosity or boundary layers, heat transfer, combustion,
-   multiphase flow, three-dimensional or spanwise effects, imported CAD, a
-   different solver, or different numerical schemes.
+5. Separate the two kinds of thing a request can contain.
 
-6. nx and ny are mesh resolution counts across the full channel length and
+   A. SIMULATION REQUIREMENTS: what must be modelled, meshed, solved or
+      configured. Only these can be unsupported.
+   B. REPORTING OBJECTIVES: what the user wants told about the finished run,
+      such as "report whether the shock is resolved", "assess the mesh
+      resolution", "say whether the result is trustworthy", "explain the
+      accuracy", "summarise the compression structure".
+
+   Put every item of kind B into reporting_objectives, verbatim or closely
+   paraphrased. Never set requests_unsupported_physics for an item of kind B.
+   Asking for an assessment of a run this family can perform is a supported
+   request: the deterministic validator and the reporting stage answer it
+   after the solver finishes. It adds no physics.
+
+6. Set requests_unsupported_physics true, with a note, only when a SIMULATION
+   REQUIREMENT falls outside the family: turbulence, viscosity or boundary
+   layers, heat transfer, combustion, multiphase flow, species transport,
+   three-dimensional or spanwise effects, imported CAD, a different solver, or
+   different numerical schemes.
+
+7. nx and ny are mesh resolution counts across the full channel length and
    height. Only set them if the request asks for a specific resolution.
 
-7. Do not predict results. Do not mention shock angles, pressure ratios or any
-   expected answer.
+8. Do not predict results. Do not state shock angles, pressure ratios or any
+   expected answer. This forbids you from ANSWERING an assessment question; it
+   does not forbid the user from ASKING one. Record the question in
+   reporting_objectives and leave it unanswered.
 
-8. case_name is a short lowercase identifier such as mach2p5_step0p15.
+9. case_name is a short lowercase identifier such as mach2p5_step0p15.
 
-9. Do not use Markdown. Return only the structured JSON object.
+10. Do not use Markdown. Return only the structured JSON object.
 """
 
 
