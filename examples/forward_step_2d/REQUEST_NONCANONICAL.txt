@@ -1,0 +1,1 @@
+Simulate a 2D forward-facing step in the validated supersonic channel family with an inlet Mach number of 2.5 and a step height of 0.15 channel heights. Report whether the compression structure ahead of the step is resolved and whether the result is trustworthy.
