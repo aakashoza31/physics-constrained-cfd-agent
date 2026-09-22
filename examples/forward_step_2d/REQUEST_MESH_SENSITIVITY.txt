@@ -1,0 +1,17 @@
+Simulate a 2D forward-facing step in the validated supersonic channel family
+with inlet Mach number 3.0, step height 0.20 channel heights, and step location
+x = 0.6.
+
+Use the registered inviscid compressible Euler forward-step family and its
+validated OpenFOAM shockFluid numerical recipe.
+
+Start from a deliberately coarse but valid mesh: use 120 cells across the
+channel length and 40 across the channel height.
+
+Assess whether the forward-step result has adequate numerical resolution. Do
+not treat a healthy solution on a single grid as evidence that the answer is
+resolved. If the evidence shows the result still depends on the grid, refine
+the mesh through the registered bounded refinement action and reassess.
+
+Report the compression and shock structure on each grid and how it changes
+between grids.

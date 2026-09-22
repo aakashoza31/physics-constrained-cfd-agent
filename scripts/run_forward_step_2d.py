@@ -51,6 +51,11 @@ from src.pipeline.forward_step_2d.build import build as build_case  # noqa: E402
 from src.pipeline.forward_step_2d.spec import ForwardStep2DSpec  # noqa: E402
 from src.reasoning.forward_step_actions import ForwardStepAction  # noqa: E402
 from src.reasoning.forward_step_diagnosis import diagnose  # noqa: E402
+from src.reasoning.forward_step_mesh_study import (  # noqa: E402
+    assess_sensitivity,
+    grid_record,
+    refine,
+)
 from src.reasoning.forward_step_scope_gate import evaluate_scope  # noqa: E402
 from src.reporting import event_stream as ev  # noqa: E402
 from src.reporting.event_stream import EventStream  # noqa: E402
@@ -195,6 +200,8 @@ class ForwardStepRun:
             }
         self.runtime: Optional[FoamRuntime] = None
         self.result: Dict[str, Any] = {"status": "INCOMPLETE"}
+        #: One entry per grid level of the mesh-refinement study.
+        self.study_levels: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
 
@@ -216,6 +223,24 @@ class ForwardStepRun:
         self.result["message"] = message
         self.provenance["llm_calls"] = self.llm_calls
         self.provenance["final_status"] = status
+        if self.study_levels:
+            self.provenance["mesh_study"] = {
+                "levels": self.study_levels,
+                "intervention_history": [
+                    {
+                        "iteration": entry.get("iteration"),
+                        "refinement_level": entry.get("refinement_level"),
+                        "cells": entry.get("cells"),
+                        "action": entry.get("llm_action"),
+                        "approved": entry.get("action_approved"),
+                        "validation_status": entry.get("validation_status"),
+                        "mesh_sensitivity_status": entry.get(
+                            "mesh_sensitivity_status"
+                        ),
+                    }
+                    for entry in self.provenance.get("iterations", [])
+                ],
+            }
         self.provenance["event_summary"] = self.stream.summary()
         save_json(self.out / "agent_result.json", self.result)
         save_json(self.out / "provenance.json", self.provenance)
@@ -502,9 +527,40 @@ class ForwardStepRun:
         spec_path = code / "spec.json"
         runtime.write_text(spec_path, json.dumps(spec.to_dict(), indent=2))
 
-        case = root / "case"
+        case = self.build_and_mesh(runtime, root, code, spec)
+        if case is None:
+            return self.result
         self.provenance["runtime_case"] = str(case)
         self.result["runtime_case"] = str(case)
+
+        # 6. iterate ----------------------------------------------------
+        return self._iterate(runtime, root, code, case, spec, resumed=False)
+
+    # ------------------------------------------------------------------
+
+    def build_and_mesh(
+        self,
+        runtime: FoamRuntime,
+        root: PurePosixPath,
+        code: PurePosixPath,
+        spec: ForwardStep2DSpec,
+    ) -> Optional[PurePosixPath]:
+        """Generate and mesh one grid. Returns its case path, or None on refusal.
+
+        Every grid goes through the same gate: blockMesh, checkMesh, two
+        solution directions, cell centres and volumes. A refined grid is not
+        exempt, so a refinement that produced an invalid mesh is reported as a
+        mesh rejection rather than being carried into the study as a result.
+        """
+        s = self.stream
+        level = spec.refinement_level
+        # Each grid gets its own case directory: an existing grid's fields and
+        # logs are never overwritten by the next one.
+        case = root / (f"case_L{level}" if level else "case")
+        suffix = f"_L{level}" if level else ""
+
+        spec_path = code / f"spec{suffix}.json"
+        runtime.write_text(spec_path, json.dumps(spec.to_dict(), indent=2))
 
         built = runtime.bash(
             f"cd {shlex.quote(str(code))} && "
@@ -514,34 +570,36 @@ class ForwardStepRun:
         )
         if not built.ok:
             s.fail(ev.CFD_SETUP, f"Case generation failed: {built.stdout}{built.stderr}")
-            return self.finish("BUILD_FAILED", built.stdout + built.stderr)
+            self.finish("BUILD_FAILED", built.stdout + built.stderr)
+            return None
 
         s.ok(
             ev.CFD_SETUP,
-            f"Case generated: {spec.cells} cells, blocks {spec.block_cells}, "
-            f"dx {spec.dx:.4g}, dy {spec.dy:.4g}. Trusted recipe copied unchanged "
-            "(Kurganov, vanLeer/vanLeerV, Euler, shockFluid).",
+            f"Grid level {level} generated: {spec.cells} cells, blocks "
+            f"{spec.block_cells}, dx {spec.dx:.4g}, dy {spec.dy:.4g}. Trusted "
+            "recipe copied unchanged (Kurganov, vanLeer/vanLeerV, Euler, "
+            "shockFluid).",
         )
 
-        # 5. mesh -------------------------------------------------------
         meshed = runtime.bash(
             f"bash {shlex.quote(str(code))}/pipeline/forward_step_2d/mesh_case.sh "
             f"{shlex.quote(str(case))}",
             timeout=900,
         )
         logs = self.out / "logs"
-        logs.mkdir(exist_ok=True)
+        logs.mkdir(parents=True, exist_ok=True)
         for name in ("log.blockMesh", "log.checkMesh", "log.centres", "log.volumes"):
-            runtime.fetch(case / name, logs / name)
-        runtime.fetch(case / "mesh_steps.json", self.out / "mesh_steps.json")
+            runtime.fetch(case / name, logs / f"{name}{suffix}")
+        steps_path = self.out / f"mesh_steps{suffix}.json"
+        runtime.fetch(case / "mesh_steps.json", steps_path)
 
         steps = {}
-        if (self.out / "mesh_steps.json").exists():
-            steps = json.loads((self.out / "mesh_steps.json").read_text())
+        if steps_path.exists():
+            steps = json.loads(steps_path.read_text())
         for step in steps.get("steps", []):
             s.emit(
                 ev.MESH_TOOL,
-                f"{step['name']}: returncode {step['returncode']}",
+                f"level {level} {step['name']}: returncode {step['returncode']}",
                 status="PASS" if step["returncode"] == 0 else "FAIL",
             )
 
@@ -549,12 +607,14 @@ class ForwardStepRun:
             failed = steps.get("failed_step") or "mesh shell"
             detail = (meshed.stderr or meshed.stdout or "")[-800:]
             s.fail(ev.MESH_TOOL, f"Mesh gate failed at {failed}: {detail}")
-            return self.finish("MESH_REJECTED", f"failed at {failed}")
+            self.finish("MESH_REJECTED", f"level {level} failed at {failed}")
+            return None
 
-        s.ok(ev.MESH_TOOL, "checkMesh: Mesh OK, 2 solution directions.")
-
-        # 6. iterate ----------------------------------------------------
-        return self._iterate(runtime, root, code, case, spec, resumed=False)
+        s.ok(
+            ev.MESH_TOOL,
+            f"level {level} checkMesh: Mesh OK, 2 solution directions.",
+        )
+        return case
 
     # ------------------------------------------------------------------
 
@@ -576,6 +636,14 @@ class ForwardStepRun:
         logs.mkdir(parents=True, exist_ok=True)
 
         current = spec
+        # The case the last solver execution ran on. A continuation is only
+        # meaningful within one mesh: OpenFOAM's latestTime restart reads
+        # fields written on the grid it is restarting into, so a new mesh must
+        # be a fresh solve from the physical initial condition. Comparing this
+        # against the case about to run is what keeps that impossible to get
+        # wrong by accident.
+        last_executed_case: Optional[PurePosixPath] = None
+
         # A resumed run numbers past the iterations already on record, so
         # iteration_03 follows iteration_02 instead of overwriting it.
         iteration = self.iteration_offset
@@ -590,7 +658,8 @@ class ForwardStepRun:
 
         while iteration < limit:
             iteration += 1
-            append = iteration > 1
+            # Continuation ONLY when this exact case has already been solved.
+            append = last_executed_case == case
 
             if skip_execution:
                 skip_execution = False
@@ -603,9 +672,14 @@ class ForwardStepRun:
             else:
                 s.emit(
                     ev.EXECUTOR,
-                    f"Iteration {iteration}: foamRun -case (shockFluid) to "
-                    f"t = {current.end_time:g}"
-                    + (" (continuation)" if append else ""),
+                    f"Iteration {iteration}: foamRun -case (shockFluid) on "
+                    f"grid level {current.refinement_level} "
+                    f"({current.cells} cells) to t = {current.end_time:g}"
+                    + (
+                        " (continuation)"
+                        if append
+                        else " (fresh solve from the physical initial condition)"
+                    ),
                 )
 
                 executed = runtime.bash(
@@ -618,6 +692,7 @@ class ForwardStepRun:
                     stream_prefix="[EXECUTOR]",
                 )
                 del executed  # status is read from execution.json, not stdout
+                last_executed_case = case
             runtime.fetch(case / "execution.json", self.out / "execution.json")
             runtime.fetch_tail(case / "log.foamRun", logs / "log.foamRun.tail")
             # The head carries the startup banner and any pre-time-loop
@@ -743,6 +818,38 @@ class ForwardStepRun:
                     llm_source="LLM:multimodal-visual-observer",
                 )
 
+            # mesh-refinement study ------------------------------------
+            #
+            # One record per grid level, replaced rather than appended when
+            # the same level is re-measured (an extended horizon on the same
+            # mesh is still one grid). The cross-grid verdict is deterministic
+            # and is computed before the model is consulted, so the model
+            # reads it as evidence rather than supplying it.
+            self.study_levels = [
+                entry
+                for entry in self.study_levels
+                if entry["refinement_level"] != current.refinement_level
+            ] + [grid_record(current, diagnostics, validation)]
+            self.study_levels.sort(key=lambda entry: entry["refinement_level"])
+
+            sensitivity = assess_sensitivity(
+                self.study_levels,
+                tolerance=args.sensitivity_tolerance,
+                requested=current.sensitivity_assessment_requested,
+            )
+            save_json(iteration_out / "mesh_sensitivity.json", sensitivity)
+            save_json(self.out / "MESH_SENSITIVITY.json", sensitivity)
+            self.result["mesh_sensitivity_status"] = sensitivity["status"]
+
+            if current.sensitivity_assessment_requested:
+                s.emit(
+                    ev.SCIENTIFIC_VALIDATOR,
+                    f"Numerical sensitivity: {sensitivity['status']} "
+                    f"({sensitivity['grids']} grid(s)). {sensitivity['reason']}",
+                    status="PASS" if sensitivity["satisfied"] else "....",
+                    data={"latest_comparison": sensitivity["latest_comparison"]},
+                )
+
             # reference-blind diagnosis --------------------------------
             try:
                 decision, action_gate, record, payload = diagnose(
@@ -754,6 +861,7 @@ class ForwardStepRun:
                     max_end_time=args.max_end_time,
                     iterations_used=iteration,
                     max_iterations=args.max_iterations,
+                    sensitivity=sensitivity,
                 )
             except LLMUnavailable as exc:
                 s.fail(ev.LLM, str(exc))
@@ -789,6 +897,13 @@ class ForwardStepRun:
                     "execution": last,
                     "validation_status": validation["status"],
                     "hard_checks_status": validation.get("hard_checks_status"),
+                    "refinement_level": current.refinement_level,
+                    "cells": current.cells,
+                    "dx": current.dx,
+                    "dy": current.dy,
+                    "runtime_case": str(case),
+                    "solver_continuation": append,
+                    "mesh_sensitivity_status": sensitivity["status"],
                     "final_acceptance": validation.get("final_acceptance"),
                     "failed_checks": validation["failed_checks"],
                     "images": sorted(images),
@@ -823,6 +938,10 @@ class ForwardStepRun:
                 validation["status"] == "PASS_2D_FORWARD_STEP"
                 and decision.action == ForwardStepAction.ACCEPT.value
                 and action_gate.approved
+                and (
+                    sensitivity["satisfied"]
+                    or not current.sensitivity_assessment_requested
+                )
             )
 
             s.emit(
@@ -899,6 +1018,38 @@ class ForwardStepRun:
                     foam=False,
                     timeout=120,
                 )
+                continue
+
+            if pending_action == ForwardStepAction.REFINE_MESH.value:
+                # The refinement itself comes from the registered operation,
+                # not from the gate's payload and not from the model: the
+                # orchestrator re-derives it so there is one place where a
+                # mesh change can be defined.
+                try:
+                    current = refine(current)
+                except ValueError as exc:
+                    s.fail(ev.ORCHESTRATOR, f"Refinement refused: {exc}")
+                    self._summarize(
+                        spec, diagnostics, validation, decision, iteration_out
+                    )
+                    return self.finish("STOPPED_REFINEMENT_REFUSED", str(exc))
+
+                s.emit(
+                    ev.ORCHESTRATOR,
+                    f"Approved REFINE_MESH: building grid level "
+                    f"{current.refinement_level} with {current.cells} cells "
+                    f"(dx {current.dx:.4g}, dy {current.dy:.4g}). A new mesh is "
+                    "a new solve from the physical initial condition; the "
+                    "previous grid's case and evidence are left untouched.",
+                    data={"spec": current.to_dict()},
+                )
+                refined_case = self.build_and_mesh(runtime, root, code, current)
+                if refined_case is None:
+                    # build_and_mesh has already recorded the refusal. A grid
+                    # that failed its own mesh gate is not a refinement result.
+                    return self.result
+                case = refined_case
+                self.result["runtime_case"] = str(case)
                 continue
 
             s.emit(
@@ -1017,6 +1168,19 @@ def main() -> int:
     ap.add_argument("--out", default=str(_REPO_ROOT / "demo/forward_step_2d"))
     ap.add_argument("--max-iterations", type=int, default=4)
     ap.add_argument("--max-end-time", type=float, default=12.0)
+    ap.add_argument(
+        "--sensitivity-tolerance",
+        type=float,
+        default=None,
+        help=(
+            "Cross-grid acceptance criterion: the largest relative change a "
+            "registered quantity may show between consecutive grids. NO "
+            "DEFAULT EXISTS. This repository contains no scientifically "
+            "justified cross-grid tolerance and none is invented; without "
+            "this flag the study measures and reports the comparison and the "
+            "verdict is withheld as SENSITIVITY_CRITERION_NOT_REGISTERED."
+        ),
+    )
     ap.add_argument("--solver-timeout", type=float, default=7200.0)
     ap.add_argument("--reference", default=None, help="Trusted reference .npz.")
     ap.add_argument("--plan-only", action="store_true")
