@@ -55,6 +55,27 @@ class ForwardStepDecision(BaseModel):
     diagnosis: str = Field(description="One of the allowed diagnosis labels.")
     reasoning_summary: str = Field(description="Two or three sentences, no hidden reasoning.")
     evidence_used: List[str] = Field(default_factory=list)
+
+    # The two facts that decide between CONTINUE_RUN and EXTEND_END_TIME.
+    # Requiring them to be stated before the action is chosen makes the
+    # distinction part of the contract rather than something the model may
+    # skip, and the orchestrator records whether each restatement matched the
+    # deterministic evidence.
+    current_horizon_reached: bool = Field(
+        default=False,
+        description=(
+            "True if the solver reached the end time this execution was asked "
+            "for (horizon.reached_current_requested_end_time in the evidence)."
+        ),
+    )
+    final_target_reached: bool = Field(
+        default=False,
+        description=(
+            "True if the run has reached the final target horizon "
+            "(horizon.reached_final_target_end_time in the evidence)."
+        ),
+    )
+
     action: str = Field(description="One of the allowed action labels.")
     clarification_question: Optional[str] = Field(default=None)
     confidence: str = Field(default="medium", description="low, medium or high.")
@@ -83,20 +104,53 @@ Rules:
    hard numerical failure. If the numbers say the run is unhealthy, say so even
    if the pictures look plausible.
 
-4. "reached_requested_end_time" false means the run stopped before the horizon
-   the specification asked for. On an otherwise healthy run that is the normal
-   reason to propose CONTINUE_RUN.
+4. TWO HORIZONS. Read both before choosing an action, and state both in
+   current_horizon_reached and final_target_reached.
 
-5. Propose exactly one action from the allowed list. Do not propose changing the
+     current_requested_end_time  the end time THIS execution was asked for
+     final_target_end_time       the horizon final scientific acceptance needs
+
+   They are usually different. A workflow may run to an early horizon first
+   and advance toward the final target in bounded steps.
+
+5. The action follows from those two facts, and confusing them stalls the
+   workflow:
+
+     reached_current_requested_end_time == false
+       The execution stopped short of its OWN horizon. There is an outstanding
+       execution to finish.
+       -> CONTINUE_RUN
+
+     reached_current_requested_end_time == true
+     and reached_final_target_end_time == false
+       The execution finished what it was asked to do, but the run has not
+       reached the horizon acceptance requires. There is nothing to resume;
+       the horizon itself must move.
+       -> EXTEND_END_TIME
+
+     both true, evidence healthy
+       -> ACCEPT
+
+   CONTINUE_RUN on a run that already reached its current horizon will be
+   refused: there is nothing left to resume toward.
+
+6. Propose exactly one action from the allowed list. Do not propose changing the
    solver, the flux scheme, the reconstruction or the gas model: those are fixed
    for this family and you cannot alter them.
 
-6. ACCEPT means "the evidence looks acceptable to me". A deterministic validator
-   decides actual acceptance; if its checks fail, your ACCEPT will be refused.
+7. Passing every hard check does NOT mean the run is finished. It means the
+   state that exists is numerically and physically healthy. A flawless solution
+   at an early horizon is a partial realization of the benchmark, and
+   deterministic_status will say so
+   (CURRENT_STATE_HEALTHY_TARGET_NOT_REACHED).
 
-7. REQUEST_CLARIFICATION requires a concrete question in clarification_question.
+8. ACCEPT means "the evidence looks acceptable to me". A deterministic validator
+   decides actual acceptance, and it requires the final target horizon as well
+   as the hard checks; if either is outstanding, your ACCEPT will be refused.
 
-8. Do not use Markdown. Return only the structured JSON object.
+9. REQUEST_CLARIFICATION requires a concrete question in clarification_question.
+
+10. Do not use Markdown. Return only the structured JSON object.
 """
 
 
@@ -148,7 +202,9 @@ def build_evidence_payload(
             },
             "resolution": {"nx": spec.nx, "ny": spec.ny, "cells": spec.cells},
             "run_control": {
-                "requested_end_time": spec.end_time,
+                "initial_execution_end_time": spec.initial_execution_end_time,
+                "current_requested_end_time": spec.end_time,
+                "final_target_end_time": spec.final_target_end_time,
                 "max_co": spec.max_co,
             },
         },
@@ -166,10 +222,24 @@ def build_evidence_payload(
             )
         },
         "horizon": {
-            "requested_end_time": d.get("requested_end_time"),
+            "initial_execution_end_time": spec.initial_execution_end_time,
+            "current_requested_end_time": d.get("requested_end_time"),
+            "final_target_end_time": spec.final_target_end_time,
             "final_time": d.get("final_time"),
-            "reached_requested_end_time": d.get("reached_requested_end_time"),
+            "reached_current_requested_end_time": d.get(
+                "reached_requested_end_time"
+            ),
+            "reached_final_target_end_time": bool(
+                float(d.get("final_time") or 0.0)
+                >= float(spec.final_target_end_time) - 1e-9
+            ),
             "saved_states": d.get("saved_times"),
+            "note": (
+                "current_requested_end_time is what this execution was asked "
+                "for. final_target_end_time is what acceptance requires. "
+                "CONTINUE_RUN finishes an outstanding execution; "
+                "EXTEND_END_TIME moves the horizon after one finished."
+            ),
         },
         "mesh": {
             k: d.get(k)
@@ -192,6 +262,9 @@ def build_evidence_payload(
         "measured_compression_structure": d.get("shock"),
         "deterministic_checks": v.get("hard_checks"),
         "deterministic_failed_checks": v.get("failed_checks"),
+        "deterministic_status": v.get("status"),
+        "hard_checks_status": v.get("hard_checks_status"),
+        "final_acceptance": v.get("final_acceptance"),
         "iterations_used": iterations_used,
         "max_iterations": max_iterations,
         "allowed_diagnoses": [x.value for x in ForwardStepDiagnosis],

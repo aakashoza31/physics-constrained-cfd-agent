@@ -104,6 +104,16 @@ def validate_action(
     reached = bool(diagnostics.get("reached_requested_end_time"))
     healthy = _healthy(diagnostics)
 
+    # The two horizons the action semantics turn on. `reached` is about the
+    # execution that just ran; `reached_target` is about the science.
+    target = float(
+        spec.final_target_end_time
+        if spec.final_target_end_time is not None
+        else spec.end_time
+    )
+    final_time = float(diagnostics.get("final_time") or 0.0)
+    reached_target = final_time >= target - 1e-9
+
     if iterations_used >= max_iterations and action in {
         ForwardStepAction.CONTINUE_RUN.value,
         ForwardStepAction.EXTEND_END_TIME.value,
@@ -123,6 +133,21 @@ def validate_action(
     # ---------------- ACCEPT -----------------------------------------
     if action == ForwardStepAction.ACCEPT.value:
         if not scientific_pass:
+            # Distinguish "defective" from "not finished": both block ACCEPT,
+            # but only one of them is a problem with the solution.
+            if not validation.get("failed_checks") and not reached_target:
+                return ActionValidation(
+                    False,
+                    action,
+                    [
+                        "ACCEPT refused: the state is healthy on all hard "
+                        f"checks, but the run has reached only t = "
+                        f"{final_time:g} of the registered final target "
+                        f"t = {target:g}. Passing the hard checks means the "
+                        "state that exists is sound, not that the benchmark "
+                        "has been realized. EXTEND_END_TIME is the action."
+                    ],
+                )
             failed = ", ".join(validation.get("failed_checks", [])) or validation.get(
                 "status", "unknown"
             )
@@ -144,14 +169,27 @@ def validate_action(
     # ---------------- CONTINUE_RUN -----------------------------------
     if action == ForwardStepAction.CONTINUE_RUN.value:
         if reached:
-            return ActionValidation(
-                False,
-                action,
-                [
-                    "CONTINUE_RUN refused: the requested horizon "
-                    f"t = {spec.end_time:g} was already reached."
-                ],
+            reason = (
+                "CONTINUE_RUN refused: the requested horizon "
+                f"t = {spec.end_time:g} was already reached. CONTINUE_RUN "
+                "resumes an execution that stopped short of its own horizon; "
+                "there is nothing left to resume toward."
             )
+            # Name the action that does apply. A gate that only says no leaves
+            # the workflow stuck on a healthy run, which is what happened at
+            # t = 1 of the first iterative experiment.
+            if not reached_target:
+                reason += (
+                    f" The final target t = {target:g} has not been reached, "
+                    "so EXTEND_END_TIME is the action for more physical "
+                    "evolution."
+                )
+            else:
+                reason += (
+                    f" The final target t = {target:g} has also been reached, "
+                    "so the decision is ACCEPT or FAIL_SAFELY."
+                )
+            return ActionValidation(False, action, [reason])
         if not healthy:
             return ActionValidation(
                 False,
@@ -177,14 +215,40 @@ def validate_action(
             return ActionValidation(
                 False, action, ["EXTEND_END_TIME refused: state is not numerically healthy."]
             )
-        proposed = min(spec.end_time * 2.0, max_end_time)
+        if not reached:
+            return ActionValidation(
+                False,
+                action,
+                [
+                    "EXTEND_END_TIME refused: the current horizon "
+                    f"t = {spec.end_time:g} has not been reached yet "
+                    f"(the run stopped at t = {final_time:g}). Moving the "
+                    "horizon further away does not finish the execution that "
+                    "is still outstanding; CONTINUE_RUN is the action for "
+                    "that."
+                ],
+            )
+        if reached_target:
+            return ActionValidation(
+                False,
+                action,
+                [
+                    "EXTEND_END_TIME refused: the registered final target "
+                    f"t = {target:g} has been reached. Extending past a "
+                    "satisfied scientific horizon is not a bounded action; "
+                    "the decision now is ACCEPT or FAIL_SAFELY."
+                ],
+            )
+        # Never overshoot the declared scientific target: the loop advances
+        # toward it, it does not wander past it.
+        proposed = min(spec.end_time * 2.0, max_end_time, target)
         if proposed <= spec.end_time + 1e-12:
             return ActionValidation(
                 False,
                 action,
                 [
                     "EXTEND_END_TIME refused: already at the declared maximum "
-                    f"horizon {max_end_time:g}."
+                    f"horizon {min(max_end_time, target):g}."
                 ],
             )
         if proposed > ForwardStep2DSpec().end_time * MAX_EXTEND_FACTOR:
@@ -194,7 +258,9 @@ def validate_action(
             )
             proposed = min(proposed, ForwardStep2DSpec().end_time * MAX_EXTEND_FACTOR)
         reasons.append(
-            f"EXTEND_END_TIME permitted: {spec.end_time:g} -> {proposed:g} on a healthy run."
+            f"EXTEND_END_TIME permitted: {spec.end_time:g} -> {proposed:g} on a "
+            f"healthy run that reached its current horizon; final target "
+            f"t = {target:g}."
         )
         return ActionValidation(True, action, reasons, {"end_time": proposed})
 

@@ -25,9 +25,35 @@ from typing import Any, Dict, List
 
 from .spec import ForwardStep2DSpec
 
+# ----------------------------------------------------------------------
+# TWO QUESTIONS, TWO ANSWERS
+#
+# "Is this solution numerically and physically healthy right now?" and "is
+# this run finished enough to accept as science?" are different questions, and
+# answering the first with PASS made the second look answered too. A run at
+# t = 0.5 of a benchmark stated at t = 4 can be flawless and still be a
+# partial realization of that benchmark.
+#
+#   hard_checks_status   the 17 hard checks: health of the state that exists
+#   final_acceptance     health AND the registered horizon requirement
+#   status               the single disposition, derived from both
+#
+# STATUS_PASS keeps its name and its meaning of final acceptance, so the
+# action gate that requires it for ACCEPT now deterministically cannot accept
+# an unfinished run. Acceptance is not delegated to the model.
+# ----------------------------------------------------------------------
+
 STATUS_PASS = "PASS_2D_FORWARD_STEP"
 STATUS_FAIL = "FAIL"
 STATUS_INCOMPLETE = "INCOMPLETE_HORIZON_NOT_REACHED"
+STATUS_HEALTHY_TARGET_NOT_REACHED = "CURRENT_STATE_HEALTHY_TARGET_NOT_REACHED"
+
+HARD_CHECKS_PASS = "PASS_HARD_CHECKS"
+HARD_CHECKS_FAIL = "FAIL_HARD_CHECKS"
+
+FINAL_ACCEPTABLE = "FINAL_ACCEPTABLE"
+FINAL_TARGET_NOT_REACHED = "TARGET_HORIZON_NOT_REACHED"
+FINAL_BLOCKED = "BLOCKED_BY_FAILED_CHECKS"
 
 
 def validate(d: Dict[str, Any]) -> Dict[str, Any]:
@@ -85,23 +111,61 @@ def validate(d: Dict[str, Any]) -> Dict[str, Any]:
     failed: List[str] = [k for k, v in checks.items() if not v]
 
     # ---------------- disposition ------------------------------------
-    if not d.get("reached_requested_end_time", False) and not failed:
-        status = STATUS_INCOMPLETE
-    elif failed:
+    #
+    # Precedence: a defect outranks an unfinished run, an execution that
+    # stopped short of its own requested horizon outranks one that reached it,
+    # and only a healthy run that has reached the registered final horizon is
+    # finally acceptable.
+    final_time = float(d["final_time"])
+    target = float(spec.final_target_end_time)
+    reached_current = bool(d.get("reached_requested_end_time", False))
+    reached_target = final_time >= target - 1e-9
+
+    if failed:
         status = STATUS_FAIL
+        acceptance = FINAL_BLOCKED
+    elif not reached_current:
+        status = STATUS_INCOMPLETE
+        acceptance = FINAL_TARGET_NOT_REACHED
+    elif not reached_target:
+        status = STATUS_HEALTHY_TARGET_NOT_REACHED
+        acceptance = FINAL_TARGET_NOT_REACHED
     else:
         status = STATUS_PASS
+        acceptance = FINAL_ACCEPTABLE
 
     result: Dict[str, Any] = {
         "status": status,
         "family": spec.family,
         "failed_checks": failed,
         "hard_checks": hard,
+        "hard_checks_status": HARD_CHECKS_PASS if not failed else HARD_CHECKS_FAIL,
         "shock_compression": shock,
+        "final_acceptance": {
+            "status": acceptance,
+            "final_acceptable": acceptance == FINAL_ACCEPTABLE,
+            "reached_final_target": reached_target,
+            "final_target_end_time": target,
+            "initial_execution_end_time": spec.initial_execution_end_time,
+            "current_requested_end_time": spec.end_time,
+            "final_time": final_time,
+            "basis": (
+                "Final acceptance requires the 17 hard checks AND the "
+                "registered final horizon. The default target is the endTime "
+                "of the vendored tutorial controlDict, the horizon this "
+                "family's reference evidence is stated at; a request that "
+                "names its own final horizon replaces it. Passing the hard "
+                "checks means the state that exists is healthy, not that the "
+                "run is finished."
+            ),
+        },
         "horizon": {
             "requested_end_time": d["requested_end_time"],
             "final_time": d["final_time"],
-            "reached": bool(d.get("reached_requested_end_time", False)),
+            "reached": reached_current,
+            "reached_final_target": reached_target,
+            "final_target_end_time": target,
+            "initial_execution_end_time": spec.initial_execution_end_time,
             "saved_states": d["saved_times"],
             "solver_runs": d.get("solver_runs"),
             "continuation_used": d.get("continuation_used"),

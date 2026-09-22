@@ -146,7 +146,15 @@ def make_case(
     reached_end: bool = True,
 ) -> Path:
     """Write a complete synthetic case tree and return its path."""
-    spec = spec or ForwardStep2DSpec(nx=60, ny=20, end_time=0.3, write_interval=0.1)
+    # final_target_end_time is stated explicitly and equal to end_time: this
+    # fixture stands for a run that HAS reached the horizon its request asked
+    # for, so it exercises the final-acceptance path. Leaving it unset would
+    # silently inherit the family reference horizon of 4 and make every
+    # synthetic run a healthy-but-unfinished one, which is a different case
+    # and is covered by its own tests.
+    spec = spec or ForwardStep2DSpec(
+        nx=60, ny=20, end_time=0.3, write_interval=0.1, final_target_end_time=0.3
+    )
     case = Path(root) / "case"
     build(spec, case)
 

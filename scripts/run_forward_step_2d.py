@@ -110,24 +110,103 @@ def save_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
 
 
+#: Per-run documents that a resume would otherwise overwrite. They are the
+#: record of what the agent decided last time, including a refused action, and
+#: that record is development provenance in its own right.
+HISTORY_FILES = (
+    "agent_result.json",
+    "provenance.json",
+    "events.jsonl",
+    "events.log",
+    "SCIENTIFIC_SUMMARY.md",
+    "report_payload.json",
+)
+
+
+def archive_prior_run(out: Path) -> Optional[Path]:
+    """Copy a previous run's top-level documents aside before resuming.
+
+    EventStream truncates events.jsonl and events.log when it opens, and
+    finish() rewrites agent_result.json, so a resume into the same directory
+    would erase the history it is supposed to continue. Per-iteration evidence
+    is never touched: iteration_NN directories are additive and the resumed
+    run numbers past them.
+    """
+    import shutil
+
+    existing = [name for name in HISTORY_FILES if (out / name).is_file()]
+    if not existing:
+        return None
+
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    archive = out / "history" / f"pre_resume_{stamp}"
+    archive.mkdir(parents=True, exist_ok=True)
+    for name in existing:
+        shutil.copy2(out / name, archive / name)
+    return archive
+
+
 class ForwardStepRun:
     def __init__(self, args: argparse.Namespace, request: str) -> None:
         self.args = args
         self.request = request
         self.out = Path(args.out).resolve()
         self.out.mkdir(parents=True, exist_ok=True)
+
+        # Resume bookkeeping, settled before the event stream opens because
+        # opening it truncates the previous run's logs.
+        self.resume_case: Optional[str] = getattr(args, "resume_case", None)
+        self.history_archive: Optional[Path] = None
+        self.iteration_offset = 0
+        self.prior_iterations: List[Dict[str, Any]] = []
+        if self.resume_case:
+            self.history_archive = archive_prior_run(self.out)
+            self.iteration_offset = len(
+                [d for d in self.out.glob("iteration_*") if d.is_dir()]
+            )
+            prior = self.out / "provenance.json"
+            if prior.is_file():
+                try:
+                    self.prior_iterations = json.loads(prior.read_text()).get(
+                        "iterations", []
+                    )
+                except json.JSONDecodeError:
+                    self.prior_iterations = []
+
         self.stream = EventStream(self.out, case_id="forward_step_2d")
         self.llm_calls: List[Dict[str, Any]] = []
         self.provenance: Dict[str, Any] = {
             "family": "forward_step_2d",
             "request": request,
             "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "iterations": [],
+            # Carried forward so the resumed run's provenance holds the whole
+            # history, including the iteration whose action was refused.
+            "iterations": list(self.prior_iterations),
         }
+        if self.resume_case:
+            self.provenance["resume"] = {
+                "resumed_case": self.resume_case,
+                "solver_restarted_from_zero": False,
+                "prior_iterations_preserved": len(self.prior_iterations),
+                "iteration_numbering_continues_from": self.iteration_offset,
+                "history_archive": (
+                    str(self.history_archive) if self.history_archive else None
+                ),
+            }
         self.runtime: Optional[FoamRuntime] = None
         self.result: Dict[str, Any] = {"status": "INCOMPLETE"}
 
     # ------------------------------------------------------------------
+
+    def _earliest_recorded_end_time(self) -> Optional[float]:
+        """The smallest execution horizon any preserved iteration recorded."""
+        horizons = [
+            float(entry["spec"]["end_time"])
+            for entry in self.prior_iterations
+            if isinstance(entry.get("spec"), dict)
+            and entry["spec"].get("end_time") is not None
+        ]
+        return min(horizons) if horizons else None
 
     def note_llm(self, record: LLMCallRecord) -> None:
         self.llm_calls.append(record.to_dict())
@@ -145,6 +224,135 @@ class ForwardStepRun:
     # ------------------------------------------------------------------
 
     def run(self) -> Dict[str, Any]:
+        if self.resume_case:
+            return self.resume()
+        return self.run_from_request()
+
+    # ------------------------------------------------------------------
+
+    def resume(self) -> Dict[str, Any]:
+        """Continue an existing solved case under the current semantics.
+
+        Nothing is re-solved. The case keeps the fields it already has, the
+        loop numbers past the iterations already recorded, and the first pass
+        collects evidence from the existing solution rather than invoking the
+        solver: the point of a resume is that the calculation so far is
+        evidence, not something to redo.
+        """
+        s = self.stream
+        args = self.args
+        case = PurePosixPath(self.resume_case)
+
+        s.emit(
+            ev.ORCHESTRATOR,
+            f"Resuming an existing case at {case}. The solver will not be "
+            "restarted from t = 0 and no existing field is rewritten.",
+        )
+        if self.history_archive:
+            s.ok(
+                ev.ORCHESTRATOR,
+                f"Previous run documents archived to {self.history_archive.name}; "
+                f"{self.iteration_offset} recorded iteration(s) preserved.",
+            )
+
+        runtime = FoamRuntime.detect()
+        self.runtime = runtime
+        if args.distro:
+            runtime.distro = args.distro
+        if args.bashrc:
+            runtime.bashrc = args.bashrc
+
+        try:
+            info = runtime.preflight()
+        except FoamRuntimeError as exc:
+            s.fail(ev.PREFLIGHT, str(exc))
+            return self.finish("NO_OPENFOAM", str(exc))
+        if not info["ok"]:
+            s.fail(ev.PREFLIGHT, f"Runtime unavailable: {info.get('reason')}")
+            return self.finish("NO_OPENFOAM", str(info.get("reason")))
+        save_json(self.out / "runtime_preflight.json", info)
+        self.provenance["runtime"] = info
+        s.ok(
+            ev.PREFLIGHT,
+            f"OpenFOAM Foundation v{info['openfoam_version']} ready "
+            f"({runtime.mode}, numpy {info['numpy']}).",
+        )
+
+        present = runtime.bash(
+            f"test -d {shlex.quote(str(case))} && "
+            f"test -f {shlex.quote(str(case))}/spec.json && "
+            f"test -f {shlex.quote(str(case))}/log.foamRun && echo PRESENT",
+            foam=False,
+            timeout=120,
+        )
+        if "PRESENT" not in present.stdout:
+            message = (
+                f"No solved case at {case}. A runtime cache is not permanent "
+                "evidence; if it has been cleared the run cannot be resumed "
+                "and would have to be reproduced from the request."
+            )
+            s.fail(ev.ORCHESTRATOR, message)
+            return self.finish("RESUME_CASE_NOT_FOUND", message)
+
+        spec_text = runtime.bash(
+            f"cat {shlex.quote(str(case))}/spec.json", foam=False, timeout=120
+        )
+        spec = ForwardStep2DSpec.from_dict(json.loads(spec_text.stdout))
+
+        # A case written before the horizons were separated carries only the
+        # end_time it had last been extended to, so the horizon the user
+        # actually asked the FIRST execution to run to is not in spec.json.
+        # It is in the run's own provenance, and recovering it is what keeps
+        # "for the initial CFD execution, use 0.5" visible after the loop has
+        # moved on. Without this the resumed record would claim the request
+        # asked for whatever the last extension happened to set.
+        recovered = self._earliest_recorded_end_time()
+        if recovered is not None and recovered < spec.initial_execution_end_time:
+            spec = spec.with_changes(initial_execution_end_time=recovered)
+            s.ok(
+                ev.ORCHESTRATOR,
+                f"Recovered the original initial execution horizon t = "
+                f"{recovered:g} from the preserved run provenance.",
+            )
+
+        if args.final_target_end_time is not None:
+            spec = spec.with_changes(
+                final_target_end_time=float(args.final_target_end_time)
+            )
+        # Write the resolved horizons back so the case carries the semantics
+        # the resumed loop is reasoning with.
+        runtime.write_text(case / "spec.json", json.dumps(spec.to_dict(), indent=2))
+
+        s.ok(
+            ev.ORCHESTRATOR,
+            f"Recovered specification: Mach {spec.mach:g}, {spec.cells} cells, "
+            f"initial execution horizon t = {spec.initial_execution_end_time:g}, "
+            f"current horizon t = {spec.end_time:g}, final target "
+            f"t = {spec.final_target_end_time:g}.",
+            data=spec.to_dict(),
+        )
+        self.provenance["spec"] = spec.to_dict()
+        self.result["runtime_case"] = str(case)
+
+        # A fresh code root: the resumed loop must run the CORRECTED pipeline,
+        # not whatever was staged beside the case when it was first solved.
+        stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+        root = runtime.make_root(f"{stamp}-forward-step-2d-resume")
+        code = root / "code"
+        runtime.bash(
+            f"mkdir -p {shlex.quote(str(code))}/pipeline/forward_step_2d "
+            f"{shlex.quote(str(code))}/pipeline/forward_step/template",
+            foam=False,
+            timeout=120,
+        )
+        self._stage_tree(runtime, code)
+        s.ok(ev.ORCHESTRATOR, "Corrected pipeline staged for the resumed loop.")
+
+        return self._iterate(runtime, root, code, case, spec, resumed=True)
+
+    # ------------------------------------------------------------------
+
+    def run_from_request(self) -> Dict[str, Any]:
         s = self.stream
         args = self.args
 
@@ -346,31 +554,70 @@ class ForwardStepRun:
         s.ok(ev.MESH_TOOL, "checkMesh: Mesh OK, 2 solution directions.")
 
         # 6. iterate ----------------------------------------------------
+        return self._iterate(runtime, root, code, case, spec, resumed=False)
+
+    # ------------------------------------------------------------------
+
+    def _iterate(
+        self,
+        runtime: FoamRuntime,
+        root: PurePosixPath,
+        code: PurePosixPath,
+        case: PurePosixPath,
+        spec: ForwardStep2DSpec,
+        *,
+        resumed: bool,
+    ) -> Dict[str, Any]:
+        """The bounded closed loop, entered fresh or on an existing solution."""
+        s = self.stream
+        args = self.args
+
+        logs = self.out / "logs"
+        logs.mkdir(parents=True, exist_ok=True)
+
         current = spec
-        iteration = 0
+        # A resumed run numbers past the iterations already on record, so
+        # iteration_03 follows iteration_02 instead of overwriting it.
+        iteration = self.iteration_offset
+        limit = self.iteration_offset + args.max_iterations
         pending_action: Optional[str] = None
         pending_changes: Dict[str, Any] = {}
 
-        while iteration < args.max_iterations:
+        # On a resume the solution at hand is already the product of a solver
+        # run: re-executing it would redo work the case has done. The first
+        # pass therefore goes straight to evidence collection.
+        skip_execution = resumed
+
+        while iteration < limit:
             iteration += 1
             append = iteration > 1
 
-            s.emit(
-                ev.EXECUTOR,
-                f"Iteration {iteration}: foamRun -case (shockFluid) to "
-                f"t = {current.end_time:g}"
-                + (" (continuation)" if append else ""),
-            )
+            if skip_execution:
+                skip_execution = False
+                s.emit(
+                    ev.EXECUTOR,
+                    f"Iteration {iteration}: no solver execution. The case is "
+                    "already solved to its current horizon; its existing "
+                    "fields are re-read as evidence.",
+                )
+            else:
+                s.emit(
+                    ev.EXECUTOR,
+                    f"Iteration {iteration}: foamRun -case (shockFluid) to "
+                    f"t = {current.end_time:g}"
+                    + (" (continuation)" if append else ""),
+                )
 
-            executed = runtime.bash(
-                f"cd {shlex.quote(str(code))} && "
-                f"FORWARD_STEP_WALL_LIMIT_S={float(args.solver_timeout)} "
-                f"python3 -u -m pipeline.forward_step_2d.execute "
-                f"{shlex.quote(str(case))} --events"
-                + (" --append" if append else ""),
-                timeout=None,
-                stream_prefix="[EXECUTOR]",
-            )
+                executed = runtime.bash(
+                    f"cd {shlex.quote(str(code))} && "
+                    f"FORWARD_STEP_WALL_LIMIT_S={float(args.solver_timeout)} "
+                    f"python3 -u -m pipeline.forward_step_2d.execute "
+                    f"{shlex.quote(str(case))} --events"
+                    + (" --append" if append else ""),
+                    timeout=None,
+                    stream_prefix="[EXECUTOR]",
+                )
+                del executed  # status is read from execution.json, not stdout
             runtime.fetch(case / "execution.json", self.out / "execution.json")
             runtime.fetch_tail(case / "log.foamRun", logs / "log.foamRun.tail")
             # The head carries the startup banner and any pre-time-loop
@@ -449,7 +696,8 @@ class ForwardStepRun:
                 ev.DIAGNOSTICS,
                 f"{len(validation['hard_checks']) - len(validation['failed_checks'])}"
                 f"/{len(validation['hard_checks'])} hard checks passed; "
-                f"status {validation['status']}; {len(images)} field images."
+                f"hard checks {validation.get('hard_checks_status')}; "
+                f"disposition {validation['status']}; {len(images)} field images."
                 + (
                     f" Failed: {', '.join(validation['failed_checks'])}."
                     if validation["failed_checks"]
@@ -457,6 +705,15 @@ class ForwardStepRun:
                 ),
                 status="PASS" if not validation["failed_checks"] else "FAIL",
             )
+
+            acceptance = validation.get("final_acceptance", {})
+            if not acceptance.get("final_acceptable", True):
+                s.emit(
+                    ev.SCIENTIFIC_VALIDATOR,
+                    "Current state is healthy but not finally acceptable: "
+                    f"t = {acceptance.get('final_time')} of the required "
+                    f"t = {acceptance.get('final_target_end_time')}.",
+                )
 
             # multimodal observation -----------------------------------
             visual: Dict[str, Any] = {"status": "not_attempted"}
@@ -531,13 +788,34 @@ class ForwardStepRun:
                     "spec": current.to_dict(),
                     "execution": last,
                     "validation_status": validation["status"],
+                    "hard_checks_status": validation.get("hard_checks_status"),
+                    "final_acceptance": validation.get("final_acceptance"),
                     "failed_checks": validation["failed_checks"],
                     "images": sorted(images),
                     "visual_status": visual.get("status"),
                     "llm_diagnosis": decision.diagnosis,
                     "llm_action": decision.action,
+                    # Whether the model's restatement of the two horizons
+                    # matched the deterministic evidence. A mismatch is not
+                    # corrected here - the gate rules regardless - but it is
+                    # recorded, because a model that misreads the horizons is
+                    # exactly what stalled this loop once.
+                    "llm_horizon_reading": {
+                        "current_horizon_reached": decision.current_horizon_reached,
+                        "final_target_reached": decision.final_target_reached,
+                        "agrees_with_evidence": (
+                            decision.current_horizon_reached
+                            == bool(diagnostics.get("reached_requested_end_time"))
+                            and decision.final_target_reached
+                            == bool(acceptance.get("reached_final_target"))
+                        ),
+                    },
                     "action_approved": action_gate.approved,
                     "action_reasons": action_gate.reasons,
+                    "solver_executed_this_iteration": last.get(
+                        "last_observed_time"
+                    ),
+                    "continuation": bool(last.get("continuation")),
                 }
             )
 
@@ -635,7 +913,8 @@ class ForwardStepRun:
 
         return self.finish(
             "ITERATION_BUDGET_EXHAUSTED",
-            f"{args.max_iterations} iterations without deterministic acceptance",
+            f"{args.max_iterations} iteration(s) in this run "
+            f"(through iteration {iteration}) without deterministic acceptance",
         )
 
     # ------------------------------------------------------------------
@@ -673,6 +952,8 @@ class ForwardStepRun:
             "solver": "OpenFOAM Foundation v14 shockFluid via foamRun",
             "specification": spec.to_dict(),
             "deterministic_verdict": validation["status"],
+            "hard_checks_status": validation.get("hard_checks_status"),
+            "final_acceptance": validation.get("final_acceptance"),
             "failed_checks": validation["failed_checks"],
             "measured": {
                 "final_time": diagnostics["final_time"],
@@ -712,6 +993,26 @@ def main() -> int:
     source = ap.add_mutually_exclusive_group(required=True)
     source.add_argument("--request", help="Natural-language engineering request.")
     source.add_argument("--request-file", help="File holding the request.")
+    source.add_argument(
+        "--resume-case",
+        help=(
+            "Runtime case directory of an already-solved run. The loop "
+            "continues that solution under the current semantics instead of "
+            "starting a new case: nothing is re-solved from t = 0, existing "
+            "iteration evidence is preserved, and the previous run's "
+            "documents are archived under <out>/history/ before the resumed "
+            "run writes its own."
+        ),
+    )
+    ap.add_argument(
+        "--final-target-end-time",
+        type=float,
+        default=None,
+        help=(
+            "Override the final scientific horizon of the resumed or "
+            "requested case. Unset keeps what the specification carries."
+        ),
+    )
 
     ap.add_argument("--out", default=str(_REPO_ROOT / "demo/forward_step_2d"))
     ap.add_argument("--max-iterations", type=int, default=4)
@@ -723,15 +1024,27 @@ def main() -> int:
     ap.add_argument("--bashrc")
 
     args = ap.parse_args()
-    request = (
-        args.request
-        if args.request
-        else Path(args.request_file).read_text(encoding="utf-8")
-    )
+    if args.resume_case:
+        # The request that produced the case is already recorded beside it.
+        # Re-reading it keeps the resumed run's provenance tied to the same
+        # engineering ask rather than to an empty string.
+        prior = Path(args.out) / "request.txt"
+        request = (
+            prior.read_text(encoding="utf-8")
+            if prior.is_file()
+            else f"Resume of the existing case at {args.resume_case}."
+        )
+    elif args.request:
+        request = args.request
+    else:
+        request = Path(args.request_file).read_text(encoding="utf-8")
 
     print()
     print("=" * 78)
-    print("  2D FORWARD-STEP AUTONOMOUS CFD AGENT")
+    print(
+        "  2D FORWARD-STEP AUTONOMOUS CFD AGENT"
+        + ("   (RESUMING AN EXISTING SOLUTION)" if args.resume_case else "")
+    )
     print("=" * 78)
 
     run = ForwardStepRun(args, request)

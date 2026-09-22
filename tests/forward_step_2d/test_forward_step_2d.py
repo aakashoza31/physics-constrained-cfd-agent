@@ -438,7 +438,7 @@ def test_diagnosis_payload_is_reference_blind(synthetic):
     for token in ("reference_comparison", "canonical_case", "stationary_normal_shock_sanity"):
         assert token not in text
 
-    assert payload["horizon"]["reached_requested_end_time"] is True
+    assert payload["horizon"]["reached_current_requested_end_time"] is True
     assert payload["allowed_actions"]
     assert "transient" in payload["important_instruction"]
 
