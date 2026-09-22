@@ -240,3 +240,46 @@ def test_a_prior_error_report_cannot_re_fail_a_corrected_run(tmp_path):
     )
     with pytest.raises(ValueError):
         read_raw_solver_log(report)
+
+
+# ----------------------------------------------------------------------
+# warnings must be archived with their message, not just their marker
+# ----------------------------------------------------------------------
+
+WARNING_LOG = STARTUP + """
+--> FOAM Warning :
+    From function void Foam::polyMesh::checkTopology() const
+    in file meshes/polyMesh/polyMesh.C at line 921
+    Mesh has multiple regions
+
+Starting time loop
+
+Time = 0.1s
+"""
+
+
+def test_a_warning_is_captured_with_its_message():
+    from src.pipeline.forward_step_2d.diagnostics import collect_warnings
+
+    (warning,) = collect_warnings(WARNING_LOG)
+    assert "FOAM Warning" in warning
+    assert "Mesh has multiple regions" in warning
+    assert "polyMesh.C at line 921" in warning
+
+
+def test_warning_capture_stops_at_the_next_record():
+    from src.pipeline.forward_step_2d.diagnostics import collect_warnings
+
+    (warning,) = collect_warnings(WARNING_LOG)
+    assert "Starting time loop" not in warning
+    assert "Time = 0.1s" not in warning
+
+
+def test_a_healthy_log_records_no_warnings():
+    from src.pipeline.forward_step_2d.diagnostics import collect_warnings
+
+    assert collect_warnings(HEALTHY) == []
+
+
+def test_a_warning_is_not_a_fatal_error():
+    assert scan_fatal_signatures(WARNING_LOG) == []

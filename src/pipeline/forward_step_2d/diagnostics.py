@@ -152,6 +152,45 @@ def scan_fatal_signatures(raw_log: str) -> list:
     return hits
 
 
+def collect_warnings(raw_log: str, limit: int = 20) -> list:
+    """Capture OpenFOAM warnings WITH their message.
+
+    OpenFOAM writes a warning as a marker line followed by indented
+    continuation lines::
+
+        --> FOAM Warning :
+            From function ...
+            in file ...
+            <the actual message>
+
+    Taking only lines containing the word "Warning" therefore records
+    ``'--> FOAM Warning: '`` and discards the entire content, which is what
+    the first live run archived. The continuation lines are kept here so a
+    warning can be read from the evidence instead of requiring the runtime
+    log to still exist.
+    """
+    lines = raw_log.splitlines()
+    warnings = []
+    index = 0
+    while index < len(lines) and len(warnings) < limit:
+        if "Warning" not in lines[index]:
+            index += 1
+            continue
+        block = [lines[index].rstrip()]
+        index += 1
+        # Continuation lines are indented or blank-then-indented; stop at the
+        # first left-aligned non-empty line, which starts the next record.
+        while index < len(lines) and len(block) < 8:
+            candidate = lines[index]
+            if candidate.strip() and not candidate[:1].isspace():
+                break
+            if candidate.strip():
+                block.append(candidate.rstrip())
+            index += 1
+        warnings.append("\n".join(block))
+    return warnings
+
+
 def scan_process_failure(execution: list) -> list:
     """Abnormal termination as reported by the executor, not by log text.
 
@@ -540,7 +579,7 @@ def diagnose(case, output, spec=None, reference: Optional[str] = None):
         "nominal_inlet_Mach": spec.mach,
         "realized_inlet_Mach": spec.realized_mach,
         "gas": {"R": R_SPECIFIC, "gamma": GAMMA, "Cp": CP},
-        "warnings": [l for l in log.splitlines() if "Warning" in l][:20],
+        "warnings": collect_warnings(log),
         "energy_momentum_scope": (
             "Stored domain totals only. Boundary momentum and energy flux "
             "closure is not computed and is not claimed."
