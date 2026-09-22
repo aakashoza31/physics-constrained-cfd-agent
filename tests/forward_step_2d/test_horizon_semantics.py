@@ -340,8 +340,12 @@ def test_7b_the_orchestrator_sets_startfrom_latesttime_for_every_continuation():
     source = Path("scripts/run_forward_step_2d.py").read_text()
     assert "startFrom       latestTime;" in source
     assert "startFrom       startTime;" not in source
-    # Every solver invocation after the first is an --append continuation.
-    assert "append = iteration > 1" in source
+    # A continuation is tied to the CASE, not to the iteration number: an
+    # iteration that runs on a newly built mesh must be a fresh solve. The
+    # earlier rule, append = iteration > 1, would have continued into a grid
+    # whose fields do not exist.
+    assert "append = last_executed_case == case" in source
+    assert "append = iteration > 1" not in source
     assert '" --append" if append else ""' in source
 
 

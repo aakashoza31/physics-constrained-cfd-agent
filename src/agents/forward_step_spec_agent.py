@@ -86,6 +86,17 @@ class ForwardStepRequest(BaseModel):
     nx: Optional[int] = Field(default=None)
     ny: Optional[int] = Field(default=None)
 
+    requests_mesh_sensitivity_assessment: bool = Field(
+        default=False,
+        description=(
+            "True if the request asks whether the result has adequate "
+            "numerical/mesh resolution, or asks for a mesh-refinement or "
+            "resolution-sensitivity assessment. This records the QUESTION "
+            "only. Do not decide whether refinement is needed and do not name "
+            "an action: the evidence decides that later."
+        ),
+    )
+
     requests_unsupported_physics: bool = Field(
         default=False,
         description=(
@@ -185,16 +196,24 @@ Rules:
    ends.
 
 8. nx and ny are mesh resolution counts across the full channel length and
-   height. Only set them if the request asks for a specific resolution.
+   height. Only set them if the request asks for a specific resolution. A
+   request for a deliberately coarse starting grid states one; honour it.
 
-9. Do not predict results. Do not state shock angles, pressure ratios or any
+9. Set requests_mesh_sensitivity_assessment true when the request asks whether
+   the resolution is adequate, asks for a mesh-refinement study, or asks
+   whether the answer still changes with the grid. This records that the
+   question was asked. Do NOT conclude that refinement is needed and do NOT
+   name REFINE_MESH or any other action: a deterministic gate decides that
+   from the CFD evidence, after the first grid has been solved.
+
+10. Do not predict results. Do not state shock angles, pressure ratios or any
    expected answer. This forbids you from ANSWERING an assessment question; it
    does not forbid the user from ASKING one. Record the question in
    reporting_objectives and leave it unanswered.
 
-10. case_name is a short lowercase identifier such as mach2p5_step0p15.
+11. case_name is a short lowercase identifier such as mach2p5_step0p15.
 
-11. Do not use Markdown. Return only the structured JSON object.
+12. Do not use Markdown. Return only the structured JSON object.
 """
 
 
@@ -253,6 +272,13 @@ def to_spec(
     # a final horizon, unstated means the registered family horizon applies.
     # Writing end_time into it would be the exact conflation that made an
     # instruction about the FIRST execution look like the whole ambition.
+    # The question asked, carried onto the specification. It names no action.
+    data["sensitivity_assessment_requested"] = bool(
+        request.requests_mesh_sensitivity_assessment
+    )
+    if request.requests_mesh_sensitivity_assessment:
+        stated.append("sensitivity_assessment_requested")
+
     if request.final_target_end_time is not None:
         data["final_target_end_time"] = _clean(request.final_target_end_time)
         stated.append("final_target_end_time")

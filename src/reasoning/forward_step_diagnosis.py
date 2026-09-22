@@ -148,9 +148,29 @@ Rules:
    decides actual acceptance, and it requires the final target horizon as well
    as the hard checks; if either is outstanding, your ACCEPT will be refused.
 
-9. REQUEST_CLARIFICATION requires a concrete question in clarification_question.
+9. MESH RESOLUTION. mesh_resolution says how fine the current grid is and
+   whether the request asked for a resolution assessment.
 
-10. Do not use Markdown. Return only the structured JSON object.
+   A solution that passes every hard check has been shown to be healthy ON THE
+   GRID IT WAS COMPUTED ON. That is not the same as showing the answer no
+   longer depends on the grid. When
+   mesh_resolution.sensitivity_assessment_requested is true and
+   mesh_resolution.sensitivity reports that the cross-grid requirement is not
+   met, the missing evidence is another grid, and REFINE_MESH is the action
+   that produces it.
+
+   REFINE_MESH maps to one registered refinement operation. You do not choose a
+   refinement factor, a cell count, a geometry or any dictionary entry, and you
+   cannot propose a different mesh. A refined grid is a fresh solve from the
+   physical initial condition, not a continuation.
+
+   Do not propose REFINE_MESH for a failure that is not about spatial
+   resolution: a broken mesh, a wrong inlet state, an edited recipe or a
+   crashed solver are not fixed by more cells, and the gate will refuse it.
+
+10. REQUEST_CLARIFICATION requires a concrete question in clarification_question.
+
+11. Do not use Markdown. Return only the structured JSON object.
 """
 
 
@@ -176,6 +196,7 @@ def build_evidence_payload(
     visual_observation: Optional[Dict[str, Any]] = None,
     iterations_used: int = 0,
     max_iterations: int = 4,
+    sensitivity: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Assemble the reference-blind packet handed to the model."""
     d = _strip(copy.deepcopy(diagnostics))
@@ -265,6 +286,17 @@ def build_evidence_payload(
         "deterministic_status": v.get("status"),
         "hard_checks_status": v.get("hard_checks_status"),
         "final_acceptance": v.get("final_acceptance"),
+        "mesh_resolution": {
+            "refinement_level": spec.refinement_level,
+            "cells": spec.cells,
+            "dx": spec.dx,
+            "dy": spec.dy,
+            "sensitivity_assessment_requested": (
+                spec.sensitivity_assessment_requested
+            ),
+            **({"sensitivity": _strip(copy.deepcopy(sensitivity))}
+               if sensitivity else {}),
+        },
         "iterations_used": iterations_used,
         "max_iterations": max_iterations,
         "allowed_diagnoses": [x.value for x in ForwardStepDiagnosis],
@@ -319,6 +351,7 @@ def diagnose(
     max_end_time: float,
     iterations_used: int,
     max_iterations: int,
+    sensitivity: Optional[Dict[str, Any]] = None,
 ) -> Tuple[ForwardStepDecision, ActionValidation, LLMCallRecord, Dict[str, Any]]:
     """Reference-blind diagnosis followed by the deterministic action gate."""
     payload = build_evidence_payload(
@@ -329,6 +362,7 @@ def diagnose(
         visual_observation=visual_observation,
         iterations_used=iterations_used,
         max_iterations=max_iterations,
+        sensitivity=sensitivity,
     )
 
     if not gemini_key_present():
@@ -360,6 +394,7 @@ def diagnose(
         iterations_used=iterations_used,
         max_iterations=max_iterations,
         clarification=decision.clarification_question,
+        sensitivity=sensitivity,
     )
 
     return decision, gate, record, payload

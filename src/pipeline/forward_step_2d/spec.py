@@ -111,6 +111,14 @@ class ForwardStep2DSpec:
     final_target_end_time: Optional[float] = None
     initial_execution_end_time: Optional[float] = None
 
+    # Mesh-refinement study state. refinement_level counts how many registered
+    # refinements produced this grid, so level 0 is whatever the request asked
+    # for. sensitivity_assessment_requested records that the request asked for
+    # a resolution assessment, which a single healthy grid cannot supply; it
+    # does not name an action, because the evidence decides that.
+    refinement_level: int = 0
+    sensitivity_assessment_requested: bool = False
+
     # fixed family identity
     family: str = FAMILY
     physics: str = PHYSICS
@@ -156,6 +164,9 @@ class ForwardStep2DSpec:
             value = getattr(self, key)
             if type(value) is not int or value < 2:
                 raise ValueError(f"{key} must be an integer >= 2, got {value!r}")
+
+        if type(self.refinement_level) is not int or self.refinement_level < 0:
+            raise ValueError("refinement_level must be a non-negative integer")
 
         if not self.step_x < self.length:
             raise ValueError("step_x must lie strictly inside the channel length")

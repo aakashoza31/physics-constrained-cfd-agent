@@ -43,7 +43,26 @@ class ForwardStepDiagnosis(str, Enum):
     OUTSIDE_VALIDATED_FAMILY = "OUTSIDE_VALIDATED_FAMILY"
 
 
-# Bounded refinement policy: one step of uniform refinement, capped.
+#: Failures a finer mesh cannot repair. Each is about the case setup, the
+#: mesh's own validity or the run's bookkeeping, not about how finely the flow
+#: is resolved.
+RESOLUTION_UNRELATED_FAILURES = {
+    "mesh_ok",
+    "two_solution_directions",
+    "mesh_stage_clean",
+    "expected_boundaries_present",
+    "planar_empty_patches",
+    "fixed_recipe_unchanged",
+    "cell_count_matches_spec",
+    "supersonic_inlet",
+    "initial_state_as_specified",
+    "impermeable_walls",
+    "no_fatal_error",
+}
+
+# Bounded refinement policy. The factor and the level cap now live in
+# src/reasoning/forward_step_mesh_study.py, which owns the one registered
+# mesh operation; REFINE_FACTOR is kept only so existing imports resolve.
 REFINE_FACTOR = 1.5
 MAX_CO_FLOOR = 0.05
 MAX_EXTEND_FACTOR = 3.0
@@ -87,8 +106,16 @@ def validate_action(
     iterations_used: int,
     max_iterations: int,
     clarification: Optional[str] = None,
+    sensitivity: Optional[Dict[str, Any]] = None,
 ) -> ActionValidation:
-    """Decide whether a proposed action may be executed. Fail closed."""
+    """Decide whether a proposed action may be executed. Fail closed.
+
+    ``sensitivity`` is the deterministic cross-grid verdict when a
+    numerical-sensitivity assessment was requested. It is a second authority
+    alongside the single-grid validator: a solution can be flawless on the
+    grid it was computed on and still be unable to answer the question the
+    request asked.
+    """
     reasons: List[str] = []
 
     try:
@@ -160,10 +187,32 @@ def validate_action(
                     f"Outstanding: {failed}."
                 ],
             )
+        # A healthy grid is not a resolution assessment. When the request
+        # asked for one, the cross-grid evidence is a second requirement and
+        # the model cannot satisfy it by declaring the result good.
+        if sensitivity is not None and sensitivity.get("assessment_requested"):
+            if not sensitivity.get("satisfied"):
+                return ActionValidation(
+                    False,
+                    action,
+                    [
+                        "ACCEPT refused: this request asked for a "
+                        "numerical-sensitivity assessment, and the registered "
+                        f"cross-grid requirement is not met "
+                        f"({sensitivity.get('status')}). "
+                        + str(sensitivity.get("reason", ""))
+                    ],
+                )
         return ActionValidation(
             True,
             action,
-            ["ACCEPT is consistent with the deterministic forward-step checks."],
+            ["ACCEPT is consistent with the deterministic forward-step checks."]
+            + (
+                [str(sensitivity.get("reason", ""))]
+                if sensitivity is not None
+                and sensitivity.get("assessment_requested")
+                else []
+            ),
         )
 
     # ---------------- CONTINUE_RUN -----------------------------------
@@ -288,33 +337,81 @@ def validate_action(
         )
 
     # ---------------- REFINE_MESH ------------------------------------
+    #
+    # The model proposes the action and nothing else. Every number below comes
+    # from the registered refinement operation: it chooses no factor, no cell
+    # count and no geometry, and it cannot reach blockMeshDict.
     if action == ForwardStepAction.REFINE_MESH.value:
-        nx = int(round(spec.nx * REFINE_FACTOR))
-        ny = int(round(spec.ny * REFINE_FACTOR))
-        try:
-            refined = spec.with_changes(nx=nx, ny=ny)
-        except ValueError as exc:
-            return ActionValidation(
-                False, action, [f"REFINE_MESH refused: {exc}"]
-            )
-        if refined.cells > MAX_CELLS:
+        from src.reasoning.forward_step_mesh_study import can_refine
+
+        # Resolution is not a repair for every defect. Refining a mesh whose
+        # run died for an unrelated reason spends four times the compute to
+        # reproduce the same failure at higher cost.
+        unrelated = [
+            name
+            for name in validation.get("failed_checks", [])
+            if name in RESOLUTION_UNRELATED_FAILURES
+        ]
+        if unrelated:
             return ActionValidation(
                 False,
                 action,
                 [
-                    f"REFINE_MESH refused: {refined.cells} cells exceeds the "
-                    f"{MAX_CELLS} bound for this family."
+                    "REFINE_MESH refused: the outstanding failures are not "
+                    f"spatial-resolution problems ({', '.join(unrelated)}). "
+                    "A finer grid would reproduce them at four times the cost."
                 ],
             )
+        if not healthy:
+            return ActionValidation(
+                False,
+                action,
+                [
+                    "REFINE_MESH refused: the current grid's solution is not "
+                    "numerically healthy, so it is not evidence that the "
+                    "resolution is what limits the result."
+                ],
+            )
+        if diagnostics.get("final_time") is None:
+            return ActionValidation(
+                False,
+                action,
+                [
+                    "REFINE_MESH refused: no CFD evidence exists for the "
+                    "current grid, so there is nothing to refine in response to."
+                ],
+            )
+
+        allowed = can_refine(spec)
+        if not allowed["permitted"]:
+            return ActionValidation(
+                False, action, [f"REFINE_MESH refused: {allowed['reason']}"]
+            )
+
+        # Already satisfied means there is nothing left to learn from a
+        # further grid, and spending one anyway is not a bounded action.
+        if sensitivity is not None and sensitivity.get("satisfied"):
+            return ActionValidation(
+                False,
+                action,
+                [
+                    "REFINE_MESH refused: the registered numerical-sensitivity "
+                    "criterion is already satisfied on the existing grids."
+                ],
+            )
+
         return ActionValidation(
             True,
             action,
             [
-                "REFINE_MESH permitted under the bounded uniform policy "
-                f"(x{REFINE_FACTOR}): {spec.cells} -> {refined.cells} cells. "
-                "Geometry and the numerical recipe are unchanged."
+                "REFINE_MESH permitted under the registered bounded policy "
+                f"(x{allowed['refinement_ratio']:g} linear): level "
+                f"{spec.refinement_level} -> {allowed['next_level']}, "
+                f"{spec.cells} -> {allowed['cells']} cells. Geometry, physics "
+                "and the numerical recipe are unchanged; a new mesh is a new "
+                "solve, not a continuation."
             ],
-            {"nx": nx, "ny": ny, "cells": refined.cells},
+            allowed,
         )
 
     # ---------------- REBUILD_FROM_VALIDATED_SPEC --------------------
