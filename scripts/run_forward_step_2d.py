@@ -58,6 +58,8 @@ from src.reporting.event_stream import EventStream  # noqa: E402
 PIPELINE_DIR = _REPO_ROOT / "src/pipeline/forward_step_2d"
 TEMPLATE_DIR = _REPO_ROOT / "src/pipeline/forward_step/template"
 
+#: Figures handed to the multimodal observer and the diagnosis payload. These
+#: are flow-field and mesh images: things a reader can look at and judge.
 FIELD_IMAGE_KEYS = [
     "Mach_field",
     "p_field",
@@ -68,6 +70,13 @@ FIELD_IMAGE_KEYS = [
     "shock_density_contours",
     "shock_front_history",
 ]
+
+#: Figures archived into the run directory. This is a superset: the transient
+#: conservation plot is evidence a reader of the handoff needs, but it is a
+#: numerical audit trace rather than a flow image, so it is archived without
+#: being added to what the observer is asked to interpret. The first live run
+#: produced nine figures and returned eight, because this list did not exist.
+ARCHIVE_IMAGE_KEYS = FIELD_IMAGE_KEYS + ["transient_conservation"]
 
 
 def fetch_binary(runtime: FoamRuntime, remote: PurePosixPath, local: Path) -> bool:
@@ -427,13 +436,14 @@ class ForwardStepRun:
             images: Dict[str, str] = {}
             figures_dir = iteration_out / "figures"
             figures_dir.mkdir(exist_ok=True)
-            for key in FIELD_IMAGE_KEYS:
+            for key in ARCHIVE_IMAGE_KEYS:
                 remote = index.get("figures", {}).get(key)
                 if not remote:
                     continue
                 local = figures_dir / f"{key}.png"
                 if fetch_binary(runtime, PurePosixPath(remote), local):
-                    images[key] = str(local)
+                    if key in FIELD_IMAGE_KEYS:
+                        images[key] = str(local)
 
             s.emit(
                 ev.DIAGNOSTICS,

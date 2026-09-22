@@ -138,3 +138,59 @@ def test_reanalysis_refuses_a_generated_document_as_the_log(
     summary.write_text("Status FAIL: a FOAM FATAL ERROR was reported.")
     with pytest.raises(ValueError, match="not a raw solver log"):
         reanalyse_run(run, solver_log=summary)
+
+
+# ----------------------------------------------------------------------
+# the full-fidelity path: a runtime case, re-judged from its native fields
+# ----------------------------------------------------------------------
+
+
+def _fingerprint(case: Path) -> str:
+    import hashlib
+
+    digest = hashlib.sha256()
+    for path in sorted(case.rglob("*")):
+        if path.is_file() and "postProcessing" not in str(path):
+            digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def test_full_reanalysis_does_not_modify_the_solved_case(tmp_path):
+    """A case that changed under reanalysis would be worthless as evidence."""
+    from src.pipeline.forward_step_2d.reanalyse import reanalyse_case
+    from tests.forward_step_2d.synthetic import make_case
+
+    case = make_case(tmp_path)
+    before = _fingerprint(case)
+    reanalyse_case(case, tmp_path / "evidence_full")
+    assert _fingerprint(case) == before
+
+
+def test_full_reanalysis_regenerates_every_expected_figure(tmp_path):
+    """The first live run archived eight of nine; transient_conservation was
+    dropped by the fetch list, not by the plotting code."""
+    from scripts.run_forward_step_2d import ARCHIVE_IMAGE_KEYS
+    from src.pipeline.forward_step_2d.reanalyse import reanalyse_case
+    from tests.forward_step_2d.synthetic import make_case
+
+    case = make_case(tmp_path)
+    index = reanalyse_case(case, tmp_path / "evidence_full")
+
+    assert index["figure_error"] is None
+    assert set(ARCHIVE_IMAGE_KEYS) <= set(index["figures"])
+    assert "transient_conservation" in index["figures"]
+    for path in index["figures"].values():
+        assert Path(path).stat().st_size > 0
+
+
+def test_full_reanalysis_declares_a_complete_log_scan(tmp_path):
+    from src.pipeline.forward_step_2d.reanalyse import reanalyse_case
+    from tests.forward_step_2d.synthetic import make_case
+
+    case = make_case(tmp_path)
+    reanalyse_case(case, tmp_path / "evidence_full")
+    diagnostics = json.loads(
+        (tmp_path / "evidence_full" / "diagnostics.json").read_text()
+    )
+    assert diagnostics["fatal_scan"]["solver_log_complete"] is True
+    assert diagnostics["fatal_error"] is False
