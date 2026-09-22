@@ -1,0 +1,497 @@
+{
+  "spec": {
+    "length": 3.0,
+    "height": 1.0,
+    "step_x": 0.6,
+    "step_height": 0.2,
+    "span": 0.1,
+    "nx": 240,
+    "ny": 80,
+    "nz": 8,
+    "mach": 3.0,
+    "pressure": 1.0,
+    "temperature": 1.0,
+    "end_time": 4.0,
+    "max_co": 0.2,
+    "write_interval": 0.1,
+    "family": "forward_step_3d",
+    "physics": "inviscid_euler",
+    "span_bc": "cyclic"
+  },
+  "cells": 129024,
+  "final_time": 4.0,
+  "saved_times": 40,
+  "solver_completed": true,
+  "mesh_ok": true,
+  "three_solution_directions": true,
+  "fatal_error": false,
+  "finite_all_saved": true,
+  "positive_all_saved": true,
+  "ranges_all_saved": {
+    "p": [
+      0.01205606551899713,
+      18.75521541039879
+    ],
+    "rho": [
+      0.03211903953347259,
+      9.741100579392274
+    ],
+    "T": [
+      0.4705255353538148,
+      4.000069427503636
+    ],
+    "speed": [
+      0.0005210047553703106,
+      3.483139145187388
+    ],
+    "Mach": [
+      0.0002700038154054153,
+      3.3661364761283123
+    ]
+  },
+  "final_ranges": {
+    "p": [
+      0.02540067830865194,
+      12.01924021342018
+    ],
+    "rho": [
+      0.04735345815208749,
+      6.527693679457208
+    ],
+    "T": [
+      0.7321968633482034,
+      2.817655644419093
+    ],
+    "speed": [
+      0.032176498349256295,
+      3.075817654845684
+    ],
+    "Mach": [
+      0.019187775441183188,
+      3.024280850396726
+    ]
+  },
+  "runtime_seconds": 1256.594667586,
+  "steps": 7820,
+  "actual_inlet_Mach": 3.000009441590908,
+  "gas": {
+    "R": 0.7142825028696203,
+    "gamma": 1.3999974822543102
+  },
+  "warnings": [
+    "--> FOAM Warning: "
+  ],
+  "energy_momentum_scope": "Stored domain totals only. Numerical boundary momentum/energy flux closure not computed; no closure claim.",
+  "boundary": {
+    "no_empty_patches": true,
+    "cyclic_patch_count": 2,
+    "translational_patch_count": 2,
+    "coupled_matching_ok": true
+  },
+  "fixed_recipe_unchanged": true,
+  "initial_state_errors": {
+    "p": 0.0,
+    "T": 0.0,
+    "U": 0.0
+  },
+  "Co": {
+    "target": 0.2,
+    "time_loop_max": 0.2024323512910291,
+    "last": 0.1937368492161619
+  },
+  "courant_finite_positive": true,
+  "max_nonorthogonality": 0.0,
+  "max_skewness": 2.831155111472868e-13,
+  "max_aspect_ratio": 1.000000000000125,
+  "mass": {
+    "final_inlet": 0.4200016371198596,
+    "final_outlet": 0.39375700220119336,
+    "instantaneous_mismatch_fraction": -0.062486982428538895,
+    "relative_residual_max": 1.9400358845837222e-10,
+    "relative_residual_p99": 1.3363291246511183e-10,
+    "cumulative_defect_fraction_initial_mass": -2.2270458388183424e-12,
+    "cumulative_defect_max_abs_fraction": 2.3227896139293328e-12,
+    "impermeable_flux_max_abs": 1.168227840853131e-17,
+    "periodic_pair_net_flux_max_abs": 1.8709263738952986e-17
+  },
+  "minima_every_step": {
+    "rho": 0.032022383058587796,
+    "p": 0.01108890847551682,
+    "T": 0.4529808558196016
+  },
+  "recent_change": {
+    "p": {
+      "relative_L2": 0.04090218430974725,
+      "relative_Linf": 0.27352522867148804
+    },
+    "rho": {
+      "relative_L2": 0.032436798485689144,
+      "relative_Linf": 0.21668271844088993
+    },
+    "T": {
+      "relative_L2": 0.02002015574812398,
+      "relative_Linf": 0.2556224141661087
+    },
+    "U": {
+      "relative_L2": 0.02491687787326389,
+      "relative_Linf": 0.33268873583381575
+    }
+  },
+  "spanwise": {
+    "p": {
+      "max_plane_relative_L2": 1.8882508237565917e-11,
+      "max_deviation_over_peak_mean": 9.521663934059822e-11
+    },
+    "rho": {
+      "max_plane_relative_L2": 1.5326446058959625e-11,
+      "max_deviation_over_peak_mean": 8.677738924088096e-11
+    },
+    "T": {
+      "max_plane_relative_L2": 6.931731278811483e-12,
+      "max_deviation_over_peak_mean": 6.365468188871547e-11
+    },
+    "U": {
+      "max_plane_relative_L2": 9.237407736365008e-12,
+      "max_deviation_over_peak_mean": 8.96706961253077e-11
+    },
+    "Mach": {
+      "max_plane_relative_L2": 3.923244500854813e-12,
+      "max_deviation_over_peak_mean": 5.343494705077287e-11
+    },
+    "speed": {
+      "max_plane_relative_L2": 6.759349128028762e-12,
+      "max_deviation_over_peak_mean": 8.792289271449766e-11
+    },
+    "max_abs_Uz": 0.3599759476178075,
+    "max_abs_Uz_over_inlet_speed": 0.11999198253926917,
+    "L2_Uz_over_U": 0.0037141839190261714
+  },
+  "shock": {
+    "lower_front_x": 0.3125,
+    "regional_angle_deg": 63.5746213502157,
+    "upper_stem_x": 0.6124999999999999,
+    "front_x_by_y": [
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.3125,
+      0.32499999999999996,
+      0.32499999999999996,
+      0.32499999999999996,
+      0.32499999999999996,
+      0.32499999999999996,
+      0.3375,
+      0.3375,
+      0.3375,
+      0.3375,
+      0.35,
+      0.35,
+      0.35,
+      0.35,
+      0.36250000000000004,
+      0.36250000000000004,
+      0.36250000000000004,
+      0.375,
+      0.375,
+      0.375,
+      0.38749999999999996,
+      0.38749999999999996,
+      0.4,
+      0.4,
+      0.4125,
+      0.4125,
+      0.4125,
+      0.42500000000000004,
+      0.42500000000000004,
+      0.4375,
+      0.4375,
+      0.44999999999999996,
+      0.4625,
+      0.4625,
+      0.475,
+      0.475,
+      0.48750000000000004,
+      0.48750000000000004,
+      0.5,
+      0.5125,
+      0.5125,
+      0.525,
+      0.5375,
+      0.5375,
+      0.55,
+      0.5625,
+      0.5625,
+      0.575,
+      0.5875,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125,
+      0.6125
+    ],
+    "sample_counts": [
+      36,
+      24
+    ],
+    "qualification": "Gradient-based regional measurements; moving/curved shocks and grid sensitivity prevent exact stationary-shock interpretation.",
+    "jumps": {
+      "p": 10.823591299562562,
+      "rho": 3.9749900543472205,
+      "T": 2.7228474192257046
+    },
+    "sample_upstream_Mach": 3.0000094415909366,
+    "stationary_normal_shock_sanity": {
+      "p": 10.333392430779002,
+      "rho": 3.8571630891552386,
+      "T": 2.679013614910986
+    }
+  },
+  "comparison_2d": {
+    "Mach": {
+      "relative_L2": 0.004583398873887133,
+      "relative_Linf": 0.17590533403084685,
+      "upstream_region": {
+        "relative_L2": 6.875248682815514e-14,
+        "relative_Linf": 1.9362228612715518e-13
+      },
+      "max_difference_location_xy": [
+        0.64375,
+        0.20625
+      ],
+      "L2_excluding_corner_box_x_0p6_0p75_y_below_0p3": 0.002683949243862739
+    },
+    "p": {
+      "relative_L2": 0.005254068871735582,
+      "relative_Linf": 0.016120928998260873,
+      "upstream_region": {
+        "relative_L2": 1.2417173111482772e-13,
+        "relative_Linf": 3.8047343053904115e-13
+      },
+      "max_difference_location_xy": [
+        0.63125,
+        0.21875
+      ],
+      "L2_excluding_corner_box_x_0p6_0p75_y_below_0p3": 0.00519257785428195
+    },
+    "rho": {
+      "relative_L2": 0.004304991067984531,
+      "relative_Linf": 0.02544007855906609,
+      "upstream_region": {
+        "relative_L2": 3.2449295426803532e-06,
+        "relative_Linf": 3.2449296501179225e-06
+      },
+      "max_difference_location_xy": [
+        0.63125,
+        0.21875
+      ],
+      "L2_excluding_corner_box_x_0p6_0p75_y_below_0p3": 0.004190629860343443
+    },
+    "T": {
+      "relative_L2": 0.002990590748286181,
+      "relative_Linf": 0.09702176078363405,
+      "upstream_region": {
+        "relative_L2": 1.2680041564961119e-13,
+        "relative_Linf": 3.488320743372242e-13
+      },
+      "max_difference_location_xy": [
+        0.63125,
+        0.20625
+      ],
+      "L2_excluding_corner_box_x_0p6_0p75_y_below_0p3": 0.002309888895276238
+    },
+    "U": {
+      "relative_L2": 0.008309614373502862,
+      "relative_Linf": 0.23887629253899462,
+      "upstream_region": {
+        "relative_L2": 2.5842129787253205e-14,
+        "relative_Linf": 1.2523302260864364e-13
+      }
+    },
+    "speed": {
+      "relative_L2": 0.0046150739203848455,
+      "relative_Linf": 0.2286162184583714,
+      "upstream_region": {
+        "relative_L2": 1.0880119331642718e-14,
+        "relative_Linf": 4.618527782440651e-14
+      },
+      "max_difference_location_xy": [
+        0.64375,
+        0.20625
+      ],
+      "L2_excluding_corner_box_x_0p6_0p75_y_below_0p3": 0.0030211756408380463
+    },
+    "shock_reference": {
+      "lower_front_x": 0.3125,
+      "regional_angle_deg": 63.5746213502157,
+      "upper_stem_x": 0.6124999999999999,
+      "front_x_by_y": [
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.3125,
+        0.32499999999999996,
+        0.32499999999999996,
+        0.32499999999999996,
+        0.32499999999999996,
+        0.32499999999999996,
+        0.3375,
+        0.3375,
+        0.3375,
+        0.3375,
+        0.35,
+        0.35,
+        0.35,
+        0.35,
+        0.36250000000000004,
+        0.36250000000000004,
+        0.36250000000000004,
+        0.375,
+        0.375,
+        0.375,
+        0.38749999999999996,
+        0.38749999999999996,
+        0.4,
+        0.4,
+        0.4125,
+        0.4125,
+        0.4125,
+        0.42500000000000004,
+        0.42500000000000004,
+        0.4375,
+        0.4375,
+        0.44999999999999996,
+        0.4625,
+        0.4625,
+        0.475,
+        0.475,
+        0.48750000000000004,
+        0.48750000000000004,
+        0.5,
+        0.5125,
+        0.5125,
+        0.525,
+        0.5375,
+        0.5375,
+        0.55,
+        0.5625,
+        0.5625,
+        0.575,
+        0.5875,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125,
+        0.6125
+      ],
+      "sample_counts": [
+        36,
+        24
+      ],
+      "qualification": "Gradient-based regional measurements; moving/curved shocks and grid sensitivity prevent exact stationary-shock interpretation.",
+      "jumps": {
+        "p": 10.819470833333334,
+        "rho": 3.9767043330642875,
+        "T": 2.72062625
+      },
+      "sample_upstream_Mach": 3.0000094415909078,
+      "stationary_normal_shock_sanity": {
+        "p": 10.333392430778801,
+        "rho": 3.857163089155212,
+        "T": 2.6790136149109527
+      }
+    },
+    "shock_differences": {
+      "lower_front_x": 0.0,
+      "upper_stem_x": 0.0,
+      "regional_angle_deg": 0.0
+    },
+    "relative_jump_differences": {
+      "p": 0.0003808380550860413,
+      "rho": -0.00043108025477622824,
+      "T": 0.000816418361656579
+    }
+  },
+  "scientific_review": {
+    "status": "BLOCKED",
+    "reason": "Nonzero spanwise mean velocity in the intended planar extrusion; uniformity across z does not imply Uz=0.",
+    "max_abs_Uz": 0.3599759476178075,
+    "max_abs_Uz_over_inlet_speed": 0.11999198253926917,
+    "max_location": [
+      0.64375,
+      0.2187499999999999,
+      0.006250000000000006
+    ],
+    "velocity_at_max": [
+      2.819610455570262,
+      0.4612144975218556,
+      0.3599759476178075
+    ],
+    "Uz_range": [
+      -0.3043658516798433,
+      0.3599759476178075
+    ],
+    "volume_fraction_abs_Uz_above_0p01": 0.05685763888888887,
+    "counting_level_note": "0.01 is descriptive only, not an acceptance threshold.",
+    "L2_Uz_over_U": 0.0037141839190261714,
+    "global_momentum_z": -1.8938947283916034e-06,
+    "root_cause_status": "Numerical departure confirmed in native fields; precise mechanism not established. Do not attribute it to physical 3D instability without further evidence.",
+    "variants": "FS-B/C/D not built or run; prepared configurations only.",
+    "OpenFOAM_components_Uz_max_difference": 0.0,
+    "component_extraction_command": [
+      "foamPostProcess",
+      "-case",
+      "/home/aakash/codex_forward_step_3d_20260922/FS-A",
+      "-func",
+      "components(U)",
+      "-time",
+      "4"
+    ],
+    "component_extraction_returncode": 0
+  }
+}
