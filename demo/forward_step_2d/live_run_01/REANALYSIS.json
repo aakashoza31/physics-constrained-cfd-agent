@@ -1,0 +1,53 @@
+{
+  "run": "/tmp/claude-0/ra/live_run_01",
+  "mode": "fetched_run_directory",
+  "solver_executed": false,
+  "cfd_fields_modified": false,
+  "recomputed": [
+    "fatal_error",
+    "fatal_error_evidence",
+    "fatal_scan"
+  ],
+  "reused_from_original_measurement": "All field-derived quantities: positivity, finiteness, ranges, Courant history, transient mass balance and shock metrics. These measure native OpenFOAM fields that are not present in a fetched run directory; they are carried forward unchanged, not recomputed and not invented.",
+  "iterations": [
+    {
+      "iteration": "iteration_01",
+      "previous_status": "FAIL",
+      "previous_failed_checks": [
+        "no_fatal_error"
+      ],
+      "status": "PASS_2D_FORWARD_STEP",
+      "failed_checks": [],
+      "fatal_error": false,
+      "fatal_error_evidence": [],
+      "fatal_scan": {
+        "logs_scanned": [
+          {
+            "log": "log.foamRun.tail",
+            "bytes": 203657,
+            "excerpt": true
+          }
+        ],
+        "solver_log": "log.foamRun.tail",
+        "solver_log_bytes": 203657,
+        "solver_log_complete": false,
+        "signatures_checked": [
+          "foam_fatal_io_error",
+          "foam_fatal_error",
+          "foam_error_stack",
+          "sigfpe_trapped",
+          "sigsegv_trapped",
+          "floating_point_exception",
+          "segmentation_fault",
+          "core_dumped",
+          "abnormal_termination",
+          "non_finite_value"
+        ],
+        "benign_excluded": "FOAM_SIGFPE / sigSegv / sigInt / sigQuit startup banner",
+        "end_line_present": true,
+        "partial_log_note": "Only excerpts of the solver log are present in this run directory. Normal termination is established independently by the executor record (return code 0, status COMPLETED) and by the terminating 'End' line: OpenFOAM writes End only after the time loop completes, and a FOAM FATAL ERROR aborts the process before it, so the two cannot coexist. For a scan over the complete log, reanalyse the runtime case directory with --case."
+      },
+      "output": "/tmp/claude-0/ra/live_run_01/iteration_01/reanalysis"
+    }
+  ]
+}
