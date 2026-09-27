@@ -53,7 +53,7 @@ def collect(case: Path, out: Path, reference=None) -> dict:
         "figures": {},
         "figure_error": None,
         "data_files": sorted(
-            str(p.relative_to(out))
+            p.relative_to(out).as_posix()  # POSIX keys in provenance
             for p in out.rglob("*")
             if p.is_file() and p.suffix in {".csv", ".npz", ".json"}
         ),

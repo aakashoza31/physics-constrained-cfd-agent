@@ -55,6 +55,6 @@ def build(spec:ForwardStep3DSpec,destination):
         t=re.sub(r'\b'+key+r'\s+[^;]+;',f'{key} {value};',t)
     p.write_text(t+monitors())
     (dest/'spec.json').write_text(json.dumps(spec.to_dict(),indent=2))
-    hashes={str(f.relative_to(TEMPLATE)):hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(TEMPLATE.rglob('*')) if f.is_file()}
+    hashes={f.relative_to(TEMPLATE).as_posix():hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(TEMPLATE.rglob('*')) if f.is_file()}  # POSIX keys: see forward_step_2d/build.py
     (dest/'template_hashes.json').write_text(json.dumps(hashes,indent=2))
     return dest
