@@ -190,8 +190,13 @@ def build(spec: ForwardStep2DSpec, destination) -> Path:
 
     (dest / "spec.json").write_text(json.dumps(spec.to_dict(), indent=2))
 
+    # Provenance keys are POSIX-relative, always. str(Path) renders a
+    # backslash separator on Windows, which would make the same template
+    # produce a different hash document per platform and break any comparison
+    # against the canonical representation. as_posix() is the serialization
+    # boundary; the hashed BYTES are untouched.
     hashes = {
-        str(f.relative_to(TEMPLATE)): hashlib.sha256(f.read_bytes()).hexdigest()
+        f.relative_to(TEMPLATE).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest()
         for f in sorted(TEMPLATE.rglob("*"))
         if f.is_file()
     }
