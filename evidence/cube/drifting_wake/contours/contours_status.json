@@ -1,0 +1,8 @@
+{
+  "visuals_version": "visuals/1.0.0",
+  "status": "NOT_AVAILABLE",
+  "field_time_directories": [],
+  "renderer": "NOT_AVAILABLE",
+  "script": "src/reporting/paraview_contours.py",
+  "reason": "the archived evidence carries post-processed series and logs but no reconstructed field time directories, so there is nothing to contour. Re-run the case live to produce fields."
+}

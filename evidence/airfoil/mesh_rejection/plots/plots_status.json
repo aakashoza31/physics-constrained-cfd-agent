@@ -1,0 +1,10 @@
+{
+  "visuals_version": "visuals/1.0.0",
+  "written": [
+    "convergence.png"
+  ],
+  "not_available": [
+    "force_history: no archived force series for this case",
+    "residuals: no parsable solver log in the archived evidence"
+  ]
+}

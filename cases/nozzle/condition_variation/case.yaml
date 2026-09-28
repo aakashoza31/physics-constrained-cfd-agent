@@ -1,0 +1,13 @@
+case_id: "condition_variation"
+original_id: "case_C_conditions"
+family: "nozzle"
+title: "Operating-condition variation"
+purpose: "same geometry, altered operating conditions"
+evidence_root: "demo/nozzle_e2e/case_C_conditions"
+evidence_present: true
+config: "configs/nozzles/case_C_conditions.yaml"
+related_campaigns:
+  - "demo/nozzle_feedback_final/case_C_conditions"
+  - "demo/published_campaign/case_C_conditions"
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

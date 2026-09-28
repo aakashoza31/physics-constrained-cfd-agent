@@ -1,0 +1,11 @@
+case_id: "mesh_rejection"
+original_id: "naca0012_2DN00"
+family: "airfoil"
+title: "NACA0012 mesh rejection (supplementary)"
+purpose: "S1: every candidate mesh failed the frozen quality contract, so CFD was never run"
+evidence_root: "outputs/airfoil_mesh"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

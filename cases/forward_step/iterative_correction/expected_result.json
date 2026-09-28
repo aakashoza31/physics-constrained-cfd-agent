@@ -1,0 +1,16 @@
+{
+  "case_id": "iterative_correction",
+  "family": "forward_step",
+  "original_id": "case_H_iterative_short_run",
+  "expected": {
+    "verdict": "ACCEPT",
+    "archived_status": "ACCEPTED",
+    "validation_status": "PASS_2D_FORWARD_STEP",
+    "iterations": 7,
+    "failed_checks": [],
+    "message": "PASS_2D_FORWARD_STEP",
+    "solver_invoked_in_archive": true
+  },
+  "source_of_truth": "demo/forward_step_2d/case_H_iterative_short_run",
+  "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+}

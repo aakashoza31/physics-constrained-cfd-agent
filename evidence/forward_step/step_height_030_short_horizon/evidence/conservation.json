@@ -1,0 +1,12 @@
+{
+  "question": "conservation",
+  "passed": true,
+  "measured": {
+    "failed_checks": [
+      "compression_front_measurable"
+    ]
+  },
+  "threshold": "the family's registered conservation criterion",
+  "detail": "re-read from the archived validation record",
+  "decided_by": "deterministic"
+}

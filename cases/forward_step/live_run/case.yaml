@@ -1,0 +1,11 @@
+case_id: "live_run"
+original_id: "live_run_01"
+family: "forward_step"
+title: "Live end-to-end run"
+purpose: "a live execution that ended in a safe stop"
+evidence_root: "demo/forward_step_2d/live_run_01"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

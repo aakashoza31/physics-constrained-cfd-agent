@@ -1,0 +1,10 @@
+{
+  "verdict": "ACCEPT",
+  "reason": "replayed from archived evidence: the run recorded ACCEPTED. No solver was executed by this replay.",
+  "family": "forward_step_2d",
+  "case": "mach20_canonical",
+  "failed_gates": [],
+  "unresolved_gates": [],
+  "decided_by": "deterministic_authority",
+  "llm_override_possible": false
+}

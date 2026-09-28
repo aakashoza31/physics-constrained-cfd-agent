@@ -1,0 +1,6 @@
+{
+  "visuals_version": "visuals/1.0.0",
+  "status": "NOT_AVAILABLE",
+  "transient_family": true,
+  "reason": "no time-resolved series is archived for this case, so there is nothing to animate. A steady solver never receives a fabricated time evolution here."
+}

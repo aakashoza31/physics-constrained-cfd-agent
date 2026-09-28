@@ -1,0 +1,14 @@
+{
+  "verdict": "REJECT",
+  "reason": "replayed from archived evidence: the run recorded MESH_REJECTED_CFD_NOT_RUN with failed checks ['all_in_plane_elements_valid', 'max_non_orthogonality', 'max_skewness', 'positive_cell_orientation']. No solver was executed by this replay.",
+  "family": "airfoil",
+  "case": "mesh_rejection",
+  "failed_gates": [
+    "mesh_quality"
+  ],
+  "unresolved_gates": [
+    "numerical_health"
+  ],
+  "decided_by": "deterministic_authority",
+  "llm_override_possible": false
+}

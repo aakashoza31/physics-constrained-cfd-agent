@@ -1,0 +1,79 @@
+# Surface-mounted cube with a drifting lateral wake
+
+**Family:** `cube` &nbsp;|&nbsp; **Case:** `drifting_wake` &nbsp;|&nbsp;
+**Original id:** `family3_baseline_compact` &nbsp;|&nbsp; **Archived verdict:** `REJECT`
+
+F3 headline demonstration: a 3-d turbulent run that executed, looked healthy, and was rejected on stationarity / development.
+
+## Reproduce
+
+```bash
+./reproduce.sh              # replay the archived evidence, no solver
+./reproduce.sh --live       # re-execute with OpenFOAM Foundation v14
+```
+
+```powershell
+.\reproduce.ps1             # replay
+.\reproduce.ps1 -Live       # re-execute
+```
+
+Replay reads the archived evidence under `handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact` and re-derives the
+deterministic decision from it. It never claims a solver was executed.
+
+## Archived outcome
+
+```json
+{
+  "verdict": "REJECT",
+  "archived_status": "RUNTIME_REJECTED",
+  "rejected_on": "STILL_DEVELOPING",
+  "failed_checks": [
+    "lateral_force_growth"
+  ],
+  "stationarity": {
+    "gate_version": "cube-stationarity/1.0.0",
+    "status": "STILL_DEVELOPING",
+    "passed": false,
+    "window": {
+      "start": 59.980000000000004,
+      "end": 79.98,
+      "samples": 500
+    },
+    "measured": {
+      "mean_fx": 0.706209298654447,
+      "mean_fy": 0.2450782018170498,
+      "mean_fz": 0.00044205078685453616,
+      "drift_fraction": {
+        "fx": 0.0007529082884745507,
+        "fy": 0.0005290983096436084,
+        "fz": 0.004620392788751231
+      },
+      "lateral_growth_ratio": 2.098378164488468,
+      "lateral_relative_magnitude": 0.0006259486921183044,
+      "mean_abs_fz_first_half": 0.0018326531209671001,
+      "mean_abs_fz_second_half": 0.003845599292119006,
+      "samples": 500
+    },
+    "thresholds": {
+      "force_drift_fraction_max": 0.02,
+      "lateral_growth_ratio_max": 1.25,
+      "lateral_relative_max": 0.05,
+      "assessment_window": 20.0
+    },
+    "failures": [
+      "lateral_force_growth"
+    ],
+    "margins_relative_to_threshold": {
+      "lateral_growth_ratio": 1.6787025315907744,
+      "max_drift_fraction": 0.23101963943756154,
+      "lateral_relative": 0.012518973842366088
+    },
+    "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
+  },
+  "solver_invoked_in_archive": true,
+  "note": "the solver ran to the requested end time and reported no numerical failure; the rejection is on flow development"
+}
+```
+
+`expected_result.json` holds the same record in machine-readable form; a replay
+that disagrees with it is a regression, not a new result.

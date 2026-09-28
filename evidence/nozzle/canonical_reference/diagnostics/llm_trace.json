@@ -1,0 +1,43 @@
+{
+  "proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered nozzle case canonical_reference",
+        "proposed_family": "nozzle",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "nozzle": [
+            "nozzle"
+          ]
+        },
+        "confidence_note": "matched on ['nozzle'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "ACCEPTABLE",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "ACCEPT",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    }
+  ],
+  "count": 3,
+  "note": "every entry is a PROPOSAL. None of them decided anything; the verdict comes from the authority trace."
+}

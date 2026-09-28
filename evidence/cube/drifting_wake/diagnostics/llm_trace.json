@@ -1,0 +1,43 @@
+{
+  "proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered cube case drifting_wake",
+        "proposed_family": "cube",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "cube": [
+            "cube"
+          ]
+        },
+        "confidence_note": "matched on ['cube'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reaching a statistically steady state",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "CONTINUE_RUN to let the lateral mode settle",
+      "model": "archived diagnosis",
+      "accepted_by_authority": false,
+      "binding": false
+    }
+  ],
+  "count": 3,
+  "note": "every entry is a PROPOSAL. None of them decided anything; the verdict comes from the authority trace."
+}

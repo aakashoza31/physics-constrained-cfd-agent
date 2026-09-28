@@ -1,0 +1,8 @@
+{
+  "visuals_version": "visuals/1.0.0",
+  "status": "RENDERED",
+  "transient_family": true,
+  "file": "simulation.mp4",
+  "represents": "SOLVER TIME (transient run)",
+  "frames": 200
+}

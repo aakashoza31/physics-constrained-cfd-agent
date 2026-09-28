@@ -1,0 +1,11 @@
+case_id: "mach35_variation"
+original_id: "case_C_mach35"
+family: "forward_step"
+title: "Forward-facing step at Mach 3.5"
+purpose: "accepted Mach-number variation"
+evidence_root: "demo/forward_step_2d/case_C_mach35"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"
