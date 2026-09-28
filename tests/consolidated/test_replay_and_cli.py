@@ -95,6 +95,11 @@ def test_an_unroutable_prompt_is_refused_without_simulating():
     assert run.artifacts["solver_invoked"] is False
 
 
+@pytest.mark.skipif(
+    not (_ROOT / "demo" / "nozzle_e2e").is_dir()
+    or not (_ROOT / "handoff").is_dir(),
+    reason=("the large archived evidence is gitignored; this check runs where "
+            "it is present. See manifests/large_assets.json."))
 def test_the_case_library_is_up_to_date_with_its_evidence():
     import subprocess
     import sys
