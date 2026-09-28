@@ -1,7 +1,7 @@
 {
   "family": "airfoil",
   "case": "mesh_rejection",
-  "started_utc": "2026-09-28T02:35:57Z",
+  "started_utc": "2026-09-28T02:47:21Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",

@@ -69,15 +69,15 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T02:35:56Z",
+  "generated_utc": "2026-09-28T02:47:59Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",
   "case": "drifting_wake",
   "solver_invoked": false,
   "solver": "OpenFOAM Foundation v14",
-  "evidence_root": null,
-  "case_directory": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/cube/drifting_wake",
+  "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+  "case_directory": "cases/cube/drifting_wake",
   "python": "3.10.12",
   "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
   "git_commit": "NOT_AVAILABLE",

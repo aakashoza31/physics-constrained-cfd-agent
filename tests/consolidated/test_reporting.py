@@ -96,3 +96,45 @@ def test_contours_report_what_was_missing(tmp_path):
         assert status["status"] == visuals.NOT_AVAILABLE
         assert status["reason"]
         assert status["script"].endswith("paraview_contours.py")
+
+
+# -- portability: a reviewer's artifacts must not carry our machine ----------
+def test_no_generated_artifact_leaks_an_absolute_or_session_path(tmp_path):
+    """Provenance is evidence a reviewer may republish. It must be portable."""
+    import re
+
+    from src.reporting.report_builder import REPO_ROOT
+
+    run = run_pipeline("replay the cube", mode=REPLAY, family="cube",
+                       case="drifting_wake")
+    out = tmp_path / "artifacts"
+    report_builder.build(run, out, make_media=False)
+
+    forbidden = re.compile(
+        r"/sessions/|/home/[a-z]+/|/Users/|[A-Za-z]:\\\\|" + re.escape(str(REPO_ROOT)))
+    offenders = []
+    for path in out.rglob("*"):
+        if not path.is_file() or path.suffix not in (".json", ".md"):
+            continue
+        for line_no, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1):
+            if forbidden.search(line):
+                offenders.append(f"{path.relative_to(out)}:{line_no}: {line[:90]}")
+    assert not offenders, "machine-specific paths in generated artifacts:\n" + \
+        "\n".join(offenders[:10])
+
+
+def test_committed_evidence_is_portable_too():
+    """The evidence/ directories shipped in the repository, same rule."""
+    import re
+
+    root = Path(__file__).resolve().parents[2]
+    forbidden = re.compile(r"/sessions/|/home/[a-z]+/|/Users/|[A-Za-z]:\\\\")
+    offenders = []
+    for path in (root / "evidence").rglob("*"):
+        if not path.is_file() or path.suffix not in (".json", ".md"):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if forbidden.search(text):
+            offenders.append(str(path.relative_to(root)))
+    assert not offenders, f"machine-specific paths in committed evidence: {offenders}"

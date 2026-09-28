@@ -45,8 +45,36 @@ EVIDENCE_APPLICABILITY: Dict[str, Dict[str, bool]] = {
 }
 
 
+#: The repository root, used to keep every emitted path portable.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def relativise(value: Any, root: Optional[Path] = None) -> Any:
+    """Rewrite absolute paths inside the repository as repo-relative ones.
+
+    An artifact directory is evidence a reviewer reads and may re-publish. A
+    path like `/home/someone/work/repo/cases/...` tells them nothing useful and
+    leaks the machine it was produced on, so every path under the repository is
+    emitted relative to it. Paths genuinely outside the repository (a scratch
+    output directory a user chose) are left alone -- they are the user's own
+    choice and rewriting them would be a lie about where the file is.
+    """
+    root = str(root or REPO_ROOT)
+    if isinstance(value, str):
+        return value.replace(root + "/", "").replace(root + "\\", "").replace(
+            root, ".")
+    if isinstance(value, dict):
+        return {k: relativise(v, root) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [relativise(v, root) for v in value]
+    if isinstance(value, Path):
+        return relativise(str(value), root)
+    return value
+
+
 def _write(path: Path, payload: Any) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
+    payload = relativise(payload)
     if isinstance(payload, str):
         path.write_text(payload, encoding="utf-8")
     else:

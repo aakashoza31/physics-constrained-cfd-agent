@@ -139,6 +139,22 @@ over 2003 archived force samples and prints the rejection with its reasoning.
 Live execution additionally requires `--i-want-to-run-cfd`. Replay never claims a
 solver ran: every artifact it writes carries `solver_invoked: false`.
 
+## 7a. Agent backends
+
+```bash
+--agent-backend deterministic   # default. No API key. NOT an LLM run.
+--agent-backend gemini          # a real model call; needs GEMINI_API_KEY
+--agent-backend replay          # a recorded model response
+```
+
+The model interprets the request and diagnoses the evidence. Its proposed action
+must be in the family's registered vocabulary or it is refused, and it can never
+reach the verdict. Every call records provider, model, temperature,
+prompt-schema version, the raw response, the proposed action, whether authority
+accepted it, and token counts where the provider reports them. Without a key the
+`gemini` backend **refuses** rather than quietly falling back — a deterministic
+run is never described as an LLM run.
+
 ## 8. Natural-language and STEP interface
 
 ```bash

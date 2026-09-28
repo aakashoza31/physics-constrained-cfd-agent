@@ -15,7 +15,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:36:41Z",
+    "started_utc": "2026-09-28T02:46:56Z",
     "prompt": "run the registered forward_step case step_height_030_short_horizon",
     "mode": "replay",
     "family": "forward_step_2d",
@@ -78,7 +78,7 @@
         "decided_by": "deterministic",
         "detail": {
           "source": "registered case",
-          "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/forward_step/step_height_030_short_horizon"
+          "case_dir": "cases/forward_step/step_height_030_short_horizon"
         }
       },
       {
@@ -119,7 +119,7 @@
     "authority_trace": {
       "family": "forward_step_2d",
       "case": "step_height_030_short_horizon",
-      "started_utc": "2026-09-28T02:36:41Z",
+      "started_utc": "2026-09-28T02:46:56Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -344,7 +344,7 @@
           "REFINE_REGION"
         ]
       },
-      "evidence_root": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_F_step030",
+      "evidence_root": "demo/forward_step_2d/case_F_step030",
       "evidence_present": true,
       "archived_record": {
         "verdict": "REJECT",
@@ -360,7 +360,7 @@
       "solver_invoked": false,
       "replay_version": "replay/1.0.0",
       "case": {
-        "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/forward_step/step_height_030_short_horizon",
+        "case_dir": "cases/forward_step/step_height_030_short_horizon",
         "case_id": "step_height_030_short_horizon",
         "original_id": "case_F_step030",
         "family": "forward_step",
@@ -500,15 +500,15 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:36:53Z",
+    "generated_utc": "2026-09-28T02:47:02Z",
     "prompt": "run the registered forward_step case step_height_030_short_horizon",
     "mode": "replay",
     "family": "forward_step_2d",
     "case": "step_height_030_short_horizon",
     "solver_invoked": false,
     "solver": "OpenFOAM Foundation v14",
-    "evidence_root": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_F_step030",
-    "case_directory": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/forward_step/step_height_030_short_horizon",
+    "evidence_root": "demo/forward_step_2d/case_F_step030",
+    "case_directory": "cases/forward_step/step_height_030_short_horizon",
     "python": "3.10.12",
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
     "git_commit": "NOT_AVAILABLE",

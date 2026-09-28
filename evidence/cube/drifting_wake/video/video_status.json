@@ -4,5 +4,6 @@
   "transient_family": true,
   "file": "simulation.mp4",
   "represents": "SOLVER TIME (transient run)",
+  "quantity": "force",
   "frames": 200
 }
