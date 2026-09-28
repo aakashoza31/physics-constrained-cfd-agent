@@ -12,7 +12,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:35:06Z",
+    "started_utc": "2026-09-28T02:46:48Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
@@ -79,7 +79,7 @@
         "decided_by": "deterministic",
         "detail": {
           "source": "registered case",
-          "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/nozzle/canonical_reference"
+          "case_dir": "cases/nozzle/canonical_reference"
         }
       },
       {
@@ -120,7 +120,7 @@
     "authority_trace": {
       "family": "nozzle",
       "case": "canonical_reference",
-      "started_utc": "2026-09-28T02:35:06Z",
+      "started_utc": "2026-09-28T02:46:48Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -347,7 +347,7 @@
           "REJECT_OUTSIDE_DOMAIN"
         ]
       },
-      "evidence_root": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference",
+      "evidence_root": "demo/nozzle_e2e/case_A_reference",
       "evidence_present": true,
       "archived_record": {
         "verdict": "ACCEPT",
@@ -362,7 +362,7 @@
       "solver_invoked": false,
       "replay_version": "replay/1.0.0",
       "case": {
-        "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/nozzle/canonical_reference",
+        "case_dir": "cases/nozzle/canonical_reference",
         "case_id": "canonical_reference",
         "original_id": "case_A_reference",
         "family": "nozzle",
@@ -501,15 +501,15 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:35:11Z",
+    "generated_utc": "2026-09-28T02:46:50Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
     "case": "canonical_reference",
     "solver_invoked": false,
     "solver": "OpenFOAM Foundation v14",
-    "evidence_root": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference",
-    "case_directory": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/nozzle/canonical_reference",
+    "evidence_root": "demo/nozzle_e2e/case_A_reference",
+    "case_directory": "cases/nozzle/canonical_reference",
     "python": "3.10.12",
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
     "git_commit": "NOT_AVAILABLE",

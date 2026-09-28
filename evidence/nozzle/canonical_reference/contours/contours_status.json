@@ -9,7 +9,7 @@
     "velocity.png"
   ],
   "source": [
-    "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference",
+    "demo/nozzle_e2e/case_A_reference",
     "demo/nozzle_feedback/case_A_reference",
     "demo/nozzle_feedback_v2/case_A_reference",
     "demo/nozzle_feedback_v2_hotfix/case_A_reference",

@@ -34,8 +34,11 @@ def _matplotlib():
 
 
 def _record(path: Path, payload: Dict[str, Any]) -> None:
+    """Write a status file with repository-relative paths."""
+    from src.reporting.report_builder import relativise
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, default=str) + "\n",
+    path.write_text(json.dumps(relativise(payload), indent=2, default=str) + "\n",
                     encoding="utf-8")
 
 

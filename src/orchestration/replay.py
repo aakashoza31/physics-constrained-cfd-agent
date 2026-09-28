@@ -147,6 +147,7 @@ def _cube_gates(meta: Dict[str, Any], path: Path) -> Tuple[List[Dict[str, Any]],
         "accepted_by_authority": False,
     }]
     artifacts = {
+        "evidence_root": str(Path(_ROOT) / meta.get("evidence_root", "")),
         "force_history": str(path / "reference" / "force_history.json"),
         "force_samples": len(samples),
         "stationarity": result.to_dict(),
