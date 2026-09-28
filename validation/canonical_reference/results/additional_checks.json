@@ -1,0 +1,6 @@
+﻿{
+  "slab_mean_sonic_crossing_x_m": 0.15205086835415096,
+  "minimum_cell_Mach_downstream_x_gt_0p17": 1.16431163503443,
+  "final_max_h0_relative_error": 0.006844564382892937,
+  "note": "Additional descriptive checks; no acceptance criteria changed."
+}

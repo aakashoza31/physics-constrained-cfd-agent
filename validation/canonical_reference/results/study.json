@@ -1,0 +1,77 @@
+﻿{
+  "status": "FINAL_REFERENCE",
+  "last_pair_change_pct": {
+    "outlet_p": 0.2676904131861835,
+    "outlet_T": 0.09308255930280396,
+    "outlet_U": 0.10134141974824651,
+    "outlet_M": 0.14809153655699347,
+    "outlet_mdot": 0.07433482925545132,
+    "throat_M": 0.4147210833695958
+  },
+  "successive_mesh_changes_pct": [
+    {
+      "outlet_p": 0.6919311122407623,
+      "outlet_T": 0.23299546973233332,
+      "outlet_U": 0.25614420209527644,
+      "outlet_M": 0.3727110572865344,
+      "outlet_mdot": 0.20222265517775284,
+      "throat_M": 1.3753934313681215
+    },
+    {
+      "outlet_p": 0.3961632309963936,
+      "outlet_T": 0.13751352352745494,
+      "outlet_U": 0.1445921144850093,
+      "outlet_M": 0.21337659838058798,
+      "outlet_mdot": 0.11373597174795247,
+      "throat_M": 0.765133896449921
+    },
+    {
+      "outlet_p": 0.2676904131861835,
+      "outlet_T": 0.09308255930280396,
+      "outlet_U": 0.10134141974824651,
+      "outlet_M": 0.14809153655699347,
+      "outlet_mdot": 0.07433482925545132,
+      "throat_M": 0.4147210833695958
+    }
+  ],
+  "acceptance": "Every mesh passes; last-pair changes below 0.5%; temporal, wedge-angle and startup verification also required for FINAL_REFERENCE.",
+  "sensitivity_on_coarse_mesh": {
+    "time_half": {
+      "status": "PASS_SINGLE_MESH",
+      "change_pct": {
+        "outlet_p": 0.017752777922042107,
+        "outlet_T": 0.0037300216453983737,
+        "outlet_U": 0.006539154840601302,
+        "outlet_M": 0.008515224437899427,
+        "outlet_mdot": 0.008306498308030541,
+        "throat_M": 0.018822762553938333
+      },
+      "pass": true
+    },
+    "angle_half": {
+      "status": "PASS_SINGLE_MESH",
+      "change_pct": {
+        "outlet_p": 0.014944917424353221,
+        "outlet_T": 0.0026080590810773074,
+        "outlet_U": 0.004444578316653569,
+        "outlet_M": 0.003126260479069387,
+        "outlet_mdot": 0.017033399550303585,
+        "throat_M": 0.004557516835634878
+      },
+      "pass": true
+    },
+    "startup_perturbed": {
+      "status": "PASS_SINGLE_MESH",
+      "change_pct": {
+        "outlet_p": 0.004189966492673669,
+        "outlet_T": 0.0017264115772741562,
+        "outlet_U": 0.0013385815366584453,
+        "outlet_M": 0.00202414837249254,
+        "outlet_mdot": 0.008373356294644196,
+        "throat_M": 0.0357598578464291
+      },
+      "pass": true
+    }
+  },
+  "scope": "Canonical axisymmetric internal inviscid nozzle only. Timestep, angle and startup sensitivity evaluated on coarse mesh; spatial refinement uses a common acoustic Courant bound."
+}
