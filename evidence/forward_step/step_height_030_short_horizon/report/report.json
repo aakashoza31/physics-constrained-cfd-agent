@@ -15,14 +15,14 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T01:47:16Z",
+    "started_utc": "2026-09-28T02:36:41Z",
     "prompt": "run the registered forward_step case step_height_030_short_horizon",
     "mode": "replay",
     "family": "forward_step_2d",
     "case": "step_height_030_short_horizon",
     "interpretation": {
       "interpreter_version": "request-interpreter/1.0.0",
-      "interpreter": "deterministic_keyword",
+      "interpreter": "deterministic",
       "prompt": "run the registered forward_step case step_height_030_short_horizon",
       "proposed_family": "forward_step",
       "parameters": {},
@@ -119,7 +119,7 @@
     "authority_trace": {
       "family": "forward_step_2d",
       "case": "step_height_030_short_horizon",
-      "started_utc": "2026-09-28T01:47:16Z",
+      "started_utc": "2026-09-28T02:36:41Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -236,7 +236,7 @@
           "activity": "interpret_user_intent",
           "content": {
             "interpreter_version": "request-interpreter/1.0.0",
-            "interpreter": "deterministic_keyword",
+            "interpreter": "deterministic",
             "prompt": "run the registered forward_step case step_height_030_short_horizon",
             "proposed_family": "forward_step",
             "parameters": {},
@@ -247,7 +247,7 @@
             "binding": false,
             "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
           },
-          "model": "deterministic_keyword",
+          "model": "deterministic",
           "accepted_by_authority": null,
           "binding": false
         }
@@ -392,6 +392,49 @@
         }
       }
     },
+    "agent_backend": {
+      "backends_version": "agent-backends/1.0.0",
+      "backend": "deterministic",
+      "calls": [
+        {
+          "stage": "interpretation",
+          "backend": "deterministic",
+          "provider": "",
+          "model": "",
+          "temperature": null,
+          "prompt_schema_version": "agent-prompts/1.0.0",
+          "prompt": "run the registered forward_step case step_height_030_short_horizon",
+          "raw_response": null,
+          "parsed": {
+            "interpreter_version": "request-interpreter/1.0.0",
+            "interpreter": "deterministic",
+            "prompt": "run the registered forward_step case step_height_030_short_horizon",
+            "proposed_family": null,
+            "parameters": {},
+            "operating_conditions": {},
+            "geometry_source": "parametric",
+            "keyword_hits": {},
+            "confidence_note": "no registered family keyword appeared in the request",
+            "binding": false,
+            "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+          },
+          "proposed_action": null,
+          "action_in_vocabulary": null,
+          "authority_accepted": null,
+          "latency_s": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "error": "",
+          "dropped": [],
+          "is_llm": false,
+          "binding": false,
+          "label": "DETERMINISTIC"
+        }
+      ],
+      "llm_calls": 0,
+      "note": "a backend proposes; deterministic authority decides. No model output here altered a threshold or a verdict."
+    },
     "solver_invoked": false
   },
   "evidence": {
@@ -437,15 +480,27 @@
   },
   "media": {
     "plots": [
+      "physics_specific_shock_front.png",
+      "conservation.png",
       "residuals.png",
       "convergence.png"
     ],
-    "contours": [],
-    "video": null
+    "contours": [
+      "density.png",
+      "mach.png",
+      "mesh.png",
+      "pressure.png",
+      "shock_density.png",
+      "shock_front_history.png",
+      "temperature.png",
+      "transient_conservation.png",
+      "velocity.png"
+    ],
+    "video": "simulation.mp4"
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T01:47:20Z",
+    "generated_utc": "2026-09-28T02:36:53Z",
     "prompt": "run the registered forward_step case step_height_030_short_horizon",
     "mode": "replay",
     "family": "forward_step_2d",

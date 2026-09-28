@@ -12,14 +12,14 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T01:47:07Z",
+    "started_utc": "2026-09-28T02:35:06Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
     "case": "canonical_reference",
     "interpretation": {
       "interpreter_version": "request-interpreter/1.0.0",
-      "interpreter": "deterministic_keyword",
+      "interpreter": "deterministic",
       "prompt": "run the registered nozzle case canonical_reference",
       "proposed_family": "nozzle",
       "parameters": {},
@@ -120,7 +120,7 @@
     "authority_trace": {
       "family": "nozzle",
       "case": "canonical_reference",
-      "started_utc": "2026-09-28T01:47:07Z",
+      "started_utc": "2026-09-28T02:35:06Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -232,7 +232,7 @@
           "activity": "interpret_user_intent",
           "content": {
             "interpreter_version": "request-interpreter/1.0.0",
-            "interpreter": "deterministic_keyword",
+            "interpreter": "deterministic",
             "prompt": "run the registered nozzle case canonical_reference",
             "proposed_family": "nozzle",
             "parameters": {},
@@ -247,7 +247,7 @@
             "binding": false,
             "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
           },
-          "model": "deterministic_keyword",
+          "model": "deterministic",
           "accepted_by_authority": null,
           "binding": false
         },
@@ -398,6 +398,53 @@
         }
       }
     },
+    "agent_backend": {
+      "backends_version": "agent-backends/1.0.0",
+      "backend": "deterministic",
+      "calls": [
+        {
+          "stage": "interpretation",
+          "backend": "deterministic",
+          "provider": "",
+          "model": "",
+          "temperature": null,
+          "prompt_schema_version": "agent-prompts/1.0.0",
+          "prompt": "run the registered nozzle case canonical_reference",
+          "raw_response": null,
+          "parsed": {
+            "interpreter_version": "request-interpreter/1.0.0",
+            "interpreter": "deterministic",
+            "prompt": "run the registered nozzle case canonical_reference",
+            "proposed_family": "nozzle",
+            "parameters": {},
+            "operating_conditions": {},
+            "geometry_source": "parametric",
+            "keyword_hits": {
+              "nozzle": [
+                "nozzle"
+              ]
+            },
+            "confidence_note": "matched on ['nozzle']",
+            "binding": false,
+            "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+          },
+          "proposed_action": null,
+          "action_in_vocabulary": null,
+          "authority_accepted": null,
+          "latency_s": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "error": "",
+          "dropped": [],
+          "is_llm": false,
+          "binding": false,
+          "label": "DETERMINISTIC"
+        }
+      ],
+      "llm_calls": 0,
+      "note": "a backend proposes; deterministic authority decides. No model output here altered a threshold or a verdict."
+    },
     "solver_invoked": false
   },
   "evidence": {
@@ -439,15 +486,22 @@
   },
   "media": {
     "plots": [
+      "physics_specific_axial_profile.png",
       "residuals.png",
       "convergence.png"
     ],
-    "contours": [],
+    "contours": [
+      "mach.png",
+      "mesh.png",
+      "pressure.png",
+      "temperature.png",
+      "velocity.png"
+    ],
     "video": null
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T01:47:10Z",
+    "generated_utc": "2026-09-28T02:35:11Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",

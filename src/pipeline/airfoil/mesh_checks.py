@@ -36,6 +36,11 @@ INCONCLUSIVE = "F3_MESH_QUALIFICATION_INCONCLUSIVE"
 
 # ---- FROZEN thresholds ------------------------------------------------
 MAX_NON_ORTHOGONALITY_DEG = 65.0
+#: SKEWNESS CAVEAT. The value computed in this module is a Python proxy built
+#: from the same geometric definition, and an independent audit established that
+#: it is NOT numerically equivalent to OpenFOAM Foundation-v14 skewness. Where a
+#: Foundation-v14 checkMesh report exists it is the authority, and the proxy must
+#: not be quoted as a Foundation-v14 number. The THRESHOLD is unchanged.
 MAX_SKEWNESS = 2.0
 MIN_INTERPOLATION_WEIGHT = 0.10
 MIN_FACE_VOLUME_RATIO = 0.10

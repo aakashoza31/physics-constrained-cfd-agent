@@ -124,8 +124,9 @@ CATALOGUE: Dict[str, Dict[str, Dict[str, Any]]] = {
             "original_id": "naca0012_2DN00",
             "evidence": "outputs/airfoil_mesh",
             "title": "NACA0012 mesh rejection (supplementary)",
-            "purpose": ("S1: every candidate mesh failed the frozen quality "
-                        "contract, so CFD was never run"),
+            "purpose": ("S1 supplementary: the NASA Family II grids fail the "
+                        "frozen in-plane stretching contract by three to four "
+                        "orders of magnitude, so CFD was never run"),
         },
     },
 }
@@ -188,18 +189,45 @@ def _cube_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
     }
 
 
-def _airfoil_outcome(root: Path) -> Dict[str, Any]:
-    summary = _read_json(root / "nasa_familyII" / "hierarchy.json") or {}
-    levels = {k: v.get("qualification_verdict")
-              for k, v in (summary.get("levels") or {}).items()}
+def _airfoil_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
+    """Read the CORRECTED diagnosis, never the superseded raw reports.
+
+    The raw qualification reports under outputs/airfoil_mesh/ contain converter
+    and diagnostic defects (handedness, vertex permutation, the wrong face
+    selected for in-plane checks, and a Python skewness metric that is not
+    Foundation-v14 skewness). They are preserved as historical evidence and are
+    deliberately NOT the source of truth here.
+    """
+    record = _read_json(case_dir / "reference" / "corrected_diagnosis.json") or {}
+    levels = record.get("levels") or {}
+    decisive = record.get("decisive_genuine_failure") or {}
     return {
         "verdict": "REJECT",
         "archived_status": "MESH_REJECTED_CFD_NOT_RUN",
-        "failed_checks": sorted({f for v in (summary.get("levels") or {}).values()
-                                 for f in (v.get("failed") or [])}),
-        "mesh_levels": levels,
+        "failed_checks": sorted({f for lv in levels.values()
+                                 for f in (lv.get("failed") or [])}),
+        "unresolved_checks": sorted({u for lv in levels.values()
+                                     for u in (lv.get("unresolved") or [])}),
+        "decisive_failure": {
+            "check": decisive.get("check"),
+            "frozen_limit": decisive.get("frozen_limit"),
+            "levels": decisive.get("levels"),
+        },
+        "mesh_levels": {name: lv.get("verdict") for name, lv in levels.items()},
+        "foundation_v14_metrics": {
+            name: {k: v.get("measured") for k, v in (lv.get("checks") or {}).items()
+                   if v.get("source", "").startswith("OpenFOAM")}
+            for name, lv in levels.items()
+        },
+        "representation_defects_were_ours_not_nasas": [
+            d["defect"] for d in record.get(
+                "representation_defects_found_in_our_converter", [])
+        ],
         "solver_invoked_in_archive": False,
-        "note": "CFD_NOT_RUN: no flow solver was ever launched for this family",
+        "source_of_truth": "cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json",
+        "note": ("CFD_NOT_RUN: no flow solver was ever launched for this family. "
+                 "The decisive genuine failure is in-plane stretching; skewness "
+                 "and orientation are NOT NASA-grid failures."),
     }
 
 
@@ -219,7 +247,7 @@ def build(root: Path, *, check: bool) -> List[str]:
             elif family == "cube":
                 outcome = _cube_outcome(evidence_root, case_dir)
             else:
-                outcome = _airfoil_outcome(evidence_root)
+                outcome = _airfoil_outcome(evidence_root, case_dir)
 
             case_yaml = {
                 "case_id": case_id,
@@ -324,6 +352,52 @@ deterministic decision from it. It never claims a solver was executed.
 
 `expected_result.json` holds the same record in machine-readable form; a replay
 that disagrees with it is a regression, not a new result.
+{_extra(family)}"""
+
+
+def _extra(family: str) -> str:
+    """Family-specific footnote appended to the generated README."""
+    if family != "airfoil":
+        return ""
+    return """
+## Corrected scientific record
+
+The authoritative record is `reference/corrected_diagnosis.json`, backed by
+`reference/independent_cell_geometry_audit.json`. The raw qualification reports
+under `outputs/airfoil_mesh/` are **superseded historical evidence** and carry a
+`SUPERSEDED.txt` banner.
+
+**Defects that were ours, not NASA's.** The coordinate transform
+`(x,y,z)_NASA -> (x,z,y)_OpenFOAM` reverses handedness; the corrected local
+permutation for the archived NASA ordering is `P = (3, 7, 6, 2, 0, 4, 5, 1)`;
+and the old in-plane checker used `cell[:4]`, which selects a side face rather
+than the constant-span flow-plane quad. After selecting the real spanwise face
+and orienting it correctly, all three levels show **0** nonpositive in-plane
+areas, **0** nonpositive bilinear corner Jacobians, and span-plane coordinates
+that match exactly.
+
+**Foundation-v14 checkMesh, the actual archived numbers.** The old Python
+skewness metric is not Foundation-v14 skewness and must not be quoted as such.
+
+| Level | non-orthogonality (≤65°) | skewness (≤2) | min weight (≥0.10) | min face-volume ratio (≥0.10) |
+|---|---|---|---|---|
+| coarse | 79.7474 **FAIL** | 0.857067 PASS | 0.123368 PASS | 0.162489 PASS |
+| medium | 57.8856 PASS | 0.820430 PASS | 0.157720 PASS | 0.213368 PASS |
+| fine | 31.5684 PASS | 0.727893 PASS | 0.213019 PASS | 0.301691 PASS |
+
+**The decisive genuine failure is in-plane stretching**, frozen limit 10,000:
+
+| Level | max stretching | cells over the limit |
+|---|---|---|
+| coarse | 31,734,384 | 974 |
+| medium | 36,320,937 | 3,924 |
+| fine | 38,855,541 | 15,678 |
+
+Face-tet warnings remain unresolved at 72 / 214 / 625 faces. They are not needed
+to establish the rejection, because stretching already fails decisively.
+
+**Final status: `MESH_REJECTED / CFD_NOT_RUN`.** Skewness and orientation are
+*not* genuine NASA-grid failures and must not be described as such.
 """
 
 

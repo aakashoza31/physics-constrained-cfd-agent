@@ -53,20 +53,23 @@ Every row below was decided by code. No model output appears in this table.
 
 | Activity | Content | Accepted by authority |
 |---|---|---|
-| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic_keyword", "prompt": "run the register | None |
+| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic", "prompt": "run the registered cube  | None |
 | diagnose_evidence | "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reachi | True |
 | propose_bounded_action | "CONTINUE_RUN to let the lateral mode settle" | False |
 
 ## 6. Media
 
-- none produced for this run
+- plot: `plots/force_history.png`
+- plot: `plots/lateral_force_growth.png`
+- plot: `plots/convergence.png`
+- video: `video/simulation.mp4`
 
 ## 7. Provenance
 
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T01:46:58Z",
+  "generated_utc": "2026-09-28T02:35:56Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",

@@ -1,0 +1,316 @@
+{
+  "record_version": "airfoil-corrected-diagnosis/1.0.0",
+  "supersedes": "outputs/airfoil_mesh/nasa_familyII/*/qualification.json, which contain converter and diagnostic defects and are preserved only as historical evidence",
+  "authority": "OpenFOAM Foundation v14 checkMesh for the mesh-quality metrics, plus an independent cell-geometry audit for the in-plane quantities",
+  "representation_defects_found_in_our_converter": [
+    {
+      "defect": "handedness",
+      "detail": "the coordinate transform (x,y,z)_NASA -> (x,z,y)_OpenFOAM reverses handedness"
+    },
+    {
+      "defect": "vertex permutation",
+      "detail": "for the specific archived NASA ordering the corrected local permutation is P = (3, 7, 6, 2, 0, 4, 5, 1)",
+      "permutation": [
+        3,
+        7,
+        6,
+        2,
+        0,
+        4,
+        5,
+        1
+      ]
+    },
+    {
+      "defect": "wrong face selected by the in-plane checker",
+      "detail": "the old checker used cell[:4], which selects a SIDE face rather than the constant-span flow-plane quad"
+    },
+    {
+      "defect": "non-equivalent skewness metric",
+      "detail": "the old Python skewness metric is not Foundation-v14 skewness and must not be quoted as such"
+    }
+  ],
+  "after_correction": {
+    "nonpositive_in_plane_areas": {
+      "coarse": 0,
+      "medium": 0,
+      "fine": 0
+    },
+    "nonpositive_bilinear_corner_jacobians": {
+      "coarse": 0,
+      "medium": 0,
+      "fine": 0
+    },
+    "span_plane_coordinates_match_exactly": {
+      "coarse": true,
+      "medium": true,
+      "fine": true
+    },
+    "conclusion": "orientation and in-plane validity are NOT NASA-grid failures. They were artefacts of our own representation and diagnostics."
+  },
+  "decisive_genuine_failure": {
+    "check": "max_in_plane_stretching",
+    "definition": "longest edge / minimum width of the constant-span flow-plane quad",
+    "frozen_limit": 10000.0,
+    "levels": {
+      "coarse": {
+        "max": 31734384.049936082,
+        "cells_over_limit": 974,
+        "cells_total": 14336
+      },
+      "medium": {
+        "max": 36320937.1389407,
+        "cells_over_limit": 3924,
+        "cells_total": 57344
+      },
+      "fine": {
+        "max": 38855541.17768772,
+        "cells_over_limit": 15678,
+        "cells_total": 229376
+      }
+    },
+    "note": "this is a property of the NASA Family II grids as supplied, measured on the correctly selected flow-plane quad. It fails by three to four orders of magnitude and gets worse with refinement."
+  },
+  "gates": {
+    "max_non_orthogonality_deg": 65.0,
+    "max_skewness": 2.0,
+    "min_interpolation_weight": 0.1,
+    "min_face_volume_ratio": 0.1,
+    "max_in_plane_stretching": 10000.0
+  },
+  "levels": {
+    "coarse": {
+      "cells": 14336,
+      "checks": {
+        "max_non_orthogonality": {
+          "measured": 79.7474,
+          "limit": 65.0,
+          "passed": false,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_skewness": {
+          "measured": 0.857067,
+          "limit": 2.0,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_interpolation_weight": {
+          "measured": 0.123368,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_face_volume_ratio": {
+          "measured": 0.162489,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_in_plane_stretching": {
+          "measured": 31734384.049936082,
+          "limit": 10000.0,
+          "passed": false,
+          "cells_over_limit": 974,
+          "cells_total": 14336,
+          "source": "independent cell-geometry audit, corrected flow-plane selection"
+        },
+        "all_in_plane_elements_valid": {
+          "measured": {
+            "nonpositive_area": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_bilinear_jacobian": {
+          "measured": {
+            "nonpositive_corner_jacobian": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_cell_orientation": {
+          "measured": {
+            "constant_plane_order_all_cells": true,
+            "span_pairs_identical_xy": true,
+            "min_signed_volume": 3.587009087175827e-11
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit, corrected permutation"
+        },
+        "face_tet_checks": {
+          "measured": {
+            "warning_faces": 72
+          },
+          "passed": null,
+          "source": "OpenFOAM Foundation v14 checkMesh",
+          "note": "left unresolved: it is not needed to establish rejection, because in-plane stretching already fails decisively"
+        }
+      },
+      "failed": [
+        "max_in_plane_stretching",
+        "max_non_orthogonality"
+      ],
+      "unresolved": [
+        "face_tet_checks"
+      ],
+      "verdict": "F3_MESH_NOT_QUALIFIED"
+    },
+    "medium": {
+      "cells": 57344,
+      "checks": {
+        "max_non_orthogonality": {
+          "measured": 57.8856,
+          "limit": 65.0,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_skewness": {
+          "measured": 0.82043,
+          "limit": 2.0,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_interpolation_weight": {
+          "measured": 0.15772,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_face_volume_ratio": {
+          "measured": 0.213368,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_in_plane_stretching": {
+          "measured": 36320937.1389407,
+          "limit": 10000.0,
+          "passed": false,
+          "cells_over_limit": 3924,
+          "cells_total": 57344,
+          "source": "independent cell-geometry audit, corrected flow-plane selection"
+        },
+        "all_in_plane_elements_valid": {
+          "measured": {
+            "nonpositive_area": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_bilinear_jacobian": {
+          "measured": {
+            "nonpositive_corner_jacobian": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_cell_orientation": {
+          "measured": {
+            "constant_plane_order_all_cells": true,
+            "span_pairs_identical_xy": true,
+            "min_signed_volume": 5.741237315883419e-12
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit, corrected permutation"
+        },
+        "face_tet_checks": {
+          "measured": {
+            "warning_faces": 214
+          },
+          "passed": null,
+          "source": "OpenFOAM Foundation v14 checkMesh",
+          "note": "left unresolved: it is not needed to establish rejection, because in-plane stretching already fails decisively"
+        }
+      },
+      "failed": [
+        "max_in_plane_stretching"
+      ],
+      "unresolved": [
+        "face_tet_checks"
+      ],
+      "verdict": "F3_MESH_NOT_QUALIFIED"
+    },
+    "fine": {
+      "cells": 229376,
+      "checks": {
+        "max_non_orthogonality": {
+          "measured": 31.5684,
+          "limit": 65.0,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_skewness": {
+          "measured": 0.727893,
+          "limit": 2.0,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_interpolation_weight": {
+          "measured": 0.213019,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "min_face_volume_ratio": {
+          "measured": 0.301691,
+          "limit": 0.1,
+          "passed": true,
+          "source": "OpenFOAM Foundation v14 checkMesh"
+        },
+        "max_in_plane_stretching": {
+          "measured": 38855541.17768772,
+          "limit": 10000.0,
+          "passed": false,
+          "cells_over_limit": 15678,
+          "cells_total": 229376,
+          "source": "independent cell-geometry audit, corrected flow-plane selection"
+        },
+        "all_in_plane_elements_valid": {
+          "measured": {
+            "nonpositive_area": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_bilinear_jacobian": {
+          "measured": {
+            "nonpositive_corner_jacobian": 0
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit"
+        },
+        "positive_cell_orientation": {
+          "measured": {
+            "constant_plane_order_all_cells": true,
+            "span_pairs_identical_xy": true,
+            "min_signed_volume": 1.0827154660681468e-12
+          },
+          "passed": true,
+          "source": "independent cell-geometry audit, corrected permutation"
+        },
+        "face_tet_checks": {
+          "measured": {
+            "warning_faces": 625
+          },
+          "passed": null,
+          "source": "OpenFOAM Foundation v14 checkMesh",
+          "note": "left unresolved: it is not needed to establish rejection, because in-plane stretching already fails decisively"
+        }
+      },
+      "failed": [
+        "max_in_plane_stretching"
+      ],
+      "unresolved": [
+        "face_tet_checks"
+      ],
+      "verdict": "F3_MESH_NOT_QUALIFIED"
+    }
+  },
+  "final_status": "MESH_REJECTED / CFD_NOT_RUN",
+  "cfd_launched": false,
+  "what_must_not_be_claimed": [
+    "that skewness is the genuine rejection reason -- Foundation v14 reports 0.857 / 0.820 / 0.728 against a limit of 2, which PASSES on all three levels",
+    "that cell orientation or in-plane validity are NASA-grid failures -- both are clean after the converter defects are corrected",
+    "that any CFD was run for this family"
+  ]
+}

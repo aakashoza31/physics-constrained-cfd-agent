@@ -1,6 +1,6 @@
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T01:46:58Z",
+  "generated_utc": "2026-09-28T02:35:56Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",

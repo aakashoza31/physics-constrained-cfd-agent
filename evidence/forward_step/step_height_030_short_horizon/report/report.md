@@ -55,19 +55,31 @@ Every row below was decided by code. No model output appears in this table.
 
 | Activity | Content | Accepted by authority |
 |---|---|---|
-| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic_keyword", "prompt": "run the register | None |
+| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic", "prompt": "run the registered forwa | None |
 
 ## 6. Media
 
+- plot: `plots/physics_specific_shock_front.png`
+- plot: `plots/conservation.png`
 - plot: `plots/residuals.png`
 - plot: `plots/convergence.png`
+- contour: `contours/density.png`
+- contour: `contours/mach.png`
+- contour: `contours/mesh.png`
+- contour: `contours/pressure.png`
+- contour: `contours/shock_density.png`
+- contour: `contours/shock_front_history.png`
+- contour: `contours/temperature.png`
+- contour: `contours/transient_conservation.png`
+- contour: `contours/velocity.png`
+- video: `video/simulation.mp4`
 
 ## 7. Provenance
 
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T01:47:20Z",
+  "generated_utc": "2026-09-28T02:36:53Z",
   "prompt": "run the registered forward_step case step_height_030_short_horizon",
   "mode": "replay",
   "family": "forward_step_2d",

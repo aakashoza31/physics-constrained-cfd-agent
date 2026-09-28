@@ -1,6 +1,6 @@
 # Engineering report — airfoil / mesh_rejection
 
-**Decision: `REJECT`** — replayed from archived evidence: the run recorded MESH_REJECTED_CFD_NOT_RUN with failed checks ['all_in_plane_elements_valid', 'max_non_orthogonality', 'max_skewness', 'positive_cell_orientation']. No solver was executed by this replay.
+**Decision: `REJECT`** — MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after our own converter defects were corrected, so neither is a NASA-grid failure. No solver was ever launched.
 
 ## 1. Request
 
@@ -36,7 +36,7 @@ Every row below was decided by code. No model output appears in this table.
 |---|---|---|---|
 | `geometry_admissibility` | PASS | "the geometry must be characterisable" | "FEATURES_EXTRACTED" |
 | `family_compatibility` | PASS | "the case must be in the registered library" | {"family": "airfoil", "case": "mesh_rejection"} |
-| `mesh_quality` | FAIL | "the frozen mesh-quality contract" | {"levels": {"coarse": "F3_MESH_NOT_QUALIFIED", "medium": "F3_MESH_NOT_QUALIFIED", "fine": "F3_MESH_NOT_QUALIFI |
+| `mesh_quality` | FAIL | "max_in_plane_stretching <= 10000.0" | {"decisive_failure": {"check": "max_in_plane_stretching", "frozen_limit": 10000.0, "levels": {"coarse": {"max" |
 | `numerical_health` | UNRESOLVED | "not reachable without a qualified mesh" | "CFD_NOT_RUN" |
 | `permitted_actions` | PASS | "a proposed action must be in the family's registered vocabulary" | {"proposed": [], "allowed": ["FAIL_SAFELY", "REJECT_UNSUPPORTED"]} |
 
@@ -50,7 +50,7 @@ Every row below was decided by code. No model output appears in this table.
 
 | Activity | Content | Accepted by authority |
 |---|---|---|
-| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic_keyword", "prompt": "run the register | None |
+| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic", "prompt": "run the registered airfo | None |
 
 ## 6. Media
 
@@ -61,7 +61,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T01:47:23Z",
+  "generated_utc": "2026-09-28T02:36:00Z",
   "prompt": "run the registered airfoil case mesh_rejection",
   "mode": "replay",
   "family": "airfoil",

@@ -1,8 +1,19 @@
 {
   "visuals_version": "visuals/1.0.0",
-  "status": "NOT_AVAILABLE",
-  "field_time_directories": [],
-  "renderer": "NOT_AVAILABLE",
-  "script": "src/reporting/paraview_contours.py",
-  "reason": "the archived evidence carries post-processed series and logs but no reconstructed field time directories, so there is nothing to contour. Re-run the case live to produce fields."
+  "status": "ARCHIVED_RENDERS",
+  "written": [
+    "density.png",
+    "mach.png",
+    "mesh.png",
+    "pressure.png",
+    "shock_density.png",
+    "shock_front_history.png",
+    "temperature.png",
+    "transient_conservation.png",
+    "velocity.png"
+  ],
+  "source": [
+    "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20"
+  ],
+  "note": "these images were rendered by the original run's own visualisation step and are copied verbatim. They are not re-rendered here, and nothing was synthesised."
 }

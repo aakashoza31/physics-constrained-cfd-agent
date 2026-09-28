@@ -6,18 +6,76 @@
     "verdict": "REJECT",
     "archived_status": "MESH_REJECTED_CFD_NOT_RUN",
     "failed_checks": [
-      "all_in_plane_elements_valid",
-      "max_non_orthogonality",
-      "max_skewness",
-      "positive_cell_orientation"
+      "max_in_plane_stretching",
+      "max_non_orthogonality"
     ],
+    "unresolved_checks": [
+      "face_tet_checks"
+    ],
+    "decisive_failure": {
+      "check": "max_in_plane_stretching",
+      "frozen_limit": 10000.0,
+      "levels": {
+        "coarse": {
+          "max": 31734384.049936082,
+          "cells_over_limit": 974,
+          "cells_total": 14336
+        },
+        "medium": {
+          "max": 36320937.1389407,
+          "cells_over_limit": 3924,
+          "cells_total": 57344
+        },
+        "fine": {
+          "max": 38855541.17768772,
+          "cells_over_limit": 15678,
+          "cells_total": 229376
+        }
+      }
+    },
     "mesh_levels": {
       "coarse": "F3_MESH_NOT_QUALIFIED",
       "medium": "F3_MESH_NOT_QUALIFIED",
       "fine": "F3_MESH_NOT_QUALIFIED"
     },
+    "foundation_v14_metrics": {
+      "coarse": {
+        "max_non_orthogonality": 79.7474,
+        "max_skewness": 0.857067,
+        "min_interpolation_weight": 0.123368,
+        "min_face_volume_ratio": 0.162489,
+        "face_tet_checks": {
+          "warning_faces": 72
+        }
+      },
+      "medium": {
+        "max_non_orthogonality": 57.8856,
+        "max_skewness": 0.82043,
+        "min_interpolation_weight": 0.15772,
+        "min_face_volume_ratio": 0.213368,
+        "face_tet_checks": {
+          "warning_faces": 214
+        }
+      },
+      "fine": {
+        "max_non_orthogonality": 31.5684,
+        "max_skewness": 0.727893,
+        "min_interpolation_weight": 0.213019,
+        "min_face_volume_ratio": 0.301691,
+        "face_tet_checks": {
+          "warning_faces": 625
+        }
+      }
+    },
+    "representation_defects_were_ours_not_nasas": [
+      "handedness",
+      "vertex permutation",
+      "wrong face selected by the in-plane checker",
+      "non-equivalent skewness metric"
+    ],
     "solver_invoked_in_archive": false,
-    "note": "CFD_NOT_RUN: no flow solver was ever launched for this family"
+    "source_of_truth": "cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json",
+    "note": "CFD_NOT_RUN: no flow solver was ever launched for this family. The decisive genuine failure is in-plane stretching; skewness and orientation are NOT NASA-grid failures."
   },
   "source_of_truth": "outputs/airfoil_mesh",
   "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"

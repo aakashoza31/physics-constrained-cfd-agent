@@ -23,6 +23,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+from src.agent.backends import BackendUnavailable                        # noqa: E402
 from src.agent.pipeline import DRY_RUN, LIVE, MODES, REPLAY, run_pipeline  # noqa: E402
 from src.families import capabilities as caps                              # noqa: E402
 from src.reporting import report_builder                                   # noqa: E402
@@ -52,6 +53,11 @@ def main() -> int:
     ap.add_argument("--out", default=None)
     ap.add_argument("--list", action="store_true", help="list registered cases")
     ap.add_argument("--i-want-to-run-cfd", action="store_true", dest="allow_cfd")
+    ap.add_argument("--agent-backend", default="deterministic",
+                    choices=["deterministic", "gemini", "replay"],
+                    help=("who interprets and diagnoses. 'deterministic' needs no "
+                          "API key and is NOT an LLM run; 'gemini' uses "
+                          "GEMINI_API_KEY"))
     ap.add_argument("--no-media", action="store_true")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
@@ -60,8 +66,13 @@ def main() -> int:
         return _list_cases()
 
     prompt = f"run the registered {args.family} case {args.case or '(default)'}"
-    run = run_pipeline(prompt, mode=args.mode, family=args.family, case=args.case,
-                       allow_cfd=args.allow_cfd)
+    try:
+        run = run_pipeline(prompt, mode=args.mode, family=args.family,
+                           case=args.case, allow_cfd=args.allow_cfd,
+                           backend=args.agent_backend)
+    except BackendUnavailable as exc:
+        print(f"agent backend unavailable: {exc}", file=sys.stderr)
+        return 2
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     out = Path(args.out) if args.out else (
         _ROOT / "runs" / f"{stamp}_{run.family or args.family}_{run.case or 'case'}")

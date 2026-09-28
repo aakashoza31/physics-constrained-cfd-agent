@@ -1,3 +1,11 @@
+> **HISTORICAL / SUPERSEDED — not the active F3 family.**
+> The active F3 family is the surface-mounted cube (`cases/cube/drifting_wake`).
+> NACA0012 is supplementary S1: `MESH_REJECTED / CFD_NOT_RUN`, decided by
+> in-plane stretching. The corrected scientific record is
+> `cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json`; anything in
+> this document that blames the NASA grid for skewness, cell orientation or
+> in-plane validity is a pre-audit artefact of our own converter.
+
 # F3 surface-distribution recipe v2 — result and diagnosis
 
 Recipe v1 is archived unchanged under `outputs/airfoil_mesh/v1/`. The active
