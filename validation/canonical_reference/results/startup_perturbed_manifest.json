@@ -1,0 +1,15 @@
+﻿{
+  "scale": 1,
+  "axial_cells": 132,
+  "radial_cells": 16,
+  "angle_deg": 5.0,
+  "maxCo": 0.4,
+  "end_time": 0.006,
+  "perturbation": 0.02,
+  "ambient_pa": 30000,
+  "ambient_imposed": false,
+  "solver": "shockFluid",
+  "initialization": "quasi_1d_internal_only",
+  "R": 287,
+  "gamma": 1.4
+}

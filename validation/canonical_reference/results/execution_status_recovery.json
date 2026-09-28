@@ -1,0 +1,15 @@
+﻿{
+  "mesh2": {
+    "observed_process_exit": 0,
+    "tool_session": 50252
+  },
+  "mesh3": {
+    "observed_process_exit": 0,
+    "tool_session": 43701
+  },
+  "time_half": {
+    "observed_process_exit": 0,
+    "evidence": "The set-e parent advanced past run_case.sh to validate.py; validation initially rejected only the missing exit sidecar."
+  },
+  "explanation": "The initial shell wrapper was edited while these processes were running, removing its trailing status-sidecar write. Completion was recovered from observed process status, not inferred from field health. Final execute.py owns process completion and records it directly."
+}

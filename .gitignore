@@ -47,3 +47,9 @@ presentation/
 Claude outputs/
 evaluation/records/
 *.tar.gz
+
+# The canonical-reference validation records ARE the reference the nozzle tests
+# read. They are small (420 KB of JSON/CSV) and must ship, so they are excepted
+# from the blanket results/ rule above.
+!validation/canonical_reference/results/
+!validation/canonical_reference/results/**
