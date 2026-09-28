@@ -34,16 +34,16 @@ def test_no_family_advertises_step_support():
 
 def test_only_accepted_families_are_routable():
     assert caps.ROUTABLE == ("nozzle", "forward_step_2d")
-    assert caps.TABLE["cube"].status == caps.RUNTIME_REJECTED
+    assert caps.TABLE["cube"].status == caps.SUPPLEMENTARY
     assert caps.TABLE["cube"].routable is False
     assert caps.TABLE["airfoil"].status == caps.SUPPLEMENTARY
     assert caps.TABLE["airfoil"].routable is False
 
 
-def test_the_cube_declaration_says_it_is_a_rejection():
+def test_the_cube_declaration_says_it_is_supplementary():
     note = caps.TABLE["cube"].notes.lower()
-    assert "rejected" in note
-    assert "not a successful validation" in note
+    assert "exploratory" in note
+    assert "not a validated benchmark result" in note
 
 
 def test_the_airfoil_declaration_says_no_cfd_was_run():

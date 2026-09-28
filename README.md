@@ -1,16 +1,15 @@
 # Physics-Constrained Autonomous CFD Agent
 
 A CFD agent in which a language model interprets engineering requests, routes
-them, diagnoses simulation evidence and proposes corrective actions — and in
-which **no model output can accept a result**. Every scientific decision is made
-by deterministic code that the model cannot reach: geometry admissibility, mesh
-quality, numerical health, conservation, convergence, stationarity, validation,
-permitted actions and the final verdict. The contribution is not a faster solver.
-It is an architecture in which an autonomous agent cannot produce a confident
-false acceptance, demonstrated by the cases where it refuses: a three-dimensional
-turbulent run that executed cleanly and was rejected because a lateral flow mode
-was still growing, and a fourth family whose every candidate mesh was refused so
-that no CFD was ever run.
+them to registered simulation families, diagnoses simulation evidence and
+proposes bounded corrective actions. Scientific acceptance remains deterministic:
+geometry admissibility, mesh quality, numerical health, conservation, convergence,
+stationarity and validation are evaluated by code outside the language model.
+The current research artifact demonstrates end-to-end autonomous CFD workflows
+for two validated compressible-flow families, with reproducible case generation,
+OpenFOAM execution, diagnostics, reporting and provenance. Supplementary studies
+exercise how the framework handles cases that are not yet certified for a
+validated scientific claim.
 
 ---
 
@@ -65,8 +64,9 @@ Blue: a language model contributes. Green: deterministic code decides. Details i
 1. That arbitrary engineering prompts can be simulated. Two families are
    validated, both inviscid compressible Euler, both 2-D.
 2. That arbitrary CAD can be meshed or solved. **No family accepts STEP.**
-3. That the cube case is a validated simulation of flow over a cube. It was
-   executed and **rejected**.
+3. That the exploratory cube study is a validated turbulent benchmark. It is
+   retained as a supplementary stationarity/development study and is **not part
+   of the validated headline claims**.
 4. That the NACA0012 work reproduces NASA results. **No CFD was run** for it,
    and its rejection rests on in-plane stretching alone — Foundation-v14
    skewness passes on all three levels, and the orientation and in-plane defects
@@ -76,44 +76,38 @@ Blue: a language model contributes. Green: deterministic code decides. Details i
 
 Full accounting: [`docs/limitations.md`](docs/limitations.md).
 
-## 4. Three headline cases
+## 4. Validated families and supplementary studies
 
-| | Family | Case | Outcome | Why it is here |
-|---|---|---|---|---|
-| **F1** | `nozzle` | `canonical_reference` (+2) | **ACCEPTED** | validated acceptance, continuation and correction |
-| **F2** | `forward_step_2d` | `mach20_canonical` (+7) | **ACCEPTED** (5) / **safe stop** (3) | variations, mesh sensitivity, and an inadmissible variation refused |
-| **F3** | `cube` | `drifting_wake` | **RUNTIME REJECTED** | 3-D turbulent execution refused on flow development |
-| S1 | `airfoil` | `mesh_rejection` | **MESH REJECTED, `CFD_NOT_RUN`** | supplementary: in-plane stretching 3.2e7–3.9e7 against a limit of 10,000 |
+The current validated headline results are the nozzle and two-dimensional
+forward-facing-step families. The cube and airfoil records are retained as
+supplementary development studies rather than presented as validated families.
 
-### The F3 refusal, in numbers
-
-| Quantity | Measured | Limit | Result |
+| | Family | Case | Scientific role |
 |---|---|---|---|
-| Streamwise force drift over the final window | **0.08%** | ≤ 2% | PASS |
-| Mean lateral force / mean drag | 6.3e-4 | ≤ 0.05 | PASS |
-| **Lateral force growth across the window** | **2.10×** | **≤ 1.25×** | **FAIL** |
+| **F1** | `nozzle` | `canonical_reference` (+2) | **VALIDATED**: accepted reference, continuation and controlled variation |
+| **F2** | `forward_step_2d` | `mach20_canonical` (+7) | **VALIDATED**: accepted canonical/variation cases plus bounded safe-stop cases |
+| X1 | `cube` | `drifting_wake` | **EXPERIMENTAL**: 3-D turbulent stationarity/development study; not a validated benchmark claim |
+| S1 | `airfoil` | `mesh_rejection` | **SUPPLEMENTARY**: mesh-development record; CFD was not run |
 
-The lateral force is a periodic mode of period ≈ 10.1 time units whose amplitude
-grew **68×** (1.01e-4 → 6.91e-3) at 0.091 per time unit, e-folding in 11.0, and
-had not saturated when the run ended. Every conventional convergence indicator
-passed; the drag was settled to 0.08%. A pipeline watching the drag would have
-accepted a flow that was still developing.
+The cube study is intentionally excluded from the validated-family count. Its
+archived machine-readable decision and force-history evidence are preserved for
+provenance, but the advisor-facing research claim is simply that turbulent cube
+validation remains future work.
 
 ## 5. Results and status
 
-| Family | Status | Cases | Accepted | Rejected | Solver run |
-|---|---|---|---|---|---|
-| `nozzle` | ACCEPTED | 3 | 3 | 0 | yes |
-| `forward_step_2d` | ACCEPTED | 8 | 5 | 3 | yes |
-| `cube` | RUNTIME_REJECTED | 1 | 0 | 1 | yes |
-| `airfoil` | SUPPLEMENTARY | 1 | 0 | 1 | **no** (`CFD_NOT_RUN`) |
-| `backward_step` | NOT_IMPLEMENTED | 0 | — | — | no |
+| Family | Role | Registered cases | Current validated claim | Solver run |
+|---|---|---:|---|---|
+| `nozzle` | VALIDATED | 3 | 3 accepted reference/variation cases | yes |
+| `forward_step_2d` | VALIDATED | 8 | 5 accepted cases; 3 bounded safe-stop cases | yes |
+| `cube` | EXPERIMENTAL | 1 | no turbulent validation claim | yes |
+| `airfoil` | SUPPLEMENTARY | 1 | mesh-development only; `CFD_NOT_RUN` | no |
+| `backward_step` | NOT_IMPLEMENTED | 0 | none | no |
 
-Replaying all 13 registered cases reproduces every archived verdict — a measured
-**false-acceptance rate of 0.0** and **correct-rejection rate of 1.0** over 13
-runs. This is a **registered-case safety regression / replay-consistency test**,
-not the paper's evaluation, and it says nothing about model generalisation. The
-ablation study is `NOT_RUN`. Details: [`docs/results.md`](docs/results.md).
+Replaying all 13 registered records reproduces their archived deterministic
+outcomes. This is a **registered-case safety regression / replay-consistency
+test**, not the paper's model-generalisation evaluation. The ablation study is
+`NOT_RUN`. Details: [`docs/results.md`](docs/results.md).
 
 ## 6. Quickstart
 
@@ -122,11 +116,11 @@ git clone <this repository> && cd physics-constrained-cfd-agent
 python -m pip install -r requirements.txt
 
 python scripts/run_demo.py --list
-python scripts/run_demo.py --family cube --case drifting_wake --mode replay
+python scripts/run_demo.py --family nozzle --case canonical_reference --mode replay
 ```
 
-The last command needs no solver and no API key. It re-runs the stationarity gate
-over 2003 archived force samples and prints the rejection with its reasoning.
+The last command needs no solver and no API key. It reproduces the archived
+canonical-nozzle evidence and deterministic decision path.
 
 ## 7. Live vs replay
 
@@ -176,11 +170,7 @@ See [`docs/cad_and_step_input.md`](docs/cad_and_step_input.md).
 python scripts/run_demo.py --family nozzle       --case canonical_reference            --mode replay
 python scripts/run_demo.py --family forward_step --case mach20_canonical               --mode replay
 python scripts/run_demo.py --family forward_step --case step_height_030_short_horizon  --mode replay
-python scripts/run_demo.py --family cube         --case drifting_wake                  --mode replay
 python scripts/run_demo.py --family airfoil      --case mesh_rejection                 --mode replay
-
-# or from the case directory
-cd cases/cube/drifting_wake && ./reproduce.sh
 
 # live (requires OpenFOAM Foundation v14)
 python scripts/run_demo.py --family nozzle --case canonical_reference --mode live --i-want-to-run-cfd
@@ -188,7 +178,7 @@ python scripts/run_demo.py --family nozzle --case canonical_reference --mode liv
 
 Each run writes `runs/<timestamp>_<family>_<case>/` with `report/`, `evidence/`,
 `diagnostics/`, `plots/`, `contours/`, `video/`, `provenance.json` and
-`final_decision.json`. Pre-generated copies for the headline cases are committed
+`final_decision.json`. Pre-generated copies for representative validated and supplementary cases are committed
 under `evidence/`.
 
 ## 10. Evaluation
@@ -227,10 +217,11 @@ tests/              the test suite
 
 ## 13. Scientific limitations
 
-Two validated families, both inviscid and 2-D. No turbulent validation: the one
-turbulent family that executed was rejected. No STEP support. No quantified
-grid-convergence index, no uncertainty quantification. Live results are claimed
-only for OpenFOAM Foundation v14. Read
+Two validated families, both inviscid and 2-D. Turbulent validation is still
+future work; the cube study is retained only as an exploratory stationarity and
+development record. No STEP support. No quantified grid-convergence index and no
+uncertainty quantification. Live results are claimed only for OpenFOAM Foundation
+v14. Read
 [`docs/limitations.md`](docs/limitations.md) before citing anything.
 
 ## 14. Citation

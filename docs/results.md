@@ -1,7 +1,8 @@
 # Results
 
-Three headline demonstrations and one supplementary case. Every row is read from
-archived evidence in this repository; nothing here is projected or expected.
+Two validated headline families and two supplementary development studies. Every
+row is read from archived evidence in this repository; nothing here is projected
+or expected.
 
 ## Status table
 
@@ -9,7 +10,7 @@ archived evidence in this repository; nothing here is projected or expected.
 |---|---|---|---|---|---|
 | F1 | `nozzle` | `canonical_reference`, `geometry_variation`, `condition_variation` | compressible Euler, 2-D | **ACCEPTED** (3/3) | validated acceptance, continuation and correction behaviour |
 | F2 | `forward_step_2d` | 8 cases | compressible Euler, 2-D transient | **ACCEPTED** (5) + **safe stop** (3) | accepted variations, mesh sensitivity, and an inadmissible variation refused |
-| F3 | `cube` | `drifting_wake` | incompressible RANS, 3-D transient | **RUNTIME REJECTED** | 3-D execution, LLM diagnosis, deterministic rejection of a still-developing flow |
+| X1 | `cube` | `drifting_wake` | incompressible RANS, 3-D transient | **SUPPLEMENTARY / NOT VALIDATED** | exploratory 3-D execution and stationarity/development assessment |
 | S1 | `airfoil` | `mesh_rejection` | incompressible RANS, 2-D | **MESH REJECTED, `CFD_NOT_RUN`** | the mesh contract refusing every candidate mesh; no solver ever launched |
 
 ## F1 — compressible nozzle (ACCEPTED)
@@ -43,10 +44,9 @@ was not measurable within the requested horizon, so the run stopped safely
 instead of being accepted. `step_height_030_extended` is the same geometry with
 the horizon extended, and it is accepted.
 
-## F3 — surface-mounted cube (RUNTIME REJECTED)
+## X1 — surface-mounted cube (supplementary exploratory study)
 
-The headline refusal. A 3-D turbulent run executed to t = 80 and reported no
-numerical failure.
+A 3-D turbulent run executed to t = 80 and reported no numerical failure.
 
 | Quantity | Measured | Registered limit | Result |
 |---|---|---|---|
@@ -60,14 +60,14 @@ grew from 1.01e-4 to 6.91e-3 — a factor of 68 — at an exponential rate of 0.
 per time unit (e-folding 11.0), and had not saturated when the run ended.
 
 **Every conventional convergence indicator passed.** The drag was settled to
-0.08%. A pipeline that watched the drag would have accepted a flow that was still
-developing. The deterministic gate refused it on growth, and the refusal is
-reproducible: `python scripts/run_demo.py --family cube --case drifting_wake
---mode replay` re-runs the gate over all 2003 archived force samples.
+0.08%, but the registered lateral-growth criterion was not satisfied. The case
+is therefore retained as a supplementary stationarity/development study rather
+than a validated cube benchmark. The archived assessment is reproducible with
+`python scripts/run_demo.py --family cube --case drifting_wake --mode replay`.
 
-This case is **not** a validated cube simulation and must never be presented as
-one. No reference comparison was performed, because a still-developing flow
-cannot be compared against one.
+No reference comparison was performed because the flow had not reached the
+registered development criterion. The raw machine-readable historical outcome is
+preserved in the case evidence for provenance.
 
 ## S1 — NACA0012 (supplementary, `CFD_NOT_RUN`)
 

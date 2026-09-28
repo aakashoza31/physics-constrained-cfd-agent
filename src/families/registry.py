@@ -262,15 +262,15 @@ def install_standing_register() -> None:
     register(
         FamilyRecord(
             name="cube",
-            status=NONACCEPTED,
+            status=SUPPORTING,
             physics="incompressible_rans",
             description=(
-                "Surface-mounted cube. NOT ACCEPTED: solver was numerically "
-                "healthy while a lateral mode kept growing, and the deterministic "
-                "stationarity gate rejected the run."
+                "Surface-mounted cube exploratory study. The solver was numerically "
+                "healthy while a lateral mode kept growing, so the case did not "
+                "meet the registered stationarity/development criterion."
             ),
             factory=None,
-            retained_as="stationarity stress test / safe-rejection evidence",
+            retained_as="exploratory stationarity/development evidence",
             evidence_root="cases/cube/drifting_wake",
             notes=(
                 "Tracked and replayable: the registered case is "

@@ -24,7 +24,7 @@ physics:
 allowed_actions: [ACCEPT, CONTINUE_RUN, REFINE_MESH, REQUEST_CLARIFICATION,
                   REJECT_UNSUPPORTED, FAIL_SAFELY]
 characteristic_dimension: throat_radius
-status: ACCEPTED          # ACCEPTED | RUNTIME_REJECTED | SUPPLEMENTARY | NOT_IMPLEMENTED
+status: ACCEPTED          # ACCEPTED | SUPPLEMENTARY | NOT_IMPLEMENTED
 ```
 
 2. **A recipe** — `FamilyRecipe`: the benchmark reference, the numerics, the
@@ -42,13 +42,11 @@ status: ACCEPTED          # ACCEPTED | RUNTIME_REJECTED | SUPPLEMENTARY | NOT_IM
 | Status | Routable | Meaning |
 |---|---|---|
 | `ACCEPTED` | yes | validated, may execute and may be accepted |
-| `RUNTIME_REJECTED` | no | executed and deterministically rejected; evidence preserved and replayable |
 | `SUPPLEMENTARY` | no | preserved evidence only; never executed for acceptance |
 | `NOT_IMPLEMENTED` | no | declared for completeness, deliberately not built |
 
-Only `ACCEPTED` families can reach a solver through the agent. A
-`RUNTIME_REJECTED` family stays fully replayable — that is how the cube
-demonstration remains reproducible without ever being presentable as a success.
+Only `ACCEPTED` families can reach a solver through the agent. Supplementary
+studies remain reproducible without being presented as validated families.
 
 ## Registered families
 
@@ -56,7 +54,7 @@ demonstration remains reproducible without ever being presentable as a success.
 |---|---|---|---|---|
 | `nozzle` | ACCEPTED | compressible Euler, 2-D | no | 3 |
 | `forward_step_2d` | ACCEPTED | compressible Euler, 2-D transient | no | 8 |
-| `cube` | RUNTIME_REJECTED | incompressible RANS, 3-D transient | no | 1 |
+| `cube` | SUPPLEMENTARY | incompressible RANS, 3-D transient | no | 1 |
 | `airfoil` | SUPPLEMENTARY | incompressible RANS, 2-D | no | 1 (mesh rejection, CFD_NOT_RUN) |
 | `backward_step` | NOT_IMPLEMENTED | — | no | 0 |
 

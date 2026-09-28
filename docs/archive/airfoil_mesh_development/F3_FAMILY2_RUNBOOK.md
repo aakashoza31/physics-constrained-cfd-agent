@@ -41,7 +41,7 @@ convert 0.6 s, qualify 3.7 s.
 ## Local commands
 
 ```powershell
-cd "C:\Backup from one drive\Desktop\Research\physics-constrained-cfd-agent-e2e"
+cd "<repo-root>"
 python -m pip install "h5py>=3.0"
 
 # 1. Fetch NASA's archive and extract the three Family II CGNS levels

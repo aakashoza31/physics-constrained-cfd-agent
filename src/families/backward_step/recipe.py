@@ -16,7 +16,7 @@ from src.families.backward_step.spec import FAMILY, PHYSICS
 RECIPE = FamilyRecipe(
     family=FAMILY,
     physics=PHYSICS,
-    reference="TODO: authoritative NASA TMR-type backward-facing-step reference, pending Astra review",
+    reference="TODO: authoritative backward-facing-step reference pending scientific review",
     numerics={
         "turbulence_model": TODO("numerics.turbulence_model", "reference states SST; the exact variant must be checked against Foundation v14"),
         "solver": TODO("numerics.solver", "steady incompressible solver choice per the reference"),
@@ -50,7 +50,7 @@ RECIPE = FamilyRecipe(
     ),
     region_vocabulary=('step_corner', 'shear_layer', 'reattachment', 'recovery'),
     notes=(
-        "CORE-PENDING. Scientific recipe unregistered. Astra supplies these "
-        "after reviewing the authoritative reference."
+        "CORE-PENDING. Scientific recipe unregistered. These constants must be "
+        "filled only after review of the authoritative reference."
     ),
 )

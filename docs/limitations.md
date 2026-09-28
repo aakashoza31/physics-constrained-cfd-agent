@@ -6,7 +6,7 @@ Read this before believing anything else in the repository.
 
 Two families, both inviscid compressible Euler, both 2-D: the converging-diverging
 nozzle and the forward-facing step. Everything else in this repository is either
-a preserved refusal (the cube, the airfoil meshes) or infrastructure.
+a supplementary development study (the cube and airfoil mesh work) or infrastructure.
 
 Two validated families is **not** a general-purpose CFD agent. The product
 contract is implemented end to end, but the set of problems it can carry from
@@ -16,8 +16,8 @@ prompt to accepted result is small and closed.
 
 No viscous wall-bounded validation, no turbulence-model validation, no reacting
 flow, no multiphase, no conjugate heat transfer, no moving geometry, no
-compressible turbulence. The one turbulent family that executed (the cube) was
-rejected before validation.
+compressible turbulence. The exploratory cube run did not reach validation
+because its registered stationarity/development criterion was not satisfied.
 
 ## Geometry
 
@@ -32,16 +32,16 @@ two validated families generate themselves.
   an uncertainty.
 - No uncertainty quantification, no sensitivity to numerical scheme, no repeated
   runs to separate solver noise from physical variation.
-- The cube case ran at one mesh resolution. Its rejection is a statement about
-  that run's development, not about the physical flow.
+- The cube case ran at one mesh resolution. Its non-certification is a statement
+  about that run's development, not about the physical flow.
 
 ## The gates themselves
 
 Deterministic authority is only as strong as the registered criteria. The cube
 stationarity thresholds (2% drift, 1.25× growth, 5% lateral magnitude) are
-registered in `src/families/cube/stationarity.py` with their reasoning, and the
-archived run misses the growth bound by 1.7× — comfortable, but a reviewer
-should still argue with the bound rather than accept it because code applied it.
+registered in `src/families/cube/stationarity.py` with their reasoning. The
+exploratory run does not satisfy the growth bound, so it is not used as validated
+turbulent-flow evidence; the threshold itself remains open to scientific review.
 
 ## LLM involvement
 

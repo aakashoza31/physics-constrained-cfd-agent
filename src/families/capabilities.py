@@ -135,7 +135,7 @@ TABLE: Dict[str, FamilyCapabilities] = {
     ),
     "cube": FamilyCapabilities(
         name="cube",
-        status=RUNTIME_REJECTED,
+        status=SUPPLEMENTARY,
         geometry_inputs=GeometryInputs(parametric=True, step=False, step_note=_NO_STEP),
         physics=Physics(compressible=False, turbulent=True, transient=True,
                         dimensionality="3-D",
@@ -143,14 +143,13 @@ TABLE: Dict[str, FamilyCapabilities] = {
         allowed_actions=("CONTINUE_RUN", "FAIL_SAFELY", "REJECT_UNSUPPORTED"),
         characteristic_dimension="cube_height",
         envelope={"regime": "3-D turbulent flow over a wall-mounted cube",
-                  "validation": "not reached: the run was rejected before "
-                                "validation, on stationarity/development"},
+                  "validation": "not reached: the exploratory run did not satisfy "
+                                "the stationarity/development criterion"},
         cases=("drifting_wake",),
         solver="OpenFOAM Foundation v14",
-        notes=("F3 headline demonstration, RUNTIME REJECTED. The archived run "
-               "executed, drifted laterally and was refused by the deterministic "
-               "stationarity gate. It is NOT a successful validation and is not "
-               "routable for acceptance."),
+        notes=("Exploratory 3-D turbulent stationarity/development study. The "
+               "archived run is preserved for provenance, is not a validated "
+               "benchmark result, and is not routable for acceptance."),
     ),
     "airfoil": FamilyCapabilities(
         name="airfoil",

@@ -41,11 +41,6 @@
       "bytes": 986758,
       "gitignored": false,
       "note": "committed: small enough to ship with the repository"
-    },
-    "Claude outputs": {
-      "files": 10,
-      "bytes": 760927,
-      "gitignored": true
     }
   },
   "key_files": {

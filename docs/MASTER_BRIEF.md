@@ -1,6 +1,6 @@
 > **HISTORICAL — superseded by the frozen scope.** The active scope is
-> F1 nozzle, F2 forward step, F3 surface-mounted cube (RUNTIME REJECTED)
-> and S1 NACA0012 (SUPPLEMENTARY, CFD_NOT_RUN). See `docs/FAMILY_REGISTER.md`
+> F1 nozzle and F2 forward step as validated families, with the surface-mounted
+> cube and NACA0012 work retained as supplementary development studies. See `docs/FAMILY_REGISTER.md`
 > and `docs/results.md`. Family 3 in this brief is NOT the active F3.
 
 # Physics-Constrained Autonomous CFD Agent — Master Brief
@@ -77,10 +77,10 @@ is coordinate arithmetic and is registered. Region *under-resolution* is
 science and is `TODO` for every family, so the action currently refuses rather
 than guesses.
 
-## Failed and rejected cases
+## Supplementary and non-certified cases
 
 Preserved and reported, never silently tuned until they appear successful. See
-`docs/FAMILY_REGISTER.md` for `square_duct` and `cube`.
+`docs/FAMILY_REGISTER.md` for the supplementary `square_duct` and `cube` studies.
 
 ## Paper questions
 

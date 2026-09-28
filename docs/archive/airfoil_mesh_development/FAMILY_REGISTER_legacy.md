@@ -25,7 +25,7 @@ differ by regime (smooth isentropic expansion vs. discontinuity capture).
 ## `square_duct` — why it is SUPPORTING and not CORE
 
 Evidence root:
-`C:\Users\Aakash\Documents\Codex\2026-09-20\i-am-attaching-a-full-project\outputs\family3_square_duct_audit`
+`<external-square-duct-audit>`
 
 The McConkey `kOmegaSST` square-duct case is OpenCFD v2006; the production
 environment is OpenFOAM Foundation v14. The compatibility audit found that v14

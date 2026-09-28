@@ -50,9 +50,9 @@ def test_fully_registered_recipe_reports_clean():
 
 def test_recipe_to_dict_renders_todos_visibly():
     r = FamilyRecipe(family="x", physics="y", reference="z",
-                     tolerances={"CL": TODO("x.CL", "awaiting Astra")})
+                     tolerances={"CL": TODO("x.CL", "awaiting reference review")})
     d = r.to_dict()
-    assert d["tolerances"]["CL"] == {"TODO": "x.CL", "awaiting": "awaiting Astra"}
+    assert d["tolerances"]["CL"] == {"TODO": "x.CL", "awaiting": "awaiting reference review"}
     assert d["registered"] is False
 
 
@@ -64,7 +64,7 @@ def test_standing_register_has_the_declared_statuses():
         "airfoil": CORE_PENDING,
         "backward_step": CORE_PENDING,
         "square_duct": SUPPORTING,
-        "cube": NONACCEPTED,
+        "cube": SUPPORTING,
     }
     for name, status in expected.items():
         record = registry.get(name)
@@ -85,10 +85,10 @@ def test_square_duct_is_preserved_as_supporting_evidence_not_deleted():
     assert "v2006" in r.description and "v14" in r.description
 
 
-def test_cube_is_preserved_as_nonaccepted_stress_test():
+def test_cube_is_preserved_as_supporting_stationarity_study():
     registry.install_standing_register()
     r = registry.get("cube")
-    assert r.status == NONACCEPTED
+    assert r.status == SUPPORTING
     assert not r.routable
     assert "stationarity" in r.retained_as
     # Evidence path is allowed to be TODO and must not block anything.

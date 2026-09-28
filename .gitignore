@@ -44,7 +44,7 @@ backups/
 assets/
 demo/
 presentation/
-Claude outputs/
+_local_tool_outputs/
 evaluation/records/
 *.tar.gz
 

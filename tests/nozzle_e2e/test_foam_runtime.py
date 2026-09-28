@@ -26,8 +26,8 @@ def test_windows_paths_map_onto_the_wsl_mount():
     runtime = FoamRuntime(mode="wsl")
 
     assert (
-        runtime.to_runtime_path(r"C:\Users\aakash\Desktop\repo")
-        == "/mnt/c/Users/aakash/Desktop/repo"
+        runtime.to_runtime_path(r"C:\Users\example\Desktop\repo")
+        == "/mnt/c/Users/example/Desktop/repo"
     )
     assert (
         runtime.to_runtime_path(r"D:\Research\physics-constrained-cfd-agent")
@@ -39,7 +39,7 @@ def test_unmappable_paths_are_refused_rather_than_guessed():
     runtime = FoamRuntime(mode="wsl")
 
     with pytest.raises(FoamRuntimeError):
-        runtime.to_runtime_path("/home/aakash/repo")
+        runtime.to_runtime_path("/home/user/repo")
 
 
 def test_wsl_invocation_matches_the_repository_probe_pattern():

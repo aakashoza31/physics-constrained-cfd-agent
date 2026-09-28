@@ -1,4 +1,4 @@
-"""F3: surface-mounted cube. Executed, and deterministically REJECTED.
+"""Experimental surface-mounted cube stationarity/development study.
 
 This family is a headline demonstration of REFUSAL, not of validation. Its one
 registered case ran a 3-D turbulent CFD case to completion, looked numerically

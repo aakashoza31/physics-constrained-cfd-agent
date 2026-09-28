@@ -7,8 +7,8 @@ anything not yet run is marked `NOT_RUN`.**
 ## Abstract
 
 See `docs/paper_overview.md`. One paragraph: agent proposes, authority decides;
-demonstrated by two accepted families, one runtime rejection and one mesh
-rejection.
+demonstrated by two validated CFD families, with supplementary studies used to
+document current operating boundaries.
 
 ## 1. Introduction
 
@@ -56,8 +56,8 @@ automated mesh generation and quality metrics; guardrail/critic architectures.
 6.1 F1 compressible nozzle — canonical, geometry variation, condition variation
 6.2 F2 forward-facing step — accepted variations, mesh sensitivity, the
     inadmissible variation and its extended-horizon counterpart
-6.3 F3 surface-mounted cube — 3-D turbulent execution and runtime rejection
-6.4 S1 NACA0012 — three mesh generations, all rejected on in-plane stretching,
+6.3 Supplementary 3-D cube stationarity/development study (not a validated benchmark claim)
+6.4 S1 NACA0012 — mesh-development study; CFD not run because qualification did not pass,
     `CFD_NOT_RUN`
 
 ## 7. Evaluation
@@ -78,7 +78,7 @@ settled, lateral mode growing) and the gate table.
 
 ## 9. Failure and rejection analysis
 
-9.1 The cube: why every conventional indicator passed and the run was still
+9.1 Exploratory cube study: drag settled while a lateral mode continued to
     refused; the lateral mode (period ≈ 10.1, amplitude ×68, e-folding 11.0)
 9.2 The airfoil: a frozen mesh contract refusing three successive generations;
     the v1 TE spacing mismatch, the v2 relocation of that mismatch, and the

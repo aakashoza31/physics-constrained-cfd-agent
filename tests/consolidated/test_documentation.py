@@ -46,8 +46,9 @@ def test_the_readme_states_what_is_not_claimed():
 
 def test_the_readme_does_not_present_the_cube_as_a_success():
     text = (_ROOT / "README.md").read_text()
-    assert "RUNTIME REJECTED" in text
-    assert "rejected" in text.lower()
+    assert "`cube` | EXPERIMENTAL" in text
+    assert "not a validated benchmark claim" in text
+    assert "no turbulent validation claim" in text
 
 
 def test_no_absolute_local_paths_in_the_new_sources():
