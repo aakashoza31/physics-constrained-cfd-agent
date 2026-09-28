@@ -67,7 +67,10 @@ Blue: a language model contributes. Green: deterministic code decides. Details i
 2. That arbitrary CAD can be meshed or solved. **No family accepts STEP.**
 3. That the cube case is a validated simulation of flow over a cube. It was
    executed and **rejected**.
-4. That the NACA0012 work reproduces NASA results. **No CFD was run** for it.
+4. That the NACA0012 work reproduces NASA results. **No CFD was run** for it,
+   and its rejection rests on in-plane stretching alone — Foundation-v14
+   skewness passes on all three levels, and the orientation and in-plane defects
+   in the first diagnosis were **ours**, not the grid's.
 5. That LLM diagnosis improves accuracy. The claim is narrower: it cannot
    compromise it, because it cannot overrule the gates.
 
@@ -80,7 +83,7 @@ Full accounting: [`docs/limitations.md`](docs/limitations.md).
 | **F1** | `nozzle` | `canonical_reference` (+2) | **ACCEPTED** | validated acceptance, continuation and correction |
 | **F2** | `forward_step_2d` | `mach20_canonical` (+7) | **ACCEPTED** (5) / **safe stop** (3) | variations, mesh sensitivity, and an inadmissible variation refused |
 | **F3** | `cube` | `drifting_wake` | **RUNTIME REJECTED** | 3-D turbulent execution refused on flow development |
-| S1 | `airfoil` | `mesh_rejection` | **MESH REJECTED, `CFD_NOT_RUN`** | supplementary: the mesh contract refusing three generations |
+| S1 | `airfoil` | `mesh_rejection` | **MESH REJECTED, `CFD_NOT_RUN`** | supplementary: in-plane stretching 3.2e7–3.9e7 against a limit of 10,000 |
 
 ### The F3 refusal, in numbers
 
@@ -106,9 +109,11 @@ accepted a flow that was still developing.
 | `airfoil` | SUPPLEMENTARY | 1 | 0 | 1 | **no** (`CFD_NOT_RUN`) |
 | `backward_step` | NOT_IMPLEMENTED | 0 | — | — | no |
 
-Replaying all 13 registered cases through the full agent gives a measured
-**false-acceptance rate of 0.0** and a **correct-rejection rate of 1.0**. The
-three ablation arms are `NOT_RUN`. Details: [`docs/results.md`](docs/results.md).
+Replaying all 13 registered cases reproduces every archived verdict — a measured
+**false-acceptance rate of 0.0** and **correct-rejection rate of 1.0** over 13
+runs. This is a **registered-case safety regression / replay-consistency test**,
+not the paper's evaluation, and it says nothing about model generalisation. The
+ablation study is `NOT_RUN`. Details: [`docs/results.md`](docs/results.md).
 
 ## 6. Quickstart
 

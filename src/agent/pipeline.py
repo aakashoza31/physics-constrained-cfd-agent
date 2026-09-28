@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from src.agent import backends as agent_backends
 from src.agent.interpret import ProblemStatement, interpret
 from src.authority import AuthorityTrace, Decision, final_decision
 from src.families import capabilities as caps
@@ -89,6 +90,7 @@ class AgentRun:
     stages: List[StageRecord] = field(default_factory=list)
     trace: AuthorityTrace = field(default_factory=AuthorityTrace)
     decision: Optional[Decision] = None
+    backend: Any = None
     artifacts: Dict[str, Any] = field(default_factory=dict)
     started_utc: str = field(
         default_factory=lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
@@ -119,6 +121,8 @@ class AgentRun:
             "authority_trace": self.trace.to_dict(),
             "final_decision": self.decision.to_dict() if self.decision else None,
             "artifacts": dict(self.artifacts),
+            "agent_backend": (self.backend.to_dict() if self.backend is not None
+                              else {"backend": "deterministic", "calls": []}),
             "solver_invoked": bool(self.artifacts.get("solver_invoked", False)),
         }
 
@@ -153,7 +157,9 @@ def run_pipeline(prompt: str, *, mode: str = DRY_RUN,
                  family: Optional[str] = None,
                  case: Optional[str] = None,
                  parameters: Optional[Dict[str, float]] = None,
-                 allow_cfd: bool = False) -> AgentRun:
+                 allow_cfd: bool = False,
+                 backend: str = agent_backends.DETERMINISTIC,
+                 live_kwargs: Optional[Dict[str, Any]] = None) -> AgentRun:
     """Run the product contract end to end, stopping at the first refusal."""
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}; got {mode!r}")
@@ -161,7 +167,11 @@ def run_pipeline(prompt: str, *, mode: str = DRY_RUN,
 
     # -- 1. request interpretation (model proposes) --------------------
     source = geom.STEP if geometry else geom.PARAMETRIC
-    statement = interpret(prompt, geometry_source=source)
+    engine = agent_backends.make(backend)
+    run.backend = engine
+    statement = engine.interpret(prompt, geometry_source=source)
+    if statement.proposed_family and statement.proposed_family not in caps.TABLE:
+        statement.proposed_family = None
     if family:
         statement.proposed_family = family
         statement.confidence_note += " | family supplied explicitly by the caller"
@@ -245,6 +255,19 @@ def run_pipeline(prompt: str, *, mode: str = DRY_RUN,
         allowed = contract["capabilities"]["allowed_actions"]
         proposed_actions = [p["content"] for p in outcome.proposals
                             if p["activity"] == "propose_bounded_action"]
+        # A model backend diagnoses the real evidence. Its action must be in the
+        # registered vocabulary, and the gate below checks that -- the model does
+        # not get to widen its own action set.
+        if engine.name == agent_backends.GEMINI:
+            call = engine.diagnose(canonical, outcome.artifacts)
+            if call.parsed.get("diagnosis"):
+                run.trace.proposal("diagnose_evidence", call.parsed["diagnosis"],
+                                   model=f"{call.provider}:{call.model}")
+            if call.proposed_action:
+                proposed_actions.append(call.proposed_action)
+                run.trace.proposal("propose_bounded_action", call.proposed_action,
+                                   model=f"{call.provider}:{call.model}",
+                                   accepted_by_authority=call.action_in_vocabulary)
         run.trace.gate(
             "permitted_actions",
             all(any(str(a).startswith(act) for act in allowed)
@@ -369,10 +392,25 @@ def run_pipeline(prompt: str, *, mode: str = DRY_RUN,
         return run
     from src.orchestration import live
 
-    outcome = live.run_case(selected, case, run=run)
+    outcome = live.run_case(selected, case, run=run, **(live_kwargs or {}))
     run.artifacts.update(outcome.artifacts)
     run.artifacts.setdefault("solver_invoked", False)
-    if not run.artifacts["solver_invoked"]:
+    if run.artifacts["solver_invoked"]:
+        # The runner executed. Its deterministic record becomes gates in this
+        # trace, so a live run and a replay are judged by the same machinery.
+        for gate in outcome.gates:
+            run.trace.gate(gate["question"], gate["passed"],
+                           measured=gate.get("measured"),
+                           threshold=gate.get("threshold"),
+                           detail=gate.get("detail", ""))
+        for proposal in outcome.proposals:
+            run.trace.proposal(proposal["activity"], proposal["content"],
+                               model=proposal.get("model", "live"),
+                               accepted_by_authority=proposal.get(
+                                   "accepted_by_authority"))
+        if not outcome.gates:
+            _no_evidence("the runner produced no decision record")
+    else:
         _no_evidence(outcome.reason)
     run.decision = final_decision(run.trace, reason=outcome.reason)
     return run

@@ -204,16 +204,32 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
               detail=expected.get("message", "") or ""),
     ]
     if expected.get("solver_invoked_in_archive") is False:
+        decisive = expected.get("decisive_failure") or {}
+        metrics = expected.get("foundation_v14_metrics") or {}
         gates = [
             _gate("mesh_quality", False,
-                  measured={"levels": expected.get("mesh_levels"),
+                  measured={"decisive_failure": decisive,
+                            "foundation_v14_metrics": metrics,
                             "failed_checks": failed},
-                  threshold="the frozen mesh-quality contract",
-                  detail="no mesh level qualified, so CFD was never run"),
+                  threshold=(f"{decisive.get('check')} <= "
+                             f"{decisive.get('frozen_limit')}"),
+                  detail=("the decisive genuine failure is in-plane stretching, "
+                          "measured on the correctly selected constant-span "
+                          "flow-plane quad. Foundation-v14 skewness PASSES on all "
+                          "three levels, and cell orientation and in-plane "
+                          "validity are clean once our own converter defects are "
+                          "corrected -- neither is a NASA-grid failure.")),
             _gate("numerical_health", None, measured="CFD_NOT_RUN",
                   threshold="not reachable without a qualified mesh",
                   detail="no solver was launched for this family"),
         ]
+        artifacts_extra = {
+            "corrected_diagnosis": expected.get("source_of_truth"),
+            "decisive_failure": decisive,
+            "foundation_v14_metrics": metrics,
+            "superseded_reports": ("outputs/airfoil_mesh/ -- historical only; "
+                                   "contains converter/diagnostic defects"),
+        }
     proposals: List[Dict[str, Any]] = []
     if expected.get("llm_diagnosis"):
         proposals.append({
@@ -235,12 +251,27 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
         "archived_record": expected,
         "solver_invoked": False,
     }
-    reason = (
-        f"replayed from archived evidence: the run recorded "
-        f"{expected.get('archived_status')}"
-        + (f" with failed checks {failed}" if failed else "")
-        + ". No solver was executed by this replay."
-    )
+    artifacts.update(locals().get("artifacts_extra") or {})
+    if expected.get("solver_invoked_in_archive") is False:
+        decisive = expected.get("decisive_failure") or {}
+        levels = decisive.get("levels") or {}
+        worst = ", ".join(
+            f"{name} {int(v['max']):,} ({v['cells_over_limit']} cells over limit)"
+            for name, v in levels.items())
+        reason = (
+            "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is "
+            f"{decisive.get('check')} against a frozen limit of "
+            f"{decisive.get('frozen_limit'):,.0f}: {worst}. Foundation-v14 "
+            "skewness passes on all three levels, and orientation and in-plane "
+            "validity are clean after our own converter defects were corrected, "
+            "so neither is a NASA-grid failure. No solver was ever launched.")
+    else:
+        reason = (
+            f"replayed from archived evidence: the run recorded "
+            f"{expected.get('archived_status')}"
+            + (f" with failed checks {failed}" if failed else "")
+            + ". No solver was executed by this replay."
+        )
     return gates, proposals, artifacts, reason
 
 

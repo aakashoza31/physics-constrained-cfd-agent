@@ -57,7 +57,8 @@ automated mesh generation and quality metrics; guardrail/critic architectures.
 6.2 F2 forward-facing step — accepted variations, mesh sensitivity, the
     inadmissible variation and its extended-horizon counterpart
 6.3 F3 surface-mounted cube — 3-D turbulent execution and runtime rejection
-6.4 S1 NACA0012 — three mesh generations, all rejected, `CFD_NOT_RUN`
+6.4 S1 NACA0012 — three mesh generations, all rejected on in-plane stretching,
+    `CFD_NOT_RUN`
 
 ## 7. Evaluation
 
@@ -81,10 +82,21 @@ settled, lateral mode growing) and the gate table.
     refused; the lateral mode (period ≈ 10.1, amplitude ×68, e-folding 11.0)
 9.2 The airfoil: a frozen mesh contract refusing three successive generations;
     the v1 TE spacing mismatch, the v2 relocation of that mismatch, and the
-    Family II skewness failure
-9.3 Honest accounting of our own defects: the CGNS orientation/in-plane
-    diagnostic defect, and the non-reproducible node numbering in the archived
-    Gmsh generator
+    Family II **in-plane stretching** failure (3.2e7 / 3.6e7 / 3.9e7 against a
+    limit of 10,000, on 974 / 3,924 / 15,678 cells)
+9.3 Honest accounting of our own defects: the first Family II diagnosis blamed
+    the NASA grid for orientation, in-plane validity and skewness. An
+    independent cell-geometry audit showed all three were artefacts of our
+    converter -- a handedness-reversing axis transform, a wrong vertex
+    permutation (corrected: P = (3,7,6,2,0,4,5,1)), an in-plane checker reading
+    `cell[:4]` (a side face) instead of the constant-span flow-plane quad, and a
+    Python skewness proxy that is not Foundation-v14 skewness. Foundation-v14
+    reports skewness 0.857 / 0.820 / 0.728, all passing. Also: the
+    non-reproducible node numbering in the archived Gmsh generator.
+9.4 What this says about autonomous diagnosis: the rejection verdict survived
+    the audit unchanged, but its stated REASON did not. A pipeline that reports
+    which gate failed, with its measured value, is auditable; one that reports
+    only ACCEPT/REJECT is not.
 
 ## 10. Limitations
 
@@ -111,5 +123,6 @@ everything else. The evidence is the cases where it says no.
 | 2 | Cube force history with assessment window | `evidence/cube/drifting_wake/plots/force_history.png` | ready |
 | 3 | Lateral amplitude growth (log) | `evidence/cube/drifting_wake/plots/lateral_force_growth.png` | ready |
 | 4 | Gate outcome table per case | `evidence/*/*/plots/convergence.png` | ready |
-| 5 | Mesh-quality failure across three generations | `docs/results.md` S1 table | table only |
+| 5 | Mesh-quality failure across three generations | `docs/results.md` S1 tables | table only |
+| 5b | Corrected vs pre-audit S1 diagnosis | `cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json` | table only |
 | 6 | Ablation results | `evaluation/` | `NOT_RUN` |

@@ -71,24 +71,70 @@ cannot be compared against one.
 
 ## S1 — NACA0012 (supplementary, `CFD_NOT_RUN`)
 
-Three mesh generations were attempted and all were rejected:
+Three mesh generations were attempted and all were rejected. The record below is
+the **corrected** one, from an independent cell-geometry audit; the raw
+qualification reports under `outputs/airfoil_mesh/` are superseded historical
+evidence and carry a `SUPERSEDED.txt` banner.
 
-| Attempt | Meshes | Outcome |
-|---|---|---|
-| Gmsh v1 (uniform cosine surface) | coarse/medium/fine | all `F3_MESH_NOT_QUALIFIED`: skewness 2.86→8.65, weight 4.3e-3, volume ratio 3.3e-3 |
-| Gmsh v2 (partitioned TE distribution) | coarse/medium/fine | all `F3_MESH_NOT_QUALIFIED`: the mismatch relocated to the BL outer front; skewness 275→792 |
-| NASA TMR Family II CGNS | 14,336 / 57,344 / 229,376 cells | all `F3_MESH_NOT_QUALIFIED`: skewness 5.06 / 4.20 / 2.41 against a limit of 2 |
+### Defects that were ours, not NASA's
 
-The Family II run also flagged `positive_cell_orientation` and
-`all_in_plane_elements_valid` on all three levels with
-`in_plane_sign_resolution` unresolved and in-plane stretching reported as 0.0 —
-a signature of a **conversion/orientation defect on our side**, not of NASA's
-grid. The genuine contract failure is the skewness one, which persists at the
-fine level (2.41 > 2.0) after improving monotonically with refinement.
+The earlier diagnosis blamed the NASA grids for cell orientation, in-plane
+validity and skewness. The audit showed all three were artefacts of our own
+representation:
 
-**No flow solver was ever launched for this family.** Its value in the paper is
-as a negative result: a frozen mesh-quality contract that refuses, three times,
-rather than proceeding to a CFD run whose accuracy could not be defended.
+* the coordinate transform `(x,y,z)_NASA -> (x,z,y)_OpenFOAM` reverses handedness;
+* the corrected local vertex permutation for the archived NASA ordering is
+  `P = (3, 7, 6, 2, 0, 4, 5, 1)`;
+* the in-plane checker used `cell[:4]`, which selects a **side** face rather than
+  the constant-span flow-plane quad;
+* the Python skewness metric is **not** Foundation-v14 skewness.
+
+After selecting the real spanwise face and orienting it correctly: **0**
+nonpositive in-plane areas, **0** nonpositive bilinear corner Jacobians, and
+span-plane coordinates matching exactly, on all three levels.
+
+### Foundation-v14 `checkMesh`, as archived
+
+| Level | non-orthogonality (≤ 65°) | skewness (≤ 2) | min weight (≥ 0.10) | min face-volume ratio (≥ 0.10) |
+|---|---|---|---|---|
+| coarse | 79.7474 **FAIL** | 0.857067 PASS | 0.123368 PASS | 0.162489 PASS |
+| medium | 57.8856 PASS | 0.820430 PASS | 0.157720 PASS | 0.213368 PASS |
+| fine | 31.5684 PASS | 0.727893 PASS | 0.213019 PASS | 0.301691 PASS |
+
+Skewness passes everywhere. It is **not** the rejection reason and must never be
+quoted as one.
+
+### The decisive genuine failure: in-plane stretching
+
+Longest edge over minimum width of the constant-span flow-plane quad, frozen
+limit **10,000**:
+
+| Level | max stretching | cells over the limit | of |
+|---|---|---|---|
+| coarse | 31,734,384 | 974 | 14,336 |
+| medium | 36,320,937 | 3,924 | 57,344 |
+| fine | 38,855,541 | 15,678 | 229,376 |
+
+Three to four orders of magnitude over the limit, and worse with refinement.
+This is a property of the Family II grids as supplied, measured on the correctly
+selected face.
+
+Face-tet warnings remain unresolved at 72 / 214 / 625 faces. They are not needed
+to establish the rejection, because stretching already fails decisively.
+
+**Final status: `MESH_REJECTED / CFD_NOT_RUN`.** No flow solver was ever launched
+for this family. Its value in the paper is as a negative result — and as an
+honest account of a diagnosis that was wrong until it was independently audited.
+
+## Registered-case safety regression (replay consistency)
+
+Replaying all 13 registered cases through the pipeline reproduces every archived
+verdict: **false acceptance 0.0, correct rejection 1.0** over 13 runs.
+
+This is a **safety regression / replay-consistency test**, not the paper's
+evaluation. It shows that the deterministic gates still reach the same verdicts
+on fixed archived evidence. It says nothing about model generalisation, because
+no model decides anything in a replay and no new case is attempted.
 
 ## Evaluation
 

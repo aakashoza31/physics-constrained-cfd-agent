@@ -1,73 +1,66 @@
-# Family Register
+# Family register — active
 
-Machine-readable source of truth: `src/families/registry.py`
-(`install_standing_register()`). Regenerate this table with
-`python3 scripts/run_family.py register`.
+The frozen scope. This page is the single source of truth for what each family
+is allowed to do; the machine-readable form is `src/families/capabilities.py`
+and the two must agree (a test enforces it).
 
-| Family | Status | Physics class | Routable | Notes |
-|---|---|---|---|---|
-| `nozzle` | **CORE** / frozen | compressible inviscid Euler | yes | Validated against quasi-1D isentropic theory. Adapter **UNVERIFIED** in the cloud working copy — see blocker B1. |
-| `forward_step_2d` | **CORE** / frozen | compressible inviscid Euler | yes | OpenFOAM benchmark reproduction + controlled variations + a safe-rejection case. Acceptance criteria fully registered. |
-| `airfoil` | **CORE-PENDING** | incompressible / low-Mach RANS | **no** | 2D NACA0012, SST. Scientific recipe **unregistered** — 20 open constants. Structurally cannot ACCEPT. |
-| `backward_step` | **CORE-PENDING** | incompressible RANS | **no** | 2D backward-facing step, SST. Scientific recipe **unregistered** — 19 open constants. Structurally cannot ACCEPT. |
-| `square_duct` | **SUPPORTING** | incompressible RANS | **no** | Cross-version incompatibility evidence. Preserved, not deleted. |
-| `cube` | **NONACCEPTED** | incompressible RANS | **no** | Stationarity stress test / safe-rejection evidence. |
-
-## Physics-class count, stated honestly
-
-Four core families span **two** physics classes: compressible inviscid Euler
-(`nozzle`, `forward_step_2d`) and incompressible/low-Mach turbulent RANS
-(`airfoil`, `backward_step`). Paper claims about architecture generality should
-say "four families across two physics classes", not imply four independent
-classes. `nozzle` and `forward_step_2d` further share a solver lineage and
-differ by regime (smooth isentropic expansion vs. discontinuity capture).
-
-## `square_duct` — why it is SUPPORTING and not CORE
-
-Evidence root:
-`C:\Users\Aakash\Documents\Codex\2026-09-20\i-am-attaching-a-full-project\outputs\family3_square_duct_audit`
-
-The McConkey `kOmegaSST` square-duct case is OpenCFD v2006; the production
-environment is OpenFOAM Foundation v14. The compatibility audit found that v14
-`omegaWallFunction` behaviour is not equivalent to the v2006 default
-`binomial2` behaviour, that the omega wall formula and near-wall production
-treatment differ, and that further semantic differences exist (e.g. pressure
-relaxation configuration). A dictionary conversion from v2006 to v14 therefore
-cannot be defended as the same numerical experiment.
-
-**The validation protocol was not the problem.** The original McConkey run
-passes our residual and forcing-stationarity gates. What failed is the
-benchmark's cross-version implementation dependence.
-
-Retained as: evidence that **matching turbulence-model names across CFD
-versions does not imply equivalent numerical physics.** This is a usable
-negative result, and it is the reason the register records a `physics` string
-per family rather than only a model name.
-
-## `cube` — why it is NONACCEPTED
-
-The solver looked numerically healthy while a lateral mode continued to grow,
-and the deterministic stationarity gate rejected the run. Retained as a
-stationarity stress test and a safe-rejection example. Evidence path is `TODO`
-and must not block implementation.
+| Family | Status | Routable | Physics | STEP | Cases | Solver run |
+|---|---|---|---|---|---|---|
+| `nozzle` | **ACCEPTED** | yes | compressible Euler, 2-D | no | 3 | yes |
+| `forward_step_2d` | **ACCEPTED** | yes | compressible Euler, 2-D transient | no | 8 | yes |
+| `cube` | **RUNTIME_REJECTED** | no | incompressible RANS, 3-D transient | no | 1 | yes |
+| `airfoil` | **SUPPLEMENTARY** | no | incompressible RANS, 2-D | no | 1 | **no** |
+| `backward_step` | **NOT_IMPLEMENTED** | no | — | no | 0 | no |
 
 ## Status semantics
 
-- **CORE** — frozen, validated, routable, acceptance criteria registered.
-- **CORE-PENDING** — visible in the register and **inspectable** (its adapter
-  and recipe construct, so `run_family.py recipe <name>` works), but **not
-  executable**: the recipe carries unresolved acceptance constants, so nothing
-  it produced could be accepted. `registry.adapter(name, for_execution=True)`
-  raises `PermissionError`, and the router refuses any proposal naming it.
-- **SUPPORTING** — preserved evidence, **not routable**.
-- **NONACCEPTED** — preserved rejection evidence, **not routable**.
+- **ACCEPTED** — validated, routable, may execute and may be accepted.
+- **RUNTIME_REJECTED** — executed and deterministically rejected. Evidence is
+  preserved and fully replayable; the family is not routable and no result from
+  it may be accepted.
+- **SUPPLEMENTARY** — preserved evidence only. Never executed for acceptance.
+- **NOT_IMPLEMENTED** — declared for completeness, deliberately not built.
 
-**Only `CORE` is routable for execution.** The router refuses any proposal
-naming a non-executable family with `REJECT / NO_REGISTERED_FAMILY`, and the
-refusal reason distinguishes a pending recipe from retained evidence.
+Only **ACCEPTED** families can reach a solver through the agent. `live.py`
+refuses the others before any process starts, and the refusal is tested.
 
-Keyword support is nevertheless computed against the **whole** register, so a
-request straddling an executable and a pending family is recognised as
-ambiguous rather than collapsing onto whichever one happens to be executable.
-That is what stops "turbulent step flow ... reattachment length" from routing
-to the inviscid `forward_step_2d` family.
+## F3 — `cube`, RUNTIME REJECTED
+
+A 3-D turbulent run that executed to t = 80 and reported no numerical failure.
+The streamwise load settled to 0.08% of its mean over the assessment window
+while a periodic lateral mode of period ≈ 10.1 grew 68× in amplitude
+(1.01e-4 → 6.91e-3, e-folding 11.0) without saturating. The deterministic
+stationarity gate refused it on growth: 2.10× across the window against a
+registered limit of 1.25.
+
+Evidence: `cases/cube/drifting_wake/` (force history, statistics, lateral-mode
+characterisation) and `evidence/cube/drifting_wake/`. Replay:
+`python scripts/run_demo.py --family cube --case drifting_wake --mode replay`.
+
+This is a demonstration of **refusal**. It is not a validated cube simulation
+and must never be presented as one.
+
+## S1 — `airfoil`, SUPPLEMENTARY, `CFD_NOT_RUN`
+
+Three mesh generations, all rejected; no solver was ever launched. The decisive
+genuine failure is **in-plane stretching** (3.17e7 / 3.63e7 / 3.89e7 against a
+frozen limit of 10,000, on 974 / 3,924 / 15,678 cells).
+
+Foundation-v14 `checkMesh` skewness is 0.857 / 0.820 / 0.728 — passing — and the
+orientation and in-plane defects in the first diagnosis were artefacts of our own
+converter, not of the NASA grids. The corrected record is
+`cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json`; the
+development history is archived under `docs/archive/airfoil_mesh_development/`.
+
+## `backward_step`
+
+Declared in the register and deliberately not built. Its adapter and recipe
+construct so the register is inspectable, and the recipe carries unresolved
+acceptance constants, so nothing it produced could ever be accepted.
+
+## Superseded terminology
+
+The status `CORE-PENDING` no longer appears in the active register. It survives
+inside `src/families/` and `src/router/` as the mechanism that makes an
+unregistered family non-executable, and in the legacy register preserved at
+`docs/archive/airfoil_mesh_development/FAMILY_REGISTER_legacy.md`.

@@ -1,3 +1,8 @@
+> **HISTORICAL — superseded by the frozen scope.** The active scope is
+> F1 nozzle, F2 forward step, F3 surface-mounted cube (RUNTIME REJECTED)
+> and S1 NACA0012 (SUPPLEMENTARY, CFD_NOT_RUN). See `docs/FAMILY_REGISTER.md`
+> and `docs/results.md`. Family 3 in this brief is NOT the active F3.
+
 # Physics-Constrained Autonomous CFD Agent — Master Brief
 
 Frozen scope of record. Supersedes brief statements held only in chat.

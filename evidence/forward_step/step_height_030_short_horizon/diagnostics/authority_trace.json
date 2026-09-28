@@ -1,7 +1,7 @@
 {
   "family": "forward_step_2d",
   "case": "step_height_030_short_horizon",
-  "started_utc": "2026-09-28T01:47:16Z",
+  "started_utc": "2026-09-28T02:36:41Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -118,7 +118,7 @@
       "activity": "interpret_user_intent",
       "content": {
         "interpreter_version": "request-interpreter/1.0.0",
-        "interpreter": "deterministic_keyword",
+        "interpreter": "deterministic",
         "prompt": "run the registered forward_step case step_height_030_short_horizon",
         "proposed_family": "forward_step",
         "parameters": {},
@@ -129,7 +129,7 @@
         "binding": false,
         "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
       },
-      "model": "deterministic_keyword",
+      "model": "deterministic",
       "accepted_by_authority": null,
       "binding": false
     }

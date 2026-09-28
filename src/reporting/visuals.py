@@ -153,6 +153,9 @@ def make_plots(run: Any, out_dir: Path) -> List[str]:
     else:
         missing.append("force_history: no archived force series for this case")
 
+    # -- family-specific physics plots, from archived series only ------
+    written += _physics_plots(run, out_dir, plt, missing)
+
     residuals = _residual_series(run)
     if residuals:
         fig, ax = plt.subplots(figsize=(9, 4))
@@ -196,10 +199,70 @@ def make_plots(run: Any, out_dir: Path) -> List[str]:
     return written
 
 
+#: Names the original pipeline gave its rendered fields, mapped to ours.
+_FIELD_ALIASES = {
+    "mach_field": "mach", "Mach_field": "mach",
+    "p_field": "pressure", "pressure_field": "pressure",
+    "T_field": "temperature", "temperature_field": "temperature",
+    "rho_field": "density", "speed_field": "velocity",
+    "shock_density_contours": "shock_density",
+    "mesh_cells": "mesh",
+}
+
+
+def _archived_contours(run: Any, out_dir: Path) -> List[str]:
+    """Copy field images the original pipeline already rendered.
+
+    These are archived renders, not something produced now, and the status file
+    says so. They are real output of the recorded run; nothing is re-coloured,
+    re-scaled or synthesised.
+    """
+    root = (run.artifacts or {}).get("evidence_root")
+    if not root:
+        return []
+    roots = [Path(root)]
+    # A campaign directory often holds the rendered visuals for the same case.
+    case_meta = (run.artifacts or {}).get("case") or {}
+    for related in case_meta.get("related_campaigns", []) or []:
+        roots.append(Path(related))
+    candidates: List[Path] = []
+    for base in roots:
+        if not base.exists():
+            continue
+        for pattern in ("iteration_*/figures/*.png", "visuals/iteration_*/*.png",
+                        "figures/*.png"):
+            candidates.extend(sorted(base.glob(pattern)))
+    if not candidates:
+        return []
+    # Prefer the LAST iteration when a case iterated.
+    chosen: Dict[str, Path] = {}
+    for path in candidates:
+        label = _FIELD_ALIASES.get(path.stem, path.stem)
+        chosen[label] = path            # later paths sort last, so they win
+    written = []
+    for label, path in sorted(chosen.items()):
+        target = out_dir / f"{label}.png"
+        target.write_bytes(path.read_bytes())
+        written.append(target.name)
+    _record(out_dir / "contours_status.json", {
+        "visuals_version": VISUALS_VERSION,
+        "status": "ARCHIVED_RENDERS",
+        "written": written,
+        "source": [str(r) for r in roots],
+        "note": ("these images were rendered by the original run's own "
+                 "visualisation step and are copied verbatim. They are not "
+                 "re-rendered here, and nothing was synthesised."),
+    })
+    return written
+
+
 def make_contours(run: Any, out_dir: Path) -> List[str]:
     """Render field contours. Requires field data AND a renderer; says which."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    archived = _archived_contours(run, out_dir)
+    if archived:
+        return archived
     root = (run.artifacts or {}).get("evidence_root")
     case_root = Path(root) if root else None
     time_dirs: List[str] = []
@@ -253,6 +316,23 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
                               "status": NOT_AVAILABLE,
                               "transient_family": transient}
 
+    series_label = "force"
+    if not samples:
+        # A transient family without forces may still have a time-resolved
+        # front history. Animate that, and say which quantity it is.
+        root = (run.artifacts or {}).get("evidence_root")
+        shock = (next(iter(sorted(Path(root).glob(
+            "iteration_*/shock_front_history.csv"))), None) if root else None)
+        if shock is not None:
+            header, rows = _csv(shock)
+            index = {name: i for i, name in enumerate(header)}
+            if rows and "time" in index and "lower_front_x" in index:
+                samples = [{"t": r[index["time"]],
+                            "fx": r[index["lower_front_x"]],
+                            "fy": 0.0,
+                            "fz": r[index.get("upper_stem_x", index["lower_front_x"])]}
+                           for r in rows]
+                series_label = "shock front"
     if not samples:
         status["reason"] = (
             "no time-resolved series is archived for this case, so there is "
@@ -280,8 +360,10 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
     ax1.set_ylim(min(fx) * 0.98, max(fx) * 1.02)
     ax2.set_xlim(min(times), max(times))
     ax2.set_ylim(min(fz) * 1.1, max(fz) * 1.1)
-    ax1.set_ylabel("streamwise $F_x$")
-    ax2.set_ylabel("lateral $F_z$")
+    ax1.set_ylabel("streamwise $F_x$" if series_label == "force"
+                   else "lower shock front x")
+    ax2.set_ylabel("lateral $F_z$" if series_label == "force"
+                   else "upper stem x")
     ax2.set_xlabel(label)
     line1, = ax1.plot([], [], lw=0.9)
     line2, = ax2.plot([], [], lw=0.9, color="crimson")
@@ -308,7 +390,7 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
             anim.save(target, writer="pillow", fps=20, dpi=100)
             name = target.name
         status.update({"status": "RENDERED", "file": name, "represents": label,
-                       "frames": len(frames)})
+                       "quantity": series_label, "frames": len(frames)})
     except Exception as exc:                        # noqa: BLE001 - reported
         status["reason"] = f"animation failed: {type(exc).__name__}: {exc}"
         name = None
@@ -316,3 +398,97 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
         plt.close(fig)
     _record(out_dir / "video_status.json", status)
     return name if status["status"] == "RENDERED" else None
+
+
+def _csv(path: Path):
+    """Read a numeric CSV with a header row. Returns (columns, rows)."""
+    lines = [ln for ln in path.read_text().splitlines() if ln.strip()]
+    if len(lines) < 2:
+        return [], []
+    header = [h.strip() for h in lines[0].split(",")]
+    rows = []
+    for line in lines[1:]:
+        try:
+            rows.append([float(v) for v in line.split(",")])
+        except ValueError:
+            continue
+    return header, rows
+
+
+def _physics_plots(run: Any, out_dir: Path, plt, missing: List[str]) -> List[str]:
+    """Plots that only make sense for one family, drawn from what exists."""
+    root = (run.artifacts or {}).get("evidence_root")
+    if not root:
+        return []
+    root = Path(root)
+    written: List[str] = []
+    family = run.family or ""
+
+    if family == "nozzle":
+        path = root / "axial_profile.csv"
+        if not path.exists():
+            missing.append("axial_profile: not in the archived evidence")
+            return written
+        header, rows = _csv(path)
+        if not rows:
+            return written
+        index = {name: i for i, name in enumerate(header)}
+        x = [r[index["x_m"]] for r in rows]
+        fig, axes = plt.subplots(3, 1, figsize=(9, 8), sharex=True)
+        for ax, key, label in ((axes[0], "Mach", "Mach number"),
+                               (axes[1], "p_Pa", "pressure [Pa]"),
+                               (axes[2], "T_K", "temperature [K]")):
+            if key in index:
+                ax.plot(x, [r[index[key]] for r in rows], lw=1.3)
+                ax.set_ylabel(label)
+                ax.grid(alpha=0.3)
+        axes[0].set_title(f"{family}/{run.case}: axial profile "
+                          "(archived solver output, steady solution)")
+        axes[-1].set_xlabel("axial position [m]")
+        fig.tight_layout()
+        fig.savefig(out_dir / "physics_specific_axial_profile.png", dpi=140)
+        plt.close(fig)
+        written.append("physics_specific_axial_profile.png")
+
+    if family == "forward_step_2d":
+        shock = next(iter(sorted(root.glob("iteration_*/shock_front_history.csv"))),
+                     None)
+        if shock is not None:
+            header, rows = _csv(shock)
+            index = {name: i for i, name in enumerate(header)}
+            if rows and "time" in index:
+                t = [r[index["time"]] for r in rows]
+                fig, ax = plt.subplots(figsize=(9, 4))
+                for key, label in (("lower_front_x", "lower shock front"),
+                                   ("upper_stem_x", "upper stem")):
+                    if key in index:
+                        ax.plot(t, [r[index[key]] for r in rows], lw=1.2,
+                                marker="o", ms=2.5, label=label)
+                ax.set_xlabel("solver time")
+                ax.set_ylabel("x position")
+                ax.set_title(f"{family}/{run.case}: shock-front history "
+                             "(archived solver output)")
+                ax.legend(fontsize=8)
+                ax.grid(alpha=0.3)
+                fig.tight_layout()
+                fig.savefig(out_dir / "physics_specific_shock_front.png", dpi=140)
+                plt.close(fig)
+                written.append("physics_specific_shock_front.png")
+        mass = next(iter(sorted(root.glob("iteration_*/transient_mass.csv"))), None)
+        if mass is not None:
+            header, rows = _csv(mass)
+            index = {name: i for i, name in enumerate(header)}
+            if rows and "relative_residual" in index:
+                t = [r[index["time"]] for r in rows]
+                fig, ax = plt.subplots(figsize=(9, 3.6))
+                ax.semilogy(t, [abs(r[index["relative_residual"]]) or 1e-300
+                                for r in rows], lw=0.9)
+                ax.set_xlabel("solver time")
+                ax.set_ylabel("|relative mass residual|")
+                ax.set_title("Transient mass closure (archived solver output)")
+                ax.grid(True, which="both", alpha=0.3)
+                fig.tight_layout()
+                fig.savefig(out_dir / "conservation.png", dpi=140)
+                plt.close(fig)
+                written.append("conservation.png")
+    return written

@@ -31,6 +31,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+from src.agent.backends import BackendUnavailable                        # noqa: E402
 from src.agent.pipeline import DRY_RUN, LIVE, MODES, REPLAY, run_pipeline  # noqa: E402
 from src.reporting import report_builder                                    # noqa: E402
 
@@ -48,15 +49,25 @@ def main() -> int:
                     help="artifact directory (default: runs/<timestamp>_<family>)")
     ap.add_argument("--i-want-to-run-cfd", action="store_true",
                     dest="allow_cfd", help="explicit opt-in for live execution")
+    ap.add_argument("--agent-backend", default="deterministic",
+                    choices=["deterministic", "gemini", "replay"],
+                    help=("who interprets and diagnoses. 'deterministic' needs no "
+                          "API key and is NOT an LLM run; 'gemini' uses "
+                          "GEMINI_API_KEY"))
     ap.add_argument("--no-media", action="store_true",
                     help="skip plots, contours and video")
     ap.add_argument("--json", action="store_true", help="print the decision as JSON")
     args = ap.parse_args()
 
-    run = run_pipeline(args.prompt, mode=args.mode,
-                       geometry=Path(args.geometry) if args.geometry else None,
-                       family=args.family, case=args.case,
-                       allow_cfd=args.allow_cfd)
+    try:
+        run = run_pipeline(args.prompt, mode=args.mode,
+                           geometry=Path(args.geometry) if args.geometry else None,
+                           family=args.family, case=args.case,
+                           allow_cfd=args.allow_cfd,
+                           backend=args.agent_backend)
+    except BackendUnavailable as exc:
+        print(f"agent backend unavailable: {exc}", file=sys.stderr)
+        return 2
 
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     out = Path(args.out) if args.out else (

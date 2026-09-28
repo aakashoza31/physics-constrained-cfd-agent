@@ -55,21 +55,27 @@ Every row below was decided by code. No model output appears in this table.
 
 | Activity | Content | Accepted by authority |
 |---|---|---|
-| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic_keyword", "prompt": "run the register | None |
+| interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic", "prompt": "run the registered nozzl | None |
 | diagnose_evidence | "ACCEPTABLE" | True |
 | propose_bounded_action | "ACCEPT" | True |
 
 ## 6. Media
 
+- plot: `plots/physics_specific_axial_profile.png`
 - plot: `plots/residuals.png`
 - plot: `plots/convergence.png`
+- contour: `contours/mach.png`
+- contour: `contours/mesh.png`
+- contour: `contours/pressure.png`
+- contour: `contours/temperature.png`
+- contour: `contours/velocity.png`
 
 ## 7. Provenance
 
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T01:47:10Z",
+  "generated_utc": "2026-09-28T02:35:11Z",
   "prompt": "run the registered nozzle case canonical_reference",
   "mode": "replay",
   "family": "nozzle",

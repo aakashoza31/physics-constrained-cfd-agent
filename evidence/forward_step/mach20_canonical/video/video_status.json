@@ -1,6 +1,9 @@
 {
   "visuals_version": "visuals/1.0.0",
-  "status": "NOT_AVAILABLE",
+  "status": "RENDERED",
   "transient_family": true,
-  "reason": "no time-resolved series is archived for this case, so there is nothing to animate. A steady solver never receives a fabricated time evolution here."
+  "file": "simulation.mp4",
+  "represents": "SOLVER TIME (transient run)",
+  "quantity": "shock front",
+  "frames": 39
 }

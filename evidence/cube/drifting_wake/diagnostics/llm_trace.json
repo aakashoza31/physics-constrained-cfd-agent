@@ -4,7 +4,7 @@
       "activity": "interpret_user_intent",
       "content": {
         "interpreter_version": "request-interpreter/1.0.0",
-        "interpreter": "deterministic_keyword",
+        "interpreter": "deterministic",
         "prompt": "run the registered cube case drifting_wake",
         "proposed_family": "cube",
         "parameters": {},
@@ -19,7 +19,7 @@
         "binding": false,
         "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
       },
-      "model": "deterministic_keyword",
+      "model": "deterministic",
       "accepted_by_authority": null,
       "binding": false
     },
