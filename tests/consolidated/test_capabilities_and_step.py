@@ -52,21 +52,69 @@ def test_the_airfoil_declaration_says_no_cfd_was_run():
     assert capability.solver == "not executed"
 
 
-def test_step_header_is_read_without_a_cad_kernel(tmp_path):
+def test_step_header_is_read_as_text(tmp_path):
+    """Header parsing needs no kernel, and claims nothing about the solid."""
     path = tmp_path / "part.step"
     path.write_text(STEP_SAMPLE)
     step = step_reader.read_step(path)
     assert step.status == step_reader.OK
     assert "AUTOMOTIVE_DESIGN" in step.schema
     assert step.entity_counts["CARTESIAN_POINT"] == 1
-    # no kernel -> nothing is claimed about the geometry
+    # Nothing was extracted, so nothing is claimed -- and this holds whether or
+    # not a CAD kernel happens to be importable in this environment.
+    assert step.geometry is None
     assert step.readable_geometry is False
+
+
+def test_an_importable_kernel_is_not_geometry(tmp_path, monkeypatch):
+    """The decisive check: a kernel on the path must not flip the answer."""
+    path = tmp_path / "part.step"
+    path.write_text(STEP_SAMPLE)
+    monkeypatch.setattr(step_reader, "available_backends",
+                        lambda: ["OCP", "cadquery"])
+    step = step_reader.read_step(path)
+    assert step.backends_present == ["OCP", "cadquery"]
+    assert step.geometry is None
+    assert step.readable_geometry is False           # still false
+    assert "not geometry" in step.note
+    features = geom.from_step(path)
+    assert features.status == geom.UNSUPPORTED
+    assert features.usable is False
+    assert features.dimensions == {}
+
+
+def test_readable_geometry_is_true_only_when_geometry_exists(tmp_path):
+    """Constructed directly: the property answers about geometry, nothing else."""
+    step = step_reader.StepFile(path=tmp_path / "p.step", status=step_reader.OK,
+                                backends_present=["OCP"])
+    assert step.readable_geometry is False
+    step.geometry = {"bounding_box_x": 0.12}
+    step.extracted_by = "OCP"
+    assert step.readable_geometry is True
+    assert step.to_dict()["geometry_extracted"] is True
 
 
 def test_a_non_step_file_is_refused(tmp_path):
     path = tmp_path / "not.step"
     path.write_text("this is not a STEP file")
     assert step_reader.read_step(path).status == step_reader.NOT_A_STEP_FILE
+
+
+@pytest.mark.parametrize("backends", [[], ["OCP"], ["OCC", "cadquery"]])
+def test_step_features_are_unsupported_whatever_is_installed(tmp_path, monkeypatch,
+                                                             backends):
+    """Portable: the public answer is UNSUPPORTED in every environment."""
+    path = tmp_path / "part.step"
+    path.write_text(STEP_SAMPLE)
+    monkeypatch.setattr(step_reader, "available_backends", lambda: backends)
+    features = geom.from_step(path)
+    assert features.status == geom.UNSUPPORTED
+    assert features.usable is False
+    assert features.dimensions == {}
+    assert features.characteristic_dimension is None
+    result = matching.match(features, proposed="nozzle")
+    assert result["selected_family"] is None
+    assert result["admissible_families"] == []
 
 
 def test_step_features_are_unsupported_and_nothing_is_invented(tmp_path):

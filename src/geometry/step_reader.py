@@ -70,10 +70,23 @@ class StepFile:
     backends_present: List[str] = field(default_factory=list)
     note: str = ""
 
+    #: Set only when a backend actually loaded a solid and returned geometry.
+    #: An importable CAD kernel is NOT geometry: nothing in this repository
+    #: calls one, so this stays False and the public answer stays UNSUPPORTED.
+    geometry: Optional[Dict[str, Any]] = None
+    extracted_by: str = ""
+
     @property
     def readable_geometry(self) -> bool:
-        """True only when a kernel could actually produce geometry. Never faked."""
-        return bool(self.backends_present) and self.status == OK
+        """True only when geometry was ACTUALLY extracted. Never faked.
+
+        Presence of an importable kernel says nothing: it is a package on the
+        path, not a loaded solid. This property answers the only question that
+        matters downstream -- did something produce real geometry -- so an
+        environment that happens to have OCP, OCC or cadquery installed behaves
+        exactly like one that does not.
+        """
+        return self.status == OK and self.geometry is not None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -88,6 +101,8 @@ class StepFile:
             "backends_present": list(self.backends_present),
             "backends_supported": [b for b, _ in BACKENDS],
             "geometry_extracted": self.readable_geometry,
+            "geometry": self.geometry,
+            "extracted_by": self.extracted_by,
             "note": self.note,
         }
 
@@ -129,11 +144,12 @@ def read_step(path: Path, *, max_entities: int = 200_000) -> StepFile:
         counts[entity.group(1)] = counts.get(entity.group(1), 0) + 1
 
     note = (
-        "header and entity histogram read as text. No CAD kernel is installed, "
-        "so no solid, bounding box or feature was extracted and none is guessed."
-        if not backends else
-        "a CAD kernel is importable, but no family in this system declares STEP "
-        "support, so geometry extraction is still not attempted."
+        "header and entity histogram read as text. No solid, bounding box or "
+        "feature was extracted and none is guessed"
+        + (". No CAD kernel is installed." if not backends else
+           f". A CAD kernel is importable ({', '.join(backends)}), but no "
+           "registered family declares STEP support, so no extraction is "
+           "attempted and an importable kernel alone is not geometry.")
     )
     return StepFile(path=path, status=OK, schema=schema, name=name,
                     description=description, entity_counts=counts,

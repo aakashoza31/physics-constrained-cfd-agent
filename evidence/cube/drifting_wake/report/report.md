@@ -69,7 +69,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T02:47:59Z",
+  "generated_utc": "2026-09-28T03:04:17Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",

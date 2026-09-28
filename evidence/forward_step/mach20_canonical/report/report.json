@@ -12,7 +12,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:46:50Z",
+    "started_utc": "2026-09-28T03:03:48Z",
     "prompt": "run the registered forward_step case mach20_canonical",
     "mode": "replay",
     "family": "forward_step_2d",
@@ -116,7 +116,7 @@
     "authority_trace": {
       "family": "forward_step_2d",
       "case": "mach20_canonical",
-      "started_utc": "2026-09-28T02:46:50Z",
+      "started_utc": "2026-09-28T03:03:48Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -479,7 +479,7 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:46:55Z",
+    "generated_utc": "2026-09-28T03:03:54Z",
     "prompt": "run the registered forward_step case mach20_canonical",
     "mode": "replay",
     "family": "forward_step_2d",

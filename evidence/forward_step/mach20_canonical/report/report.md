@@ -79,7 +79,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T02:46:55Z",
+  "generated_utc": "2026-09-28T03:03:54Z",
   "prompt": "run the registered forward_step case mach20_canonical",
   "mode": "replay",
   "family": "forward_step_2d",

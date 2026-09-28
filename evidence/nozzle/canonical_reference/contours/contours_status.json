@@ -13,7 +13,8 @@
     "demo/nozzle_feedback/case_A_reference",
     "demo/nozzle_feedback_v2/case_A_reference",
     "demo/nozzle_feedback_v2_hotfix/case_A_reference",
-    "demo/published_campaign/case_A_reference"
+    "demo/published_campaign/case_A_reference",
+    "evidence/nozzle/canonical_reference"
   ],
   "note": "these images were rendered by the original run's own visualisation step and are copied verbatim. They are not re-rendered here, and nothing was synthesised."
 }

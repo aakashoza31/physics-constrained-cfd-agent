@@ -16,7 +16,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:47:21Z",
+    "started_utc": "2026-09-28T03:04:17Z",
     "prompt": "run the registered airfoil case mesh_rejection",
     "mode": "replay",
     "family": "airfoil",
@@ -124,7 +124,7 @@
     "authority_trace": {
       "family": "airfoil",
       "case": "mesh_rejection",
-      "started_utc": "2026-09-28T02:47:21Z",
+      "started_utc": "2026-09-28T03:04:17Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -648,7 +648,7 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:47:22Z",
+    "generated_utc": "2026-09-28T03:04:19Z",
     "prompt": "run the registered airfoil case mesh_rejection",
     "mode": "replay",
     "family": "airfoil",

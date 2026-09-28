@@ -1,8 +1,10 @@
 {
   "visuals_version": "visuals/1.0.0",
-  "status": "NOT_AVAILABLE",
+  "status": "FLOW_CONTOURS_NOT_AVAILABLE_FROM_COMPACT_ARCHIVE",
   "field_time_directories": [],
   "renderer": "NOT_AVAILABLE",
   "script": "src/reporting/paraview_contours.py",
-  "reason": "the archived evidence carries post-processed series and logs but no reconstructed field time directories, so there is nothing to contour. Re-run the case live to produce fields."
+  "reason": "the archived evidence carries post-processed series and logs but no reconstructed field time directories, so there is nothing to contour. Re-run the case live to produce fields.",
+  "what_exists_instead": "time-resolved integral series (forces, probes, fluxes) and the solver logs; those are plotted and animated, and they are not flow-field visualisations",
+  "not_done": "no flow field was synthesised, interpolated or stood in for the missing time directories"
 }

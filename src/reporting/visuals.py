@@ -228,12 +228,22 @@ def _archived_contours(run: Any, out_dir: Path) -> List[str]:
     case_meta = (run.artifacts or {}).get("case") or {}
     for related in case_meta.get("related_campaigns", []) or []:
         roots.append(Path(related))
+    # The tracked artifact directory for this case. It holds the same archived
+    # renders and, unlike the large demo/ archive, it ships with the repository
+    # -- so a clone reproduces the same media as the development tree.
+    case_dir = case_meta.get("case_dir")
+    if case_dir:
+        parts = Path(case_dir).parts
+        if len(parts) >= 2:
+            tracked = Path("evidence") / parts[-2] / parts[-1]
+            if (tracked / "contours").is_dir():
+                roots.append(tracked)
     candidates: List[Path] = []
     for base in roots:
         if not base.exists():
             continue
         for pattern in ("iteration_*/figures/*.png", "visuals/iteration_*/*.png",
-                        "figures/*.png"):
+                        "figures/*.png", "contours/*.png"):
             candidates.extend(sorted(base.glob(pattern)))
     if not candidates:
         return []
@@ -257,6 +267,12 @@ def _archived_contours(run: Any, out_dir: Path) -> List[str]:
                  "re-rendered here, and nothing was synthesised."),
     })
     return written
+
+
+#: Reported when a case's archive was compacted: the post-processed series and
+#: logs survived, the raw field time directories did not, so there is nothing to
+#: contour and nothing is invented in their place.
+FLOW_CONTOURS_NOT_AVAILABLE = "FLOW_CONTOURS_NOT_AVAILABLE_FROM_COMPACT_ARCHIVE"
 
 
 def make_contours(run: Any, out_dir: Path) -> List[str]:
@@ -283,10 +299,17 @@ def make_contours(run: Any, out_dir: Path) -> List[str]:
         "script": "src/reporting/paraview_contours.py",
     }
     if not time_dirs:
+        status["status"] = FLOW_CONTOURS_NOT_AVAILABLE
         status["reason"] = (
             "the archived evidence carries post-processed series and logs but no "
             "reconstructed field time directories, so there is nothing to "
             "contour. Re-run the case live to produce fields.")
+        status["what_exists_instead"] = (
+            "time-resolved integral series (forces, probes, fluxes) and the "
+            "solver logs; those are plotted and animated, and they are not "
+            "flow-field visualisations")
+        status["not_done"] = ("no flow field was synthesised, interpolated or "
+                              "stood in for the missing time directories")
     elif not renderer:
         status["reason"] = (
             "field data are present but no ParaView renderer (pvpython/pvbatch) "
@@ -357,6 +380,10 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
     fx = [s["fx"] for s in samples]
     label = ("SOLVER TIME (transient run)" if transient
              else "ITERATION HISTORY — not physical time (steady solver)")
+    # Name the quantity in the label too: this is an integral-series animation,
+    # never a flow-field movie. The distinction is the whole point.
+    quantity_note = ("integral force history" if series_label == "force"
+                     else f"{series_label} history")
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 5), sharex=True)
     ax1.set_xlim(min(times), max(times))
@@ -378,7 +405,8 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
     def update(index: int):
         line1.set_data(times[:index], fx[:index])
         line2.set_data(times[:index], fz[:index])
-        title.set_text(f"{run.family}/{run.case} — {label} — t = {times[index-1]:.2f}")
+        title.set_text(f"{run.family}/{run.case} — {quantity_note} — {label} — "
+                       f"t = {times[index-1]:.2f}")
         return line1, line2, title
 
     anim = animation.FuncAnimation(fig, update, frames=frames, blit=False)
@@ -393,7 +421,13 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
             anim.save(target, writer="pillow", fps=20, dpi=100)
             name = target.name
         status.update({"status": "RENDERED", "file": name, "represents": label,
-                       "quantity": series_label, "frames": len(frames)})
+                       "quantity": series_label,
+                       "is_flow_field_animation": False,
+                       "note": (f"this animates the {quantity_note} written by "
+                                "the solver's function objects. It is NOT a "
+                                "flow-field visualisation, and no flow field "
+                                "was fabricated."),
+                       "frames": len(frames)})
     except Exception as exc:                        # noqa: BLE001 - reported
         status["reason"] = f"animation failed: {type(exc).__name__}: {exc}"
         name = None
