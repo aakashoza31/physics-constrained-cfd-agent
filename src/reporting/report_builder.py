@@ -207,7 +207,7 @@ def _report_markdown(run: Any, docs: Dict[str, Dict[str, Any]],
     for name in contours:
         media.append(f"- contour: `contours/{name}`")
     if video:
-        media.append(f"- video: `video/{video}`")
+        media.append(f"- field movie: [{video}](../video/{video})")
     media_block = "\n".join(media) or "- none produced for this run"
 
     return f"""# Engineering report — {run.family or 'unrouted'} / {run.case or 'ad hoc'}
@@ -318,14 +318,46 @@ def build(run: Any, out_dir: Path, *, make_media: bool = True) -> ReportPaths:
     plots: List[str] = []
     contours: List[str] = []
     video: Optional[str] = None
+    visualization = {"status": "VISUALIZATION_INCOMPLETE", "reason": "Media generation disabled"}
+    history = None
+    media_errors = []
     if make_media:
         from src.reporting import visuals
+        from src.reporting.field_video import make_field_video
+        def attempt(name, action, fallback):
+            try:
+                return action()
+            except Exception as exc:  # reporting must never lose the authority's verdict
+                media_errors.append({"stage": name, "reason": f"{type(exc).__name__}: {exc}"})
+                return fallback
+        plots = attempt("plots", lambda: visuals.make_plots(run, out / "plots"), [])
+        contours = attempt("contours", lambda: visuals.make_contours(run, out / "contours"), [])
+        visualization = attempt("field_video", lambda: make_field_video(run, out / "video"),
+                                {"status": "VISUALIZATION_INCOMPLETE", "reason": "Field renderer raised an exception"})
+        video = "summary_evolution.mp4" if visualization["status"] == "RENDERED" else None
+        if video:
+            # Reuse the genuine final rendered fields if the initial static-contour
+            # stage had no standalone renderer or only compact evidence available.
+            import shutil
+            for name in visualization.get("fields_rendered", []):
+                frame = out / "video" / "frames" / name / f"{visualization['frame_count']-1:05d}.png"
+                if frame.exists():
+                    (out / "contours").mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(frame, out / "contours" / f"{name}.png")
+                    if f"{name}.png" not in contours:
+                        contours.append(f"{name}.png")
+            _write(out / "contours" / "contours_status.json", {
+                "status": "RENDERED", "written": contours,
+                "source": "final actual field-video frame", "time": visualization.get("rendered_solver_times", [None])[-1]})
+        history = attempt("history", lambda: visuals.make_history_video(run, out / "video"), None)
 
-        plots = visuals.make_plots(run, out / "plots")
-        contours = visuals.make_contours(run, out / "contours")
-        video = visuals.make_video(run, out / "video")
+    if media_errors:
+        visualization.update(status="VISUALIZATION_INCOMPLETE", stage_errors=media_errors)
+    _write(out / "video" / "video_manifest.json", visualization)
 
-    prov = provenance(run)
+    _write(out / "video" / "visualization_status.json", visualization)
+
+    prov = relativise(provenance(run))
     _write(out / "provenance.json", prov)
     decision = run.decision.to_dict() if run.decision else {"verdict": "NONE"}
     _write(out / "final_decision.json", decision)
@@ -335,13 +367,24 @@ def build(run: Any, out_dir: Path, *, make_media: bool = True) -> ReportPaths:
         "decision": decision,
         "run": run.to_dict(),
         "evidence": docs,
-        "media": {"plots": plots, "contours": contours, "video": video},
+        "media": {"plots": plots, "contours": contours, "video": video, "history": history,
+                  "field_videos": visualization.get("output_files", [])},
+        "visualization": visualization,
+        "artifact_complete": visualization["status"] in ("RENDERED", "VIDEO_NOT_AVAILABLE_CFD_NOT_RUN"),
         "provenance": prov,
     }
     report_json_path = _write(out / "report" / "report.json", report_json)
     report_md_path = _write(out / "report" / "report.md",
                             _report_markdown(run, docs, prov, plots, contours,
                                              video))
+    with report_md_path.open("a", encoding="utf-8") as handle:
+        handle.write("\nVisualization status: **" + visualization["status"] + "**\n\n")
+        handle.write(visualization.get("reason", "") + "\n\n")
+        for name in visualization.get("output_files", []):
+            handle.write(f"- [{name}](../video/{name})\n")
+        handle.write("- [Video manifest](../video/video_manifest.json)\n")
+        if history:
+            handle.write(f"- [History animation (not a flow field)](../video/{history})\n")
     return ReportPaths(root=out, report_md=report_md_path,
                        report_json=report_json_path,
                        final_decision=out / "final_decision.json",

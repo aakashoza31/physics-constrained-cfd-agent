@@ -1,0 +1,125 @@
+{
+  "status": "PASS",
+  "frame_count": 59,
+  "actual_time_range": [
+    2.0,
+    80.0
+  ],
+  "fixed_ranges_verified": true,
+  "all_movies_fully_decoded": true,
+  "scientific_verdict": "REJECT",
+  "outputs": [
+    {
+      "file": "pressure_evolution.mp4",
+      "sha256": "9deff79bf03378fbbf1aaa73428e0e4be9a3924bcde84cdb64b5b8df00687857",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "velocity_evolution.mp4",
+      "sha256": "376f9cfbab2fff14614526ef1f4a7b9a883e811921de343a7277ae4f12403649",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "turbulence_evolution.mp4",
+      "sha256": "2ce99fa80d97bdc642e7526c17b16888c03fc6bd4842a7c11406f6e7efdf7a90",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "turbulent_viscosity_evolution.mp4",
+      "sha256": "004e7189a49baf37c46f23b2cc5a95fa2439e1811646d2d7169095806571ff5a",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "wake_evolution.mp4",
+      "sha256": "e6ea7c25bb28d1652638aea111a5a04ca159c508dec48988603427fec8953b4b",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "summary_evolution.mp4",
+      "sha256": "7725310f00506b0d4f8a08a6c317cce14bbba5d105bb6472b5c6f1594087d60a",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1920,
+          "height": 1200,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    },
+    {
+      "file": "simulation.mp4",
+      "sha256": "7725310f00506b0d4f8a08a6c317cce14bbba5d105bb6472b5c6f1594087d60a",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1920,
+          "height": 1200,
+          "nb_read_frames": "59"
+        }
+      ],
+      "format": {
+        "duration": "7.375000"
+      }
+    }
+  ]
+}

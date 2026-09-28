@@ -229,6 +229,12 @@ def run_case(family: str, case: Optional[str], *, run: Any = None,
         "stdout_tail": (getattr(completed, "stdout", "") or "")[-4000:],
         "stderr_tail": (getattr(completed, "stderr", "") or "")[-2000:],
     }
+    # The reporting stage needs the raw runtime case, not just compact JSON evidence.
+    # This carries a location only; it cannot change any authority gate.
+    for record in evidence.values():
+        if isinstance(record, dict) and isinstance(record.get("runtime_case"), str):
+            artifacts["raw_case"] = record["runtime_case"]
+            break
     stages = [
         ("execution", "EXECUTED" if returncode == 0 else "RUNNER_FAILED",
          {"solver_invoked": True, "returncode": returncode,

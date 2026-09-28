@@ -1,0 +1,10 @@
+{
+  "family": "airfoil",
+  "case": "mesh_rejection",
+  "verdict": "REJECT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields",
+  "status": "VIDEO_NOT_AVAILABLE_CFD_NOT_RUN",
+  "output_files": [],
+  "reason": "CFD was not executed for this request."
+}

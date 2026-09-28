@@ -53,3 +53,5 @@ evaluation/records/
 # from the blanket results/ rule above.
 !validation/canonical_reference/results/
 !validation/canonical_reference/results/**
+
+.video-tools/

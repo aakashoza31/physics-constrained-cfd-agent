@@ -1,0 +1,109 @@
+{
+  "status": "PASS",
+  "frame_count": 41,
+  "actual_time_range": [
+    0.0,
+    4.0
+  ],
+  "fixed_ranges_verified": true,
+  "all_movies_fully_decoded": true,
+  "scientific_verdict": "ACCEPT",
+  "outputs": [
+    {
+      "file": "pressure_evolution.mp4",
+      "sha256": "727d166cbcdf7febfe9fce3e63c1574bc4606d0ca780e3451870913f5934bd6f",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    },
+    {
+      "file": "velocity_evolution.mp4",
+      "sha256": "3cb5c3969f9d197121459efc743b3693bece5fcc14bbd1bc0021f1e83b004262",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    },
+    {
+      "file": "temperature_evolution.mp4",
+      "sha256": "29be8c677e76b91999edb0471bdc04af769565f57d652587b37037ae37114aa6",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    },
+    {
+      "file": "mach_evolution.mp4",
+      "sha256": "007f5d9682e2a8ec279fddd230fe188818191a200dd305aeea986f1600adc795",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 960,
+          "height": 600,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    },
+    {
+      "file": "summary_evolution.mp4",
+      "sha256": "baef1f117d2772b06353e1e10162f610e41f69ccfec8c35f675501f55c486db1",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1920,
+          "height": 1200,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    },
+    {
+      "file": "simulation.mp4",
+      "sha256": "baef1f117d2772b06353e1e10162f610e41f69ccfec8c35f675501f55c486db1",
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1920,
+          "height": 1200,
+          "nb_read_frames": "41"
+        }
+      ],
+      "format": {
+        "duration": "5.125000"
+      }
+    }
+  ]
+}
