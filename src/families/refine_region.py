@@ -144,21 +144,10 @@ def rule_on_region_request(
             ],
         )
 
-    # 2. The deterministic detector must have found a region.
-    if selection is None:
-        return ActionRuling(
-            False,
-            ACTION,
-            ["the deterministic region detector selected no region"],
-        )
-    if not selection.derivation:
-        return ActionRuling(
-            False,
-            ACTION,
-            ["region selection carries no derivation; refusing an unaudited region"],
-        )
-
-    # 3. Under-resolution must be established, deterministically.
+    # 2. Under-resolution must be established, deterministically. This is
+    #    checked BEFORE the region, because a family with no registered
+    #    criterion could not justify refinement even with a region in hand, and
+    #    the reported reason should name the real blocker.
     if resolution_verdict == NOT_ESTABLISHED:
         return ActionRuling(
             False,
@@ -170,6 +159,20 @@ def rule_on_region_request(
                 "threshold."
             ],
             {"resolution_verdict": resolution_verdict},
+        )
+
+    # 3. The deterministic detector must have found an audited region.
+    if selection is None:
+        return ActionRuling(
+            False,
+            ACTION,
+            ["the deterministic region detector selected no region"],
+        )
+    if not selection.derivation:
+        return ActionRuling(
+            False,
+            ACTION,
+            ["region selection carries no derivation; refusing an unaudited region"],
         )
     if resolution_verdict == ADEQUATELY_RESOLVED:
         return ActionRuling(
