@@ -272,9 +272,11 @@ def build(root: Path, *, check: bool) -> List[str]:
                          "replay that disagrees with it is a regression"),
             }
             case_dir.mkdir(parents=True, exist_ok=True)
-            (case_dir / "reference").mkdir(exist_ok=True)
+            reference = case_dir / "reference"
+            reference.mkdir(exist_ok=True)
 
             payloads = {
+                "reference/README.md": _reference_readme(family, case_id, meta),
                 "case.yaml": _as_yaml(case_yaml),
                 "expected_result.json": json.dumps(expected, indent=2) + "\n",
                 "README.md": _readme(family, case_id, meta, outcome),
@@ -398,6 +400,33 @@ to establish the rejection, because stretching already fails decisively.
 
 **Final status: `MESH_REJECTED / CFD_NOT_RUN`.** Skewness and orientation are
 *not* genuine NASA-grid failures and must not be described as such.
+"""
+
+
+def _reference_readme(family: str, case_id: str, meta: Dict[str, Any]) -> str:
+    """Every case ships a reference/ directory, so a clone has the same shape.
+
+    Git does not track an empty directory, so a case whose evidence lives
+    elsewhere would lose its reference/ on clone and the case contract would
+    differ between the development tree and a reviewer's checkout.
+    """
+    extracted = sorted(p.name for p in
+                       (_ROOT / "cases" / family / case_id / "reference").glob("*")
+                       if p.name != "README.md")
+    listing = ("\n".join(f"- `{name}`" for name in extracted)
+               if extracted else "- (none: this case needs no extracted series)")
+    return f"""# Reference data — {family}/{case_id}
+
+Compact series extracted from the archived run, committed so that a replay works
+from a clone:
+
+{listing}
+
+The full archived evidence for this case is `{meta['evidence']}`, which is
+gitignored because of its size; its inventory and digests are in
+`manifests/large_assets.json`. Replay does not require it: the deterministic
+record a replay re-evaluates is `../expected_result.json`, and any series it
+needs is in this directory.
 """
 
 

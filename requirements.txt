@@ -1,8 +1,13 @@
-pillow==12.3.0
-gmsh==4.15.2
-google-genai==2.16.0
-numpy==2.5.1
-pydantic==2.13.4
-pyvista==0.48.4
-PyYAML==6.0.3
-matplotlib==3.11.2
+# Minimum versions a reviewer needs. The exact versions this work was developed
+# against are in requirements.txt.pinned; they are recorded for provenance, not
+# imposed, because several are newer than what a default Python ships with.
+numpy>=1.24
+PyYAML>=6.0
+matplotlib>=3.6
+scipy>=1.10
+pydantic>=2.0
+
+# Optional, per capability:
+#   h5py>=3.0          reading the NASA CGNS grids (supplementary S1 only)
+#   gmsh>=4.11         the archived Gmsh mesh generator (historical)
+#   google-genai       the --agent-backend gemini path (needs GEMINI_API_KEY)

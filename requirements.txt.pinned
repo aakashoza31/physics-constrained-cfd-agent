@@ -1,0 +1,8 @@
+pillow==12.3.0
+gmsh==4.15.2
+google-genai==2.16.0
+numpy==2.5.1
+pydantic==2.13.4
+pyvista==0.48.4
+PyYAML==6.0.3
+matplotlib==3.11.2
