@@ -92,23 +92,30 @@ def from_step(path: Path) -> GeometryFeatures:
             reason=f"the STEP file could not be read: {step.status}. {step.note}",
         )
     if not step.readable_geometry:
+        kernel = (f"a CAD kernel is importable ({', '.join(step.backends_present)}), "
+                  "but an importable kernel is not geometry and no registered "
+                  "family declares STEP support, so no solid was loaded"
+                  if step.backends_present else
+                  "no CAD kernel is installed, so no solid can be loaded")
         return GeometryFeatures(
             source=STEP, status=UNSUPPORTED, provenance=info,
             topology={"entity_counts": step.entity_counts},
             reason=(
-                "no CAD kernel is installed, so no solid can be loaded and no "
-                "bounding box, characteristic dimension or feature can be "
-                "measured. Nothing is estimated from the entity histogram."
+                f"{kernel}. No bounding box, characteristic dimension or feature "
+                "was measured, and nothing is estimated from the entity histogram."
             ),
         )
-    # A kernel is present, but no family declares STEP support, so extraction is
-    # still refused rather than half-performed.
+    # Reached only if a future backend genuinely extracts geometry. Even then the
+    # answer stays UNSUPPORTED until a family advertises step: true AND can mesh
+    # the result to its frozen mesh contract.
     return GeometryFeatures(
         source=STEP, status=UNSUPPORTED, provenance=info,
         topology={"entity_counts": step.entity_counts},
+        dimensions=dict(step.geometry or {}),
         reason=(
-            "a CAD kernel is importable, but no registered family declares STEP "
-            "input, so feature extraction is not attempted. Implementing it "
-            "requires a family to advertise step: true and to mesh the result."
+            f"geometry was extracted by {step.extracted_by or 'a CAD backend'}, "
+            "but no registered family declares STEP input, so the request is "
+            "still refused. Implementing it requires a family to advertise "
+            "step: true and to mesh the result."
         ),
     )

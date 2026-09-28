@@ -5,5 +5,7 @@
   "file": "simulation.mp4",
   "represents": "SOLVER TIME (transient run)",
   "quantity": "force",
+  "is_flow_field_animation": false,
+  "note": "this animates the integral force history written by the solver's function objects. It is NOT a flow-field visualisation, and no flow field was fabricated.",
   "frames": 200
 }

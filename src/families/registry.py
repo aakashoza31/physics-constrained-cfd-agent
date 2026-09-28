@@ -34,7 +34,10 @@ class FamilyRecord:
     factory: Optional[Callable[[], Any]] = None
     #: Why a non-core family is retained.
     retained_as: str = ""
-    evidence_root: str = ""
+    #: Repository-relative path to tracked evidence, or None when none exists.
+    #: Never an absolute path: a register entry must mean the same thing in a
+    #: reviewer's clone as it does on the machine that wrote it.
+    evidence_root: Optional[str] = None
     notes: str = ""
 
     @property
@@ -245,10 +248,11 @@ def install_standing_register() -> None:
                 "cross-version incompatibility evidence: matching turbulence-model "
                 "names across CFD versions does not imply equivalent numerical physics"
             ),
-            evidence_root=(
-                r"C:\Users\Aakash\Documents\Codex\2026-09-20"
-                r"\i-am-attaching-a-full-project\outputs\family3_square_duct_audit"
-            ),
+            #: Repository-relative, or None when the evidence is not in the tree.
+            #: The square-duct audit was produced outside this repository and was
+            #: never imported, so there is no path to point at and none is
+            #: invented. Its conclusion is recorded in `retained_as` above.
+            evidence_root=None,
             notes=(
                 "Validation protocol was not the problem: the original McConkey run "
                 "passes our residual and forcing-stationarity gates. Preserved, not deleted."
@@ -267,7 +271,14 @@ def install_standing_register() -> None:
             ),
             factory=None,
             retained_as="stationarity stress test / safe-rejection evidence",
-            evidence_root="TODO",
-            notes="Evidence path TODO; must not block implementation.",
+            evidence_root="cases/cube/drifting_wake",
+            notes=(
+                "Tracked and replayable: the registered case is "
+                "cases/cube/drifting_wake (force history, statistics and "
+                "lateral-mode characterisation), with the generated artifact "
+                "directory at evidence/cube/drifting_wake. Replay with "
+                "`python scripts/run_demo.py --family cube --case drifting_wake "
+                "--mode replay`."
+            ),
         )
     )

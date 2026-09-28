@@ -75,7 +75,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T02:46:50Z",
+  "generated_utc": "2026-09-28T03:03:48Z",
   "prompt": "run the registered nozzle case canonical_reference",
   "mode": "replay",
   "family": "nozzle",

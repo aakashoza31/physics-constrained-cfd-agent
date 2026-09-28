@@ -61,7 +61,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T02:47:22Z",
+  "generated_utc": "2026-09-28T03:04:19Z",
   "prompt": "run the registered airfoil case mesh_rejection",
   "mode": "replay",
   "family": "airfoil",

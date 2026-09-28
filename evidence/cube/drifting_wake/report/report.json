@@ -16,7 +16,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:47:41Z",
+    "started_utc": "2026-09-28T03:04:00Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",
@@ -124,7 +124,7 @@
     "authority_trace": {
       "family": "cube",
       "case": "drifting_wake",
-      "started_utc": "2026-09-28T02:47:41Z",
+      "started_utc": "2026-09-28T03:04:00Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -598,7 +598,7 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:47:59Z",
+    "generated_utc": "2026-09-28T03:04:17Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",

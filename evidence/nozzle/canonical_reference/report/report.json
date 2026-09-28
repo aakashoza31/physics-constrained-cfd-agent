@@ -12,7 +12,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T02:46:48Z",
+    "started_utc": "2026-09-28T03:03:46Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
@@ -120,7 +120,7 @@
     "authority_trace": {
       "family": "nozzle",
       "case": "canonical_reference",
-      "started_utc": "2026-09-28T02:46:48Z",
+      "started_utc": "2026-09-28T03:03:46Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -501,7 +501,7 @@
   },
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T02:46:50Z",
+    "generated_utc": "2026-09-28T03:03:48Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",

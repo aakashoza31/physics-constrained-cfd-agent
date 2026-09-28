@@ -78,7 +78,10 @@ def test_square_duct_is_preserved_as_supporting_evidence_not_deleted():
     assert r.status == SUPPORTING
     assert not r.routable, "a SUPPORTING family must not be routable"
     assert "cross-version" in r.retained_as
-    assert r.evidence_root and "family3_square_duct_audit" in r.evidence_root
+    # The audit was produced outside this repository and never imported, so the
+    # register carries None rather than a path that would only resolve on one
+    # machine. What the evidence SHOWED is recorded in retained_as above.
+    assert r.evidence_root is None
     assert "v2006" in r.description and "v14" in r.description
 
 
@@ -89,7 +92,9 @@ def test_cube_is_preserved_as_nonaccepted_stress_test():
     assert not r.routable
     assert "stationarity" in r.retained_as
     # Evidence path is allowed to be TODO and must not block anything.
-    assert r.evidence_root == "TODO"
+    # Tracked and replayable, repository-relative.
+    assert r.evidence_root == "cases/cube/drifting_wake"
+    assert "run_demo.py" in r.notes
 
 
 def test_only_core_families_are_routable():

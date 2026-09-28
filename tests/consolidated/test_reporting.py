@@ -93,9 +93,44 @@ def test_contours_report_what_was_missing(tmp_path):
     written = visuals.make_contours(run, tmp_path / "contours")
     status = json.loads((tmp_path / "contours" / "contours_status.json").read_text())
     if not written:
-        assert status["status"] == visuals.NOT_AVAILABLE
+        # The cube's archive was compacted: series and logs survived, the raw
+        # field time directories did not. The status must say exactly that, and
+        # no flow field may be stood in for them.
+        assert status["status"] == visuals.FLOW_CONTOURS_NOT_AVAILABLE
+        assert status["status"] == (
+            "FLOW_CONTOURS_NOT_AVAILABLE_FROM_COMPACT_ARCHIVE")
         assert status["reason"]
         assert status["script"].endswith("paraview_contours.py")
+        assert "synthesised" in status["not_done"]
+
+
+def test_the_cube_animation_is_not_presented_as_a_flow_field(tmp_path):
+    """The cube keeps its force-history video, labelled for what it is."""
+    from src.reporting import visuals
+
+    run = run_pipeline("replay cube", mode=REPLAY, family="cube",
+                       case="drifting_wake")
+    name = visuals.make_video(run, tmp_path / "video")
+    status = json.loads((tmp_path / "video" / "video_status.json").read_text())
+    assert name, "the archived force history must still produce an animation"
+    assert status["status"] == "RENDERED"
+    assert status["is_flow_field_animation"] is False
+    assert status["quantity"] == "force"
+    assert "NOT a flow-field visualisation" in status["note"]
+
+
+def test_forward_step_contours_come_from_the_tracked_evidence(tmp_path):
+    """A clone has no demo/ archive; the tracked renders must still be copied."""
+    from src.reporting import visuals
+
+    run = run_pipeline("replay the step", mode=REPLAY, family="forward_step",
+                       case="mach20_canonical")
+    written = visuals.make_contours(run, tmp_path / "contours")
+    status = json.loads((tmp_path / "contours" / "contours_status.json").read_text())
+    assert written, "the archived forward-step field renders were not copied"
+    assert status["status"] == "ARCHIVED_RENDERS"
+    assert "copied verbatim" in status["note"]
+    assert any(name.startswith("mach") for name in written)
 
 
 # -- portability: a reviewer's artifacts must not carry our machine ----------

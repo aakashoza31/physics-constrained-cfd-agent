@@ -13,7 +13,8 @@
     "velocity.png"
   ],
   "source": [
-    "demo/forward_step_2d/case_F_step030"
+    "demo/forward_step_2d/case_F_step030",
+    "evidence/forward_step/step_height_030_short_horizon"
   ],
   "note": "these images were rendered by the original run's own visualisation step and are copied verbatim. They are not re-rendered here, and nothing was synthesised."
 }
