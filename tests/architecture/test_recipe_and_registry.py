@@ -124,33 +124,69 @@ def test_non_core_evidence_families_have_no_adapter_at_all():
             registry.adapter(name)
 
 
-@pytest.mark.parametrize("family", ["airfoil", "backward_step"])
-def test_pending_families_cannot_accept(family):
+def _unregistered_pending() -> list:
+    """Pending families whose scientific recipe is still unregistered.
+
+    Computed, not hard-coded: a family gains a registered recipe before it gains
+    CORE status, and this invariant must follow that transition rather than
+    pinning a list that goes stale.
+    """
     registry.install_standing_register()
-    adapter = registry.adapter(family)
-    assert not adapter.recipe.is_registered()
-    validation = adapter.validate({}, None)
-    assert validation["status"] == CRITERION_NOT_REGISTERED
-    assert adapter.maps_to_decision(validation) == INCONCLUSIVE
-    assert adapter.maps_to_decision(validation) != ACCEPT
+    return [
+        r.name for r in registry.pending_families()
+        if r.inspectable and not registry.adapter(r.name).recipe.is_registered()
+    ]
 
 
 @pytest.mark.parametrize("family", ["airfoil", "backward_step"])
-def test_pending_family_scope_gate_fails_closed(family):
+def test_every_pending_family_is_non_executable(family):
+    """The invariant that holds for ALL pending families, registered recipe or not."""
     registry.install_standing_register()
-    adapter = registry.adapter(family)
-    scope = adapter.check_scope(None)
-    assert scope.approved is False
-    assert CRITERION_NOT_REGISTERED in scope.decision
+    record = registry.get(family)
+    assert record.status == CORE_PENDING
+    assert record.routable is False
+    with pytest.raises(PermissionError):
+        registry.adapter(family, for_execution=True)
+    # And its own scope gate refuses on top of the registry refusal.
+    assert registry.adapter(family).check_scope(None).approved is False
 
 
-@pytest.mark.parametrize("family", ["airfoil", "backward_step"])
-def test_pending_family_spec_refuses_to_be_built_from_guesses(family):
+def test_unregistered_pending_families_cannot_accept():
+    families = _unregistered_pending()
+    assert families, "expected at least one family with an unregistered recipe"
+    for family in families:
+        adapter = registry.adapter(family)
+        validation = adapter.validate({}, None)
+        assert validation["status"] == CRITERION_NOT_REGISTERED, family
+        assert adapter.maps_to_decision(validation) == INCONCLUSIVE, family
+        assert adapter.maps_to_decision(validation) != ACCEPT, family
+
+
+def test_unregistered_pending_scope_gate_names_the_missing_criteria():
+    for family in _unregistered_pending():
+        scope = registry.adapter(family).check_scope(None)
+        assert scope.approved is False
+        assert CRITERION_NOT_REGISTERED in scope.decision, family
+
+
+def test_unregistered_pending_spec_refuses_to_be_built_from_guesses():
     from importlib import import_module
 
-    spec_cls = [
-        v for v in vars(import_module(f"src.families.{family}.spec")).values()
-        if hasattr(v, "__dataclass_fields__")
-    ][0]
-    with pytest.raises(ValueError):
-        spec_cls()
+    for family in _unregistered_pending():
+        spec_cls = [
+            v for v in vars(import_module(f"src.families.{family}.spec")).values()
+            if hasattr(v, "__dataclass_fields__")
+        ][0]
+        with pytest.raises(ValueError):
+            spec_cls()
+
+
+def test_a_registered_pending_recipe_still_cannot_reach_core_by_itself():
+    """airfoil: recipe registered, yet execution stays closed behind readiness."""
+    registry.install_standing_register()
+    adapter = registry.adapter("airfoil")
+    assert adapter.recipe.is_registered()
+    readiness = adapter.readiness()
+    assert readiness["ready_for_core"] is False
+    assert readiness["open_gates"]
+    assert registry.get("airfoil").routable is False
