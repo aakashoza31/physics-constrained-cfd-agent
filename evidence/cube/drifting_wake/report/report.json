@@ -1,0 +1,574 @@
+{
+  "report_version": "report-builder/1.0.0",
+  "decision": {
+    "verdict": "REJECT",
+    "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.",
+    "family": "cube",
+    "case": "drifting_wake",
+    "failed_gates": [
+      "stationarity"
+    ],
+    "unresolved_gates": [
+      "validation"
+    ],
+    "decided_by": "deterministic_authority",
+    "llm_override_possible": false
+  },
+  "run": {
+    "pipeline_version": "agent-pipeline/1.0.0",
+    "started_utc": "2026-09-28T01:46:57Z",
+    "prompt": "run the registered cube case drifting_wake",
+    "mode": "replay",
+    "family": "cube",
+    "case": "drifting_wake",
+    "interpretation": {
+      "interpreter_version": "request-interpreter/1.0.0",
+      "interpreter": "deterministic_keyword",
+      "prompt": "run the registered cube case drifting_wake",
+      "proposed_family": "cube",
+      "parameters": {},
+      "operating_conditions": {},
+      "geometry_source": "parametric",
+      "keyword_hits": {
+        "cube": [
+          "cube"
+        ]
+      },
+      "confidence_note": "matched on ['cube'] | family supplied explicitly by the caller",
+      "binding": false,
+      "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+    },
+    "stages": [
+      {
+        "stage": "request_interpretation",
+        "status": "PROPOSED",
+        "decided_by": "deterministic",
+        "detail": {
+          "proposed_family": "cube",
+          "parameters": {}
+        }
+      },
+      {
+        "stage": "geometry_characterization",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "source": "parametric",
+          "geometry_status": "FEATURES_EXTRACTED",
+          "reason": ""
+        }
+      },
+      {
+        "stage": "family_routing",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "selected": "cube",
+          "replay": true,
+          "detail": "registered case cube/drifting_wake"
+        }
+      },
+      {
+        "stage": "family_contract",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "family_status": "RUNTIME_REJECTED",
+          "routable": false
+        }
+      },
+      {
+        "stage": "case_and_mesh",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "source": "registered case",
+          "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/cube/drifting_wake"
+        }
+      },
+      {
+        "stage": "execution",
+        "status": "REPLAYED",
+        "decided_by": "deterministic",
+        "detail": {
+          "solver_invoked": false,
+          "note": "archived evidence was read; no solver was launched"
+        }
+      },
+      {
+        "stage": "evidence_extraction",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact"
+        }
+      },
+      {
+        "stage": "llm_diagnosis",
+        "status": "PROPOSED",
+        "decided_by": "deterministic",
+        "detail": {
+          "proposals": 2
+        }
+      },
+      {
+        "stage": "bounded_correction",
+        "status": "SKIPPED",
+        "decided_by": "deterministic",
+        "detail": {
+          "reason": "replay does not issue new corrective actions"
+        }
+      }
+    ],
+    "stopped_at": "execution",
+    "authority_trace": {
+      "family": "cube",
+      "case": "drifting_wake",
+      "started_utc": "2026-09-28T01:46:57Z",
+      "authority_questions": [
+        "family_compatibility",
+        "geometry_admissibility",
+        "mesh_quality",
+        "physical_model",
+        "boundary_condition_consistency",
+        "numerical_health",
+        "conservation",
+        "convergence",
+        "stationarity",
+        "validation",
+        "permitted_actions",
+        "final_decision"
+      ],
+      "model_activities": [
+        "interpret_user_intent",
+        "propose_family_route",
+        "diagnose_evidence",
+        "propose_bounded_action",
+        "explain_result",
+        "draft_narrative"
+      ],
+      "gates": [
+        {
+          "question": "geometry_admissibility",
+          "passed": true,
+          "measured": "FEATURES_EXTRACTED",
+          "threshold": "the geometry must be characterisable",
+          "detail": "",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "family_compatibility",
+          "passed": true,
+          "measured": {
+            "family": "cube",
+            "case": "drifting_wake"
+          },
+          "threshold": "the case must be in the registered library",
+          "detail": "registered case cube/drifting_wake",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "numerical_health",
+          "passed": true,
+          "measured": {
+            "solver_completed": true,
+            "end_time_reached": 79.98
+          },
+          "threshold": "the solver must complete without a fatal error",
+          "detail": "the archived run completed to its requested end time and reported no numerical failure",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "convergence",
+          "passed": true,
+          "measured": {
+            "streamwise_force_drift_fraction": 0.0007529082884745507
+          },
+          "threshold": "drift over the window <= 0.02 of the mean streamwise force",
+          "detail": "the drag looks converged -- this is exactly why watching only the drag would have accepted the run",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "stationarity",
+          "passed": false,
+          "measured": {
+            "lateral_growth_ratio": 2.098378164488468,
+            "mean_abs_fz_first_half": 0.0018326531209671001,
+            "mean_abs_fz_second_half": 0.003845599292119006
+          },
+          "threshold": "lateral force growth ratio <= 1.25",
+          "detail": "a periodic lateral mode is still growing across the assessment window, so the flow is not developed",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "validation",
+          "passed": null,
+          "measured": "not reached",
+          "threshold": "a validated result requires a stationary flow first",
+          "detail": "validation was never attempted: a run that is still developing cannot be compared against a reference",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "permitted_actions",
+          "passed": true,
+          "measured": {
+            "proposed": [
+              "CONTINUE_RUN to let the lateral mode settle"
+            ],
+            "allowed": [
+              "CONTINUE_RUN",
+              "FAIL_SAFELY",
+              "REJECT_UNSUPPORTED"
+            ]
+          },
+          "threshold": "a proposed action must be in the family's registered vocabulary",
+          "detail": "an action outside the vocabulary is refused, not executed",
+          "decided_by": "deterministic"
+        }
+      ],
+      "failed": [
+        "stationarity"
+      ],
+      "unresolved": [
+        "validation"
+      ],
+      "llm_proposals": [
+        {
+          "activity": "interpret_user_intent",
+          "content": {
+            "interpreter_version": "request-interpreter/1.0.0",
+            "interpreter": "deterministic_keyword",
+            "prompt": "run the registered cube case drifting_wake",
+            "proposed_family": "cube",
+            "parameters": {},
+            "operating_conditions": {},
+            "geometry_source": "parametric",
+            "keyword_hits": {
+              "cube": [
+                "cube"
+              ]
+            },
+            "confidence_note": "matched on ['cube'] | family supplied explicitly by the caller",
+            "binding": false,
+            "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+          },
+          "model": "deterministic_keyword",
+          "accepted_by_authority": null,
+          "binding": false
+        },
+        {
+          "activity": "diagnose_evidence",
+          "content": "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reaching a statistically steady state",
+          "model": "archived diagnosis",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "propose_bounded_action",
+          "content": "CONTINUE_RUN to let the lateral mode settle",
+          "model": "archived diagnosis",
+          "accepted_by_authority": false,
+          "binding": false
+        }
+      ],
+      "verdict": "REJECT",
+      "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+    },
+    "final_decision": {
+      "verdict": "REJECT",
+      "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.",
+      "family": "cube",
+      "case": "drifting_wake",
+      "failed_gates": [
+        "stationarity"
+      ],
+      "unresolved_gates": [
+        "validation"
+      ],
+      "decided_by": "deterministic_authority",
+      "llm_override_possible": false
+    },
+    "artifacts": {
+      "geometry": {
+        "features_version": "geometry-features/1.0.0",
+        "source": "parametric",
+        "status": "FEATURES_EXTRACTED",
+        "usable": true,
+        "dimensions": {},
+        "characteristic_dimension": null,
+        "characteristic_name": "cube_height",
+        "topology": {},
+        "provenance": {
+          "origin": "request parameters; geometry is generated from these values, so the features are exact"
+        },
+        "reason": ""
+      },
+      "contract": {
+        "capabilities": {
+          "family": "cube",
+          "status": "RUNTIME_REJECTED",
+          "routable": false,
+          "geometry_inputs": {
+            "parametric": true,
+            "step": false,
+            "step_note": "this family meshes a parametric geometry it generates itself; no STEP import, healing or feature-recognition path is implemented for it"
+          },
+          "physics": {
+            "compressible": false,
+            "turbulent": true,
+            "transient": true,
+            "dimensionality": "3-D",
+            "model": "incompressible RANS, surface-mounted cube"
+          },
+          "allowed_actions": [
+            "CONTINUE_RUN",
+            "FAIL_SAFELY",
+            "REJECT_UNSUPPORTED"
+          ],
+          "characteristic_dimension": "cube_height",
+          "envelope": {
+            "regime": "3-D turbulent flow over a wall-mounted cube",
+            "validation": "not reached: the run was rejected before validation, on stationarity/development"
+          },
+          "cases": [
+            "drifting_wake"
+          ],
+          "solver": "OpenFOAM Foundation v14",
+          "notes": "F3 headline demonstration, RUNTIME REJECTED. The archived run executed, drifted laterally and was refused by the deterministic stationarity gate. It is NOT a successful validation and is not routable for acceptance."
+        },
+        "registered": true,
+        "register_status": "NONACCEPTED",
+        "adapter_error": "KeyError: \"'cube' has no adapter (status NONACCEPTED)\""
+      },
+      "force_history": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/cube/drifting_wake/reference/force_history.json",
+      "force_samples": 2003,
+      "stationarity": {
+        "gate_version": "cube-stationarity/1.0.0",
+        "status": "STILL_DEVELOPING",
+        "passed": false,
+        "window": {
+          "start": 59.980000000000004,
+          "end": 79.98,
+          "samples": 500
+        },
+        "measured": {
+          "mean_fx": 0.706209298654447,
+          "mean_fy": 0.2450782018170498,
+          "mean_fz": 0.00044205078685453616,
+          "drift_fraction": {
+            "fx": 0.0007529082884745507,
+            "fy": 0.0005290983096436084,
+            "fz": 0.004620392788751231
+          },
+          "lateral_growth_ratio": 2.098378164488468,
+          "lateral_relative_magnitude": 0.0006259486921183044,
+          "mean_abs_fz_first_half": 0.0018326531209671001,
+          "mean_abs_fz_second_half": 0.003845599292119006,
+          "samples": 500
+        },
+        "thresholds": {
+          "force_drift_fraction_max": 0.02,
+          "lateral_growth_ratio_max": 1.25,
+          "lateral_relative_max": 0.05,
+          "assessment_window": 20.0
+        },
+        "failures": [
+          "lateral_force_growth"
+        ],
+        "margins_relative_to_threshold": {
+          "lateral_growth_ratio": 1.6787025315907744,
+          "max_drift_fraction": 0.23101963943756154,
+          "lateral_relative": 0.012518973842366088
+        },
+        "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
+      },
+      "solver_invoked": false,
+      "lateral_mode": {
+        "description": "the lateral force is not a slow one-way drift: it is a periodic lateral mode whose amplitude grows exponentially and has not saturated by the end of the run",
+        "period": 10.144000000000005,
+        "zero_crossings": 16,
+        "first_peak": {
+          "t": 30.14,
+          "abs_fz": 0.00010108853584633
+        },
+        "last_peak": {
+          "t": 76.62,
+          "abs_fz": 0.006914910397946
+        },
+        "amplitude_growth_factor": 68.40449651439921,
+        "exponential_growth_rate_per_time": 0.09090874700908845,
+        "e_folding_time": 11.000041612057712,
+        "method": "peaks are local maxima of |Fz| above 1e-4; the rate is the log slope between the first and last peak"
+      },
+      "replay_version": "replay/1.0.0",
+      "case": {
+        "case_dir": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/cube/drifting_wake",
+        "case_id": "drifting_wake",
+        "original_id": "family3_baseline_compact",
+        "family": "cube",
+        "title": "Surface-mounted cube with a drifting lateral wake",
+        "purpose": "F3 headline demonstration: a 3-D turbulent run that executed, looked healthy, and was REJECTED on stationarity / development",
+        "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+        "evidence_present": true,
+        "config": null,
+        "related_campaigns": [],
+        "solver": "OpenFOAM Foundation v14",
+        "builder_version": "case-library/1.0.0",
+        "expected": {
+          "case_id": "drifting_wake",
+          "family": "cube",
+          "original_id": "family3_baseline_compact",
+          "expected": {
+            "verdict": "REJECT",
+            "archived_status": "RUNTIME_REJECTED",
+            "rejected_on": "STILL_DEVELOPING",
+            "failed_checks": [
+              "lateral_force_growth"
+            ],
+            "stationarity": {
+              "gate_version": "cube-stationarity/1.0.0",
+              "status": "STILL_DEVELOPING",
+              "passed": false,
+              "window": {
+                "start": 59.980000000000004,
+                "end": 79.98,
+                "samples": 500
+              },
+              "measured": {
+                "mean_fx": 0.706209298654447,
+                "mean_fy": 0.2450782018170498,
+                "mean_fz": 0.00044205078685453616,
+                "drift_fraction": {
+                  "fx": 0.0007529082884745507,
+                  "fy": 0.0005290983096436084,
+                  "fz": 0.004620392788751231
+                },
+                "lateral_growth_ratio": 2.098378164488468,
+                "lateral_relative_magnitude": 0.0006259486921183044,
+                "mean_abs_fz_first_half": 0.0018326531209671001,
+                "mean_abs_fz_second_half": 0.003845599292119006,
+                "samples": 500
+              },
+              "thresholds": {
+                "force_drift_fraction_max": 0.02,
+                "lateral_growth_ratio_max": 1.25,
+                "lateral_relative_max": 0.05,
+                "assessment_window": 20.0
+              },
+              "failures": [
+                "lateral_force_growth"
+              ],
+              "margins_relative_to_threshold": {
+                "lateral_growth_ratio": 1.6787025315907744,
+                "max_drift_fraction": 0.23101963943756154,
+                "lateral_relative": 0.012518973842366088
+              },
+              "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
+            },
+            "solver_invoked_in_archive": true,
+            "note": "the solver ran to the requested end time and reported no numerical failure; the rejection is on flow development"
+          },
+          "source_of_truth": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+          "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+        }
+      }
+    },
+    "solver_invoked": false
+  },
+  "evidence": {
+    "convergence": {
+      "question": "convergence",
+      "passed": true,
+      "measured": {
+        "streamwise_force_drift_fraction": 0.0007529082884745507
+      },
+      "threshold": "drift over the window <= 0.02 of the mean streamwise force",
+      "detail": "the drag looks converged -- this is exactly why watching only the drag would have accepted the run",
+      "decided_by": "deterministic"
+    },
+    "stationarity": {
+      "question": "stationarity",
+      "passed": false,
+      "measured": {
+        "lateral_growth_ratio": 2.098378164488468,
+        "mean_abs_fz_first_half": 0.0018326531209671001,
+        "mean_abs_fz_second_half": 0.003845599292119006
+      },
+      "threshold": "lateral force growth ratio <= 1.25",
+      "detail": "a periodic lateral mode is still growing across the assessment window, so the flow is not developed",
+      "decided_by": "deterministic",
+      "full_assessment": {
+        "gate_version": "cube-stationarity/1.0.0",
+        "status": "STILL_DEVELOPING",
+        "passed": false,
+        "window": {
+          "start": 59.980000000000004,
+          "end": 79.98,
+          "samples": 500
+        },
+        "measured": {
+          "mean_fx": 0.706209298654447,
+          "mean_fy": 0.2450782018170498,
+          "mean_fz": 0.00044205078685453616,
+          "drift_fraction": {
+            "fx": 0.0007529082884745507,
+            "fy": 0.0005290983096436084,
+            "fz": 0.004620392788751231
+          },
+          "lateral_growth_ratio": 2.098378164488468,
+          "lateral_relative_magnitude": 0.0006259486921183044,
+          "mean_abs_fz_first_half": 0.0018326531209671001,
+          "mean_abs_fz_second_half": 0.003845599292119006,
+          "samples": 500
+        },
+        "thresholds": {
+          "force_drift_fraction_max": 0.02,
+          "lateral_growth_ratio_max": 1.25,
+          "lateral_relative_max": 0.05,
+          "assessment_window": 20.0
+        },
+        "failures": [
+          "lateral_force_growth"
+        ],
+        "margins_relative_to_threshold": {
+          "lateral_growth_ratio": 1.6787025315907744,
+          "max_drift_fraction": 0.23101963943756154,
+          "lateral_relative": 0.012518973842366088
+        },
+        "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
+      }
+    }
+  },
+  "media": {
+    "plots": [],
+    "contours": [],
+    "video": null
+  },
+  "provenance": {
+    "report_version": "report-builder/1.0.0",
+    "generated_utc": "2026-09-28T01:46:58Z",
+    "prompt": "run the registered cube case drifting_wake",
+    "mode": "replay",
+    "family": "cube",
+    "case": "drifting_wake",
+    "solver_invoked": false,
+    "solver": "OpenFOAM Foundation v14",
+    "evidence_root": null,
+    "case_directory": "/sessions/rcw-01m814mtbxqgyvyf1ij1udgi/mnt/physics-constrained-cfd-agent-e2e/cases/cube/drifting_wake",
+    "python": "3.10.12",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "git_commit": "NOT_AVAILABLE",
+    "pipeline_stages": [
+      "request_interpretation",
+      "geometry_characterization",
+      "family_routing",
+      "family_contract",
+      "case_and_mesh",
+      "execution",
+      "evidence_extraction",
+      "llm_diagnosis",
+      "bounded_correction"
+    ],
+    "note": "a replay reads archived evidence and re-derives the decision; it never implies that a solver was executed"
+  }
+}

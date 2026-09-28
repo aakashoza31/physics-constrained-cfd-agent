@@ -1,0 +1,11 @@
+case_id: "mach20_canonical"
+original_id: "case_B_mach20"
+family: "forward_step"
+title: "Forward-facing step at Mach 2.0"
+purpose: "accepted reference run of the F2 family"
+evidence_root: "demo/forward_step_2d/case_B_mach20"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

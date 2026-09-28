@@ -1,0 +1,24 @@
+{
+  "case_id": "mesh_rejection",
+  "family": "airfoil",
+  "original_id": "naca0012_2DN00",
+  "expected": {
+    "verdict": "REJECT",
+    "archived_status": "MESH_REJECTED_CFD_NOT_RUN",
+    "failed_checks": [
+      "all_in_plane_elements_valid",
+      "max_non_orthogonality",
+      "max_skewness",
+      "positive_cell_orientation"
+    ],
+    "mesh_levels": {
+      "coarse": "F3_MESH_NOT_QUALIFIED",
+      "medium": "F3_MESH_NOT_QUALIFIED",
+      "fine": "F3_MESH_NOT_QUALIFIED"
+    },
+    "solver_invoked_in_archive": false,
+    "note": "CFD_NOT_RUN: no flow solver was ever launched for this family"
+  },
+  "source_of_truth": "outputs/airfoil_mesh",
+  "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+}

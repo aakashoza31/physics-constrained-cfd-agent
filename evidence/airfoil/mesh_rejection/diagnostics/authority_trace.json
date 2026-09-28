@@ -1,0 +1,123 @@
+{
+  "family": "airfoil",
+  "case": "mesh_rejection",
+  "started_utc": "2026-09-28T01:47:20Z",
+  "authority_questions": [
+    "family_compatibility",
+    "geometry_admissibility",
+    "mesh_quality",
+    "physical_model",
+    "boundary_condition_consistency",
+    "numerical_health",
+    "conservation",
+    "convergence",
+    "stationarity",
+    "validation",
+    "permitted_actions",
+    "final_decision"
+  ],
+  "model_activities": [
+    "interpret_user_intent",
+    "propose_family_route",
+    "diagnose_evidence",
+    "propose_bounded_action",
+    "explain_result",
+    "draft_narrative"
+  ],
+  "gates": [
+    {
+      "question": "geometry_admissibility",
+      "passed": true,
+      "measured": "FEATURES_EXTRACTED",
+      "threshold": "the geometry must be characterisable",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "family_compatibility",
+      "passed": true,
+      "measured": {
+        "family": "airfoil",
+        "case": "mesh_rejection"
+      },
+      "threshold": "the case must be in the registered library",
+      "detail": "registered case airfoil/mesh_rejection",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "mesh_quality",
+      "passed": false,
+      "measured": {
+        "levels": {
+          "coarse": "F3_MESH_NOT_QUALIFIED",
+          "medium": "F3_MESH_NOT_QUALIFIED",
+          "fine": "F3_MESH_NOT_QUALIFIED"
+        },
+        "failed_checks": [
+          "all_in_plane_elements_valid",
+          "max_non_orthogonality",
+          "max_skewness",
+          "positive_cell_orientation"
+        ]
+      },
+      "threshold": "the frozen mesh-quality contract",
+      "detail": "no mesh level qualified, so CFD was never run",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "numerical_health",
+      "passed": null,
+      "measured": "CFD_NOT_RUN",
+      "threshold": "not reachable without a qualified mesh",
+      "detail": "no solver was launched for this family",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "permitted_actions",
+      "passed": true,
+      "measured": {
+        "proposed": [],
+        "allowed": [
+          "FAIL_SAFELY",
+          "REJECT_UNSUPPORTED"
+        ]
+      },
+      "threshold": "a proposed action must be in the family's registered vocabulary",
+      "detail": "an action outside the vocabulary is refused, not executed",
+      "decided_by": "deterministic"
+    }
+  ],
+  "failed": [
+    "mesh_quality"
+  ],
+  "unresolved": [
+    "numerical_health"
+  ],
+  "llm_proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered airfoil case mesh_rejection",
+        "proposed_family": "airfoil",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "airfoil": [
+            "airfoil"
+          ]
+        },
+        "confidence_note": "matched on ['airfoil'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    }
+  ],
+  "verdict": "REJECT",
+  "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+}

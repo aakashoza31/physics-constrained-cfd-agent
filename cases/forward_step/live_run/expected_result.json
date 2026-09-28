@@ -1,0 +1,18 @@
+{
+  "case_id": "live_run",
+  "family": "forward_step",
+  "original_id": "live_run_01",
+  "expected": {
+    "verdict": "REJECT",
+    "archived_status": "STOPPED_FAIL_SAFELY",
+    "validation_status": null,
+    "iterations": 1,
+    "failed_checks": [
+      "no_fatal_error"
+    ],
+    "message": "Although the run reached the requested end time and saved finite positive fields, the deterministic checks show a fatal error flag triggered during the simulation. Therefore, the numerical run is classified as unstable.",
+    "solver_invoked_in_archive": true
+  },
+  "source_of_truth": "demo/forward_step_2d/live_run_01",
+  "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+}

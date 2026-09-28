@@ -1,34 +1,71 @@
 # Limitations
 
-This repository is a research prototype with a deliberately narrow validated domain.
+Read this before believing anything else in the repository.
 
-## Physics limitations
+## What is actually validated
 
-The demonstrated solver path is restricted to internal axisymmetric inviscid nozzle flow with calorically perfect air and adiabatic slip walls. It does not validate turbulence, boundary layers, viscosity, heat transfer, real-gas effects, external jets, arbitrary shock-containing back-pressure branches, or general three-dimensional geometries.
+Two families, both inviscid compressible Euler, both 2-D: the converging-diverging
+nozzle and the forward-facing step. Everything else in this repository is either
+a preserved refusal (the cube, the airfoil meshes) or infrastructure.
 
-## Transfer limitations
+Two validated families is **not** a general-purpose CFD agent. The product
+contract is implemented end to end, but the set of problems it can carry from
+prompt to accepted result is small and closed.
 
-The software scope gate permits a wider numerical envelope than the three demonstrated cases. Those bounds are safety/transfer guardrails, not proof of validated accuracy everywhere inside the box.
+## Physics not covered
 
-Only the following nearby changes were directly demonstrated in the public A/B/C campaign:
+No viscous wall-bounded validation, no turbulence-model validation, no reacting
+flow, no multiphase, no conjugate heat transfer, no moving geometry, no
+compressible turbulence. The one turbulent family that executed (the cube) was
+rejected before validation.
 
-- exit radius 35.4 mm -> 37.0 mm
-- reservoir total pressure 200 kPa -> 220 kPa
+## Geometry
 
-## Single-grid transfer cases
+No STEP/CAD family exists. The interface classifies and refuses CAD parts; see
+`docs/cad_and_step_input.md`. Parametric geometry only, and only the shapes the
+two validated families generate themselves.
 
-B and C are `PASS_SINGLE_MESH` results. They do not independently repeat the canonical grid-convergence, timestep, wedge-angle, and startup-sensitivity studies.
+## Statistical and numerical rigour
 
-## LLM limitations
+- No formal grid-convergence index or Richardson extrapolation is reported for
+  the accepted families; mesh sensitivity is demonstrated, not quantified into
+  an uncertainty.
+- No uncertainty quantification, no sensitivity to numerical scheme, no repeated
+  runs to separate solver noise from physical variation.
+- The cube case ran at one mesh resolution. Its rejection is a statement about
+  that run's development, not about the physical flow.
 
-The LLM proposes high-level actions and can make incorrect interpretations. Deterministic scope, action, and scientific validators therefore remain mandatory.
+## The gates themselves
 
-Visual observations are qualitative. The model is explicitly forbidden from declaring convergence from images or reading precise physical values from colormaps.
+Deterministic authority is only as strong as the registered criteria. The cube
+stationarity thresholds (2% drift, 1.25× growth, 5% lateral magnitude) are
+registered in `src/families/cube/stationarity.py` with their reasoning, and the
+archived run misses the growth bound by 1.7× — comfortable, but a reviewer
+should still argue with the bound rather than accept it because code applied it.
 
-## Feedback-action validation
+## LLM involvement
 
-The architecture supports multiple actions, but the demonstrated multi-iteration public trajectory specifically exercises `CONTINUE_RUN -> ACCEPT` in Case A. Refinement, diagnostic requests, and clean restart are implemented/guarded pathways, but should be described as supported mechanisms unless separately exercised and archived in a dedicated experiment.
+The default interpreter and diagnosis path in this repository are deterministic
+keyword and recipe logic, so the pipeline runs without an API key. The archived
+campaigns contain real LLM calls (`llm_calls.json`, `llm_interpretation.json`).
+No claim is made about which model, at which temperature, would reproduce those
+diagnoses — that experiment has not been run.
 
-## Numerical-reference interpretation
+## Reproducibility boundaries
 
-The canonical campaign is a numerically verified reference, not experimental validation and not a formal exact-solution proof. Quasi-1D theory is a useful screening/reference model for this problem but is not exact truth for the finite-angle multidimensional nozzle.
+- Replay is fully reproducible and needs no solver.
+- Live execution requires OpenFOAM Foundation v14; results on another
+  distribution or version are not claimed to match. The square-duct work in the
+  archive is the evidence for that caution: matching turbulence-model *names*
+  across CFD versions did not imply equivalent numerical physics.
+- Contour rendering requires ParaView; video requires ffmpeg or pillow. Both
+  report NOT_AVAILABLE rather than degrading silently.
+
+## What this repository does not claim
+
+1. That an arbitrary engineering prompt can be simulated.
+2. That arbitrary CAD geometry can be meshed or solved.
+3. That the cube case is a validated simulation of flow over a cube.
+4. That the NACA0012 work reproduces NASA CFL3D results — no CFD was run.
+5. That LLM diagnosis improves accuracy. The claim is narrower: it does not
+   compromise it, because it cannot overrule the gates.

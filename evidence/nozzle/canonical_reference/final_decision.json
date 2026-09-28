@@ -1,0 +1,10 @@
+{
+  "verdict": "ACCEPT",
+  "reason": "replayed from archived evidence: the run recorded PASS_SINGLE_MESH. No solver was executed by this replay.",
+  "family": "nozzle",
+  "case": "canonical_reference",
+  "failed_gates": [],
+  "unresolved_gates": [],
+  "decided_by": "deterministic_authority",
+  "llm_override_possible": false
+}

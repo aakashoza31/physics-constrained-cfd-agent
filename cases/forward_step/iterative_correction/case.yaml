@@ -1,0 +1,11 @@
+case_id: "iterative_correction"
+original_id: "case_H_iterative_short_run"
+family: "forward_step"
+title: "Bounded correction loop"
+purpose: "accepted after several bounded corrective iterations"
+evidence_root: "demo/forward_step_2d/case_H_iterative_short_run"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

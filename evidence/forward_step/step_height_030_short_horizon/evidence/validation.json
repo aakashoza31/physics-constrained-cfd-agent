@@ -1,0 +1,13 @@
+{
+  "question": "validation",
+  "passed": false,
+  "measured": {
+    "validation_status": "STOPPED_FAIL_SAFELY",
+    "failed_checks": [
+      "compression_front_measurable"
+    ]
+  },
+  "threshold": "every registered validation check must pass",
+  "detail": "Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upstream to the inlet boundary. Consequently, no valid measurable compression structure remains inside the domain.",
+  "decided_by": "deterministic"
+}

@@ -1,0 +1,6 @@
+# Reproduce forward_step/step_height_010. Replay by default; -Live re-executes OpenFOAM.
+param([switch]$Live)
+Set-Location (Join-Path $PSScriptRoot "..\..\..")
+$mode = if ($Live) { "live" } else { "replay" }
+$extra = if ($Live) { @("--i-want-to-run-cfd") } else { @() }
+python scripts/run_demo.py --family forward_step --case step_height_010 --mode $mode @extra

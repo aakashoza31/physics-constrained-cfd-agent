@@ -1,0 +1,11 @@
+{
+  "question": "validation",
+  "passed": true,
+  "measured": {
+    "validation_status": "PASS_SINGLE_MESH",
+    "failed_checks": []
+  },
+  "threshold": "every registered validation check must pass",
+  "detail": "",
+  "decided_by": "deterministic"
+}

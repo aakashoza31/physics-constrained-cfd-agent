@@ -1,0 +1,11 @@
+{
+  "visuals_version": "visuals/1.0.0",
+  "written": [
+    "force_history.png",
+    "lateral_force_growth.png",
+    "convergence.png"
+  ],
+  "not_available": [
+    "residuals: no parsable solver log in the archived evidence"
+  ]
+}

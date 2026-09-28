@@ -1,0 +1,214 @@
+{
+  "assets": {
+    "familyII_coarse_hex_cgns": {
+      "bytes": 619327,
+      "expected": {
+        "airfoil_surface_points": 129,
+        "archive": "NACA0012numerics_grids.zip",
+        "cells": 14336,
+        "cells_identity": "(225-1)*(65-1) = 14336",
+        "cgns_dimensions": [
+          2,
+          225,
+          65
+        ],
+        "chord_m": 1.0,
+        "family": "NASA TMR NACA0012 Numerical Analysis Family II",
+        "farfield_chords_approx": 500,
+        "format": "CGNS/HDF5, unstructured, single base / single zone, HEXA_8",
+        "level": "coarse",
+        "reader_dependency": "h5py>=3.0",
+        "regeneration_note": "NASA states all grids were re-generated with the corrected airfoil shape as of 2014-06-23",
+        "spanwise_cells": 1,
+        "spanwise_planes": 2,
+        "structured_dimensions_ni_nj": [
+          225,
+          65
+        ],
+        "trailing_edge": "sharp; Family II TE spacing 1.25e-5 c"
+      },
+      "filename": "n0012familyII.6.hex.cgns.gz",
+      "role": "ACTIVE canonical F3 mesh, coarse level: NASA TMR NACA0012 Numerical Analysis Family II 225x65 C-grid, unstructured hexahedral CGNS -- authoritative for in-plane coordinates and connectivity",
+      "sha256": "80722f29822b8bcd106d8a8897fedb6698a3f1cb275b7a030eaac09b9ffa9be2",
+      "source": "listed on https://tmbwg.github.io/turbmodels/naca0012numerics_grids.html; NASA distributes the Family II grids inside NACA0012numerics_grids.zip, from which the individual level is extracted. Digests are recorded in the lockfile at install time from the bytes actually retrieved."
+    },
+    "familyII_fine_hex_cgns": {
+      "bytes": 10886987,
+      "expected": {
+        "airfoil_surface_points": 513,
+        "archive": "NACA0012numerics_grids.zip",
+        "cells": 229376,
+        "cells_identity": "(897-1)*(257-1) = 229376",
+        "cgns_dimensions": [
+          2,
+          897,
+          257
+        ],
+        "chord_m": 1.0,
+        "family": "NASA TMR NACA0012 Numerical Analysis Family II",
+        "farfield_chords_approx": 500,
+        "format": "CGNS/HDF5, unstructured, single base / single zone, HEXA_8",
+        "level": "fine",
+        "reader_dependency": "h5py>=3.0",
+        "regeneration_note": "NASA states all grids were re-generated with the corrected airfoil shape as of 2014-06-23",
+        "spanwise_cells": 1,
+        "spanwise_planes": 2,
+        "structured_dimensions_ni_nj": [
+          897,
+          257
+        ],
+        "trailing_edge": "sharp; Family II TE spacing 1.25e-5 c"
+      },
+      "filename": "n0012familyII.4.hex.cgns.gz",
+      "role": "ACTIVE canonical F3 mesh, fine level: NASA TMR NACA0012 Numerical Analysis Family II 897x257 C-grid, unstructured hexahedral CGNS -- authoritative for in-plane coordinates and connectivity",
+      "sha256": "7d4aac91f89f97bb8079af7506292c2d4b08de56366bd0dc4a0704c9d6f9c7fb",
+      "source": "listed on https://tmbwg.github.io/turbmodels/naca0012numerics_grids.html; NASA distributes the Family II grids inside NACA0012numerics_grids.zip, from which the individual level is extracted. Digests are recorded in the lockfile at install time from the bytes actually retrieved."
+    },
+    "familyII_medium_hex_cgns": {
+      "bytes": 2683617,
+      "expected": {
+        "airfoil_surface_points": 257,
+        "archive": "NACA0012numerics_grids.zip",
+        "cells": 57344,
+        "cells_identity": "(449-1)*(129-1) = 57344",
+        "cgns_dimensions": [
+          2,
+          449,
+          129
+        ],
+        "chord_m": 1.0,
+        "family": "NASA TMR NACA0012 Numerical Analysis Family II",
+        "farfield_chords_approx": 500,
+        "format": "CGNS/HDF5, unstructured, single base / single zone, HEXA_8",
+        "level": "medium",
+        "reader_dependency": "h5py>=3.0",
+        "regeneration_note": "NASA states all grids were re-generated with the corrected airfoil shape as of 2014-06-23",
+        "spanwise_cells": 1,
+        "spanwise_planes": 2,
+        "structured_dimensions_ni_nj": [
+          449,
+          129
+        ],
+        "trailing_edge": "sharp; Family II TE spacing 1.25e-5 c"
+      },
+      "filename": "n0012familyII.5.hex.cgns.gz",
+      "role": "ACTIVE canonical F3 mesh, medium level: NASA TMR NACA0012 Numerical Analysis Family II 449x129 C-grid, unstructured hexahedral CGNS -- authoritative for in-plane coordinates and connectivity",
+      "sha256": "62ef72f7c78c83aa59d537a2d852bfde674dedad530e5227afdc0b0f564c4a5e",
+      "source": "listed on https://tmbwg.github.io/turbmodels/naca0012numerics_grids.html; NASA distributes the Family II grids inside NACA0012numerics_grids.zip, from which the individual level is extracted. Digests are recorded in the lockfile at install time from the bytes actually retrieved."
+    },
+    "mesh_canonical": {
+      "bytes": 5174312,
+      "expected": {
+        "cells_2d": 229376,
+        "cells_converted": 229376,
+        "chord_m": 1.0,
+        "dimension_meaning": "ni = 2 spanwise planes (two identical x-z planes separated by y = 1); nj = C-wrap; nk = radial",
+        "dimensions_ni_nj_nk": [
+          2,
+          897,
+          257
+        ],
+        "farfield_chords_approx": 500,
+        "spanwise_layers": 1,
+        "topology": "structured C-grid, single block, 3-D formatted Plot3D",
+        "trailing_edge": "NASA modified sharp trailing edge"
+      },
+      "filename": "n0012_897-257.p3dfmt.gz",
+      "role": "canonical NASA structured C-grid for the 2DN00 NACA0012 validation case; the registered scientific mesh asset",
+      "sha256": "0078b3587173a164a818bf74b7ccec61101febdb03e48cef289262ddb658f66e",
+      "source": "NASA Turbulence Modeling Resource grid page: https://tmbwg.github.io/turbmodels/naca0012_grids.html"
+    },
+    "mesh_sensitivity": {
+      "bytes": 1263394,
+      "expected": {
+        "cells_2d": 57344,
+        "cells_converted": 57344,
+        "chord_m": 1.0,
+        "dimension_meaning": "ni = 2 spanwise planes (two identical x-z planes separated by y = 1); nj = C-wrap; nk = radial",
+        "dimensions_ni_nj_nk": [
+          2,
+          449,
+          129
+        ],
+        "farfield_chords_approx": 500,
+        "spanwise_layers": 1,
+        "topology": "structured C-grid, single block, 3-D formatted Plot3D",
+        "trailing_edge": "NASA modified sharp trailing edge"
+      },
+      "filename": "n0012_449-129.p3dfmt.gz",
+      "role": "coarser NASA grid of the same family, for the grid-sensitivity demonstration",
+      "sha256": "fb93b5191c0ab3794e5e02624eae7fa3364b5b6fc28512bf305c9e1154dcac51",
+      "source": "NASA Turbulence Modeling Resource grid page: https://tmbwg.github.io/turbmodels/naca0012_grids.html"
+    },
+    "ref_cfl3d_cf": {
+      "bytes": 37962,
+      "expected": {
+        "alpha_deg": 0.0,
+        "format": "native TMR whitespace-delimited .dat",
+        "quantities": [
+          "x_over_c",
+          "Cf"
+        ]
+      },
+      "filename": "n0012cf_cfl3d_sst.dat",
+      "role": "supporting CFD evidence only: NASA CFL3D SST skin friction at zero incidence. Supporting, because no experimental Cf is supplied here; it is reported, never used as an acceptance gate.",
+      "sha256": "d8001cd09d0c573de63475f8e0e02a2a989216133af74b84876eba5c328da8be",
+      "source": "NASA TMR NACA0012 validation page: https://tmbwg.github.io/turbmodels/naca0012_val.html"
+    },
+    "ref_cfl3d_cp": {
+      "bytes": 48141,
+      "expected": {
+        "alpha_deg": 0.0,
+        "format": "native TMR whitespace-delimited .dat",
+        "quantities": [
+          "x_over_c",
+          "Cp"
+        ],
+        "surfaces": "taken from zone/title labels when present; an unlabelled single curve is applied to both surfaces and that transformation is recorded in the derived artifact"
+      },
+      "filename": "n0012cp_cfl3d_sst.dat",
+      "role": "supporting quantitative CFD reference curve: NASA CFL3D SST surface pressure at zero incidence; the registered Cp comparison target",
+      "sha256": "378f9dcd058ffbe900081f213ee5c7e24dfaec0d6a9e02f366f96e8d76bf179d",
+      "source": "NASA TMR NACA0012 validation page: https://tmbwg.github.io/turbmodels/naca0012_val.html"
+    },
+    "ref_cfl3d_forces": {
+      "bytes": 417,
+      "expected": {
+        "code": "CFL3D",
+        "format": "native TMR whitespace-delimited .dat",
+        "model": "SST",
+        "quantities": [
+          "alpha_deg",
+          "CL",
+          "CD"
+        ]
+      },
+      "filename": "n0012clcd_cfl3d_sst.dat",
+      "role": "supporting CFD reference: NASA CFL3D SST lift/drag",
+      "sha256": "373dc142018816628b7b53ad278327db731162988ba35a166cd9fdc131a7fd7a",
+      "source": "NASA TMR NACA0012 validation page: https://tmbwg.github.io/turbmodels/naca0012_val.html"
+    },
+    "ref_ladson_forces": {
+      "bytes": 1343,
+      "expected": {
+        "condition": "tripped, Re_c = 6e6",
+        "datasets": "one or more grit/trip conditions, separated by title lines",
+        "format": "native TMR whitespace-delimited .dat",
+        "note": "the experimental incidence offset is PRESERVED; CFD alpha is never tuned to force agreement",
+        "quantities": [
+          "alpha_deg",
+          "CL",
+          "CD"
+        ]
+      },
+      "filename": "CLCD_Ladson_expdata.dat",
+      "role": "EXPERIMENTAL force reference: Ladson tripped force data, as published by TMR. This is the only experimental gate in this family. Ladson PRESSURE data is NOT a pressure gate for this setup and is deliberately not registered as an acceptance asset.",
+      "sha256": "78cd2f6aa4968e80f44cbf6c96f699bd9c6e45681d958ec528a10cf72ed23357",
+      "source": "Ladson, C.L., NASA TM-4074 (1988); tabulated on the NASA TMR NACA0012 validation page: https://tmbwg.github.io/turbmodels/naca0012_val.html"
+    }
+  },
+  "family": "airfoil",
+  "note": "SHA256 digests of registered external assets. Written once at install time and committed. A mismatch fails closed; nothing substitutes.",
+  "registered_utc": "2026-09-27T17:49:41Z",
+  "toolchain": "src/pipeline/airfoil/p3d.py (NASA 3-D formatted Plot3D, 2 x I x J, spanwise-first; axes remapped NASA(x,z,y) -> OpenFOAM(x,y,z); wake merged; supplied spanwise planes preserved) -> gmshToFoam -> deterministic boundary rewrite (front/back -> empty) -> checkMesh -allTopology -allGeometry"
+}

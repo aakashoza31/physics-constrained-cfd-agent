@@ -1,0 +1,11 @@
+case_id: "step_height_030_short_horizon"
+original_id: "case_F_step030"
+family: "forward_step"
+title: "Step height 0.30, short horizon"
+purpose: "the INADMISSIBLE variation: the run stopped safely instead of being accepted"
+evidence_root: "demo/forward_step_2d/case_F_step030"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

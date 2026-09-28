@@ -1,0 +1,13 @@
+{
+  "verdict": "REJECT",
+  "reason": "replayed from archived evidence: the run recorded STOPPED_FAIL_SAFELY with failed checks ['compression_front_measurable']. No solver was executed by this replay.",
+  "family": "forward_step_2d",
+  "case": "step_height_030_short_horizon",
+  "failed_gates": [
+    "convergence",
+    "validation"
+  ],
+  "unresolved_gates": [],
+  "decided_by": "deterministic_authority",
+  "llm_override_possible": false
+}

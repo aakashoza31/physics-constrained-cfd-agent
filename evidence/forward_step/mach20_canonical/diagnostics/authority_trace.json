@@ -1,0 +1,132 @@
+{
+  "family": "forward_step_2d",
+  "case": "mach20_canonical",
+  "started_utc": "2026-09-28T01:47:12Z",
+  "authority_questions": [
+    "family_compatibility",
+    "geometry_admissibility",
+    "mesh_quality",
+    "physical_model",
+    "boundary_condition_consistency",
+    "numerical_health",
+    "conservation",
+    "convergence",
+    "stationarity",
+    "validation",
+    "permitted_actions",
+    "final_decision"
+  ],
+  "model_activities": [
+    "interpret_user_intent",
+    "propose_family_route",
+    "diagnose_evidence",
+    "propose_bounded_action",
+    "explain_result",
+    "draft_narrative"
+  ],
+  "gates": [
+    {
+      "question": "geometry_admissibility",
+      "passed": true,
+      "measured": "FEATURES_EXTRACTED",
+      "threshold": "the geometry must be characterisable",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "family_compatibility",
+      "passed": true,
+      "measured": {
+        "family": "forward_step_2d",
+        "case": "mach20_canonical"
+      },
+      "threshold": "the case must be in the registered library",
+      "detail": "registered case forward_step/mach20_canonical",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "numerical_health",
+      "passed": true,
+      "measured": {
+        "archived_status": "ACCEPTED"
+      },
+      "threshold": "the solver must complete without a fatal error",
+      "detail": "read from the archived run record",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "conservation",
+      "passed": true,
+      "measured": {
+        "failed_checks": []
+      },
+      "threshold": "the family's registered conservation criterion",
+      "detail": "re-read from the archived validation record",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "convergence",
+      "passed": true,
+      "measured": {
+        "iterations": 1
+      },
+      "threshold": "the family's registered convergence criterion",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "validation",
+      "passed": true,
+      "measured": {
+        "validation_status": "PASS_2D_FORWARD_STEP",
+        "failed_checks": []
+      },
+      "threshold": "every registered validation check must pass",
+      "detail": "PASS_2D_FORWARD_STEP",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "permitted_actions",
+      "passed": true,
+      "measured": {
+        "proposed": [],
+        "allowed": [
+          "ACCEPT",
+          "CONTINUE_RUN",
+          "REFINE_MESH",
+          "REQUEST_CLARIFICATION",
+          "REJECT_UNSUPPORTED",
+          "FAIL_SAFELY"
+        ]
+      },
+      "threshold": "a proposed action must be in the family's registered vocabulary",
+      "detail": "an action outside the vocabulary is refused, not executed",
+      "decided_by": "deterministic"
+    }
+  ],
+  "failed": [],
+  "unresolved": [],
+  "llm_proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered forward_step case mach20_canonical",
+        "proposed_family": "forward_step",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {},
+        "confidence_note": "no registered family keyword appeared in the request | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    }
+  ],
+  "verdict": "ACCEPT",
+  "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+}

@@ -1,0 +1,13 @@
+case_id: "geometry_variation"
+original_id: "case_B_geometry"
+family: "nozzle"
+title: "Geometry variation"
+purpose: "same physics, altered nozzle geometry"
+evidence_root: "demo/nozzle_e2e/case_B_geometry"
+evidence_present: true
+config: "configs/nozzles/case_B_geometry.yaml"
+related_campaigns:
+  - "demo/nozzle_feedback_final/case_B_geometry"
+  - "demo/published_campaign/case_B_geometry"
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

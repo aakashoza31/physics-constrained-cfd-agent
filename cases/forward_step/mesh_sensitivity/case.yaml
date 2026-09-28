@@ -1,0 +1,11 @@
+case_id: "mesh_sensitivity"
+original_id: "case_I_mesh_sensitivity"
+family: "forward_step"
+title: "Mesh-sensitivity study"
+purpose: "mesh-sensitivity evidence; the loop stopped when a proposed action was refused"
+evidence_root: "demo/forward_step_2d/case_I_mesh_sensitivity"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

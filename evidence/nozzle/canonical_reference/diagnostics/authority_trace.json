@@ -1,0 +1,152 @@
+{
+  "family": "nozzle",
+  "case": "canonical_reference",
+  "started_utc": "2026-09-28T01:47:07Z",
+  "authority_questions": [
+    "family_compatibility",
+    "geometry_admissibility",
+    "mesh_quality",
+    "physical_model",
+    "boundary_condition_consistency",
+    "numerical_health",
+    "conservation",
+    "convergence",
+    "stationarity",
+    "validation",
+    "permitted_actions",
+    "final_decision"
+  ],
+  "model_activities": [
+    "interpret_user_intent",
+    "propose_family_route",
+    "diagnose_evidence",
+    "propose_bounded_action",
+    "explain_result",
+    "draft_narrative"
+  ],
+  "gates": [
+    {
+      "question": "geometry_admissibility",
+      "passed": true,
+      "measured": "FEATURES_EXTRACTED",
+      "threshold": "the geometry must be characterisable",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "family_compatibility",
+      "passed": true,
+      "measured": {
+        "family": "nozzle",
+        "case": "canonical_reference"
+      },
+      "threshold": "the case must be in the registered library",
+      "detail": "registered case nozzle/canonical_reference",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "numerical_health",
+      "passed": true,
+      "measured": {
+        "archived_status": "PASS_SINGLE_MESH"
+      },
+      "threshold": "the solver must complete without a fatal error",
+      "detail": "read from the archived run record",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "conservation",
+      "passed": true,
+      "measured": {
+        "failed_checks": []
+      },
+      "threshold": "the family's registered conservation criterion",
+      "detail": "re-read from the archived validation record",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "convergence",
+      "passed": true,
+      "measured": {
+        "iterations": null
+      },
+      "threshold": "the family's registered convergence criterion",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "validation",
+      "passed": true,
+      "measured": {
+        "validation_status": "PASS_SINGLE_MESH",
+        "failed_checks": []
+      },
+      "threshold": "every registered validation check must pass",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "permitted_actions",
+      "passed": true,
+      "measured": {
+        "proposed": [
+          "ACCEPT"
+        ],
+        "allowed": [
+          "ACCEPT",
+          "CONTINUE_RUN",
+          "REFINE_MESH",
+          "REQUEST_CLARIFICATION",
+          "REJECT_UNSUPPORTED",
+          "FAIL_SAFELY"
+        ]
+      },
+      "threshold": "a proposed action must be in the family's registered vocabulary",
+      "detail": "an action outside the vocabulary is refused, not executed",
+      "decided_by": "deterministic"
+    }
+  ],
+  "failed": [],
+  "unresolved": [],
+  "llm_proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered nozzle case canonical_reference",
+        "proposed_family": "nozzle",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "nozzle": [
+            "nozzle"
+          ]
+        },
+        "confidence_note": "matched on ['nozzle'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "ACCEPTABLE",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "ACCEPT",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    }
+  ],
+  "verdict": "ACCEPT",
+  "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+}

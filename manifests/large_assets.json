@@ -1,0 +1,87 @@
+{
+  "note": "large archived evidence is not committed. This manifest is the inventory: counts, byte totals and digests of the key files each registered case points at.",
+  "directories": {
+    "handoff": {
+      "files": 823,
+      "bytes": 523031141,
+      "gitignored": true
+    },
+    "outputs": {
+      "files": 16,
+      "bytes": 76021910,
+      "gitignored": true
+    },
+    "demo": {
+      "files": 951,
+      "bytes": 60446641,
+      "gitignored": true
+    },
+    "build": {
+      "files": 1,
+      "bytes": 12849284,
+      "gitignored": true
+    },
+    "assets": {
+      "files": 9,
+      "bytes": 20715500,
+      "gitignored": true
+    },
+    "presentation": {
+      "files": 12,
+      "bytes": 1309890,
+      "gitignored": true
+    },
+    "backups": {
+      "files": 9,
+      "bytes": 100331,
+      "gitignored": true
+    },
+    "validation": {
+      "files": 50,
+      "bytes": 986758,
+      "gitignored": false,
+      "note": "committed: small enough to ship with the repository"
+    },
+    "Claude outputs": {
+      "files": 10,
+      "bytes": 760927,
+      "gitignored": true
+    }
+  },
+  "key_files": {
+    "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact/system/controlDict": {
+      "sha256": "2d655c8538efc956a2e8bdf8d95b4c75358a9ad4c4eb00b1c7251319791f100c",
+      "bytes": 3944
+    },
+    "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact/system/blockMeshDict": {
+      "sha256": "1463d58cb92de5237353d652b9a488599aa41226ff198f979484f90f0feb8ed5",
+      "bytes": 7756
+    },
+    "demo/nozzle_e2e/case_A_reference/acceptance.json": {
+      "sha256": "d4325efcd248130c6152ec3f32e9101091d3e9d6b3ff912e37c46defb6fc3f5e",
+      "bytes": 627
+    },
+    "demo/forward_step_2d/case_B_mach20/agent_result.json": {
+      "sha256": "94f7b2f5fde4b3f4ee24c0e02dc084b73a5ea1aeabf9550277a367e4c54642fc",
+      "bytes": 383
+    },
+    "outputs/airfoil_mesh/nasa_familyII/hierarchy.json": {
+      "sha256": "d0d522b5318863759a73376561fdfca0bff4c9fe6517d45ae192af3ab77a901e",
+      "bytes": 2519
+    }
+  },
+  "committed_extracts": {
+    "cases/cube/drifting_wake/reference/force_history.json": {
+      "sha256": "cab2f902e7966dbc4d9290a86a2d5f135100c0f796618d910f782e30fc033453",
+      "bytes": 555463
+    },
+    "cases/cube/drifting_wake/reference/force_statistics.json": {
+      "sha256": "0178a7f784c98d789668255e447cf980f3af494c443ae44341b264c1882e519d",
+      "bytes": 4917
+    },
+    "cases/cube/drifting_wake/reference/lateral_mode.json": {
+      "sha256": "77d46b57e8cbdba7b3409f7c541cc3a014904a98f03183af4bfb198ea52e8629",
+      "bytes": 623
+    }
+  }
+}

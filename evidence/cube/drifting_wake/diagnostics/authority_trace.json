@@ -1,0 +1,153 @@
+{
+  "family": "cube",
+  "case": "drifting_wake",
+  "started_utc": "2026-09-28T01:46:57Z",
+  "authority_questions": [
+    "family_compatibility",
+    "geometry_admissibility",
+    "mesh_quality",
+    "physical_model",
+    "boundary_condition_consistency",
+    "numerical_health",
+    "conservation",
+    "convergence",
+    "stationarity",
+    "validation",
+    "permitted_actions",
+    "final_decision"
+  ],
+  "model_activities": [
+    "interpret_user_intent",
+    "propose_family_route",
+    "diagnose_evidence",
+    "propose_bounded_action",
+    "explain_result",
+    "draft_narrative"
+  ],
+  "gates": [
+    {
+      "question": "geometry_admissibility",
+      "passed": true,
+      "measured": "FEATURES_EXTRACTED",
+      "threshold": "the geometry must be characterisable",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "family_compatibility",
+      "passed": true,
+      "measured": {
+        "family": "cube",
+        "case": "drifting_wake"
+      },
+      "threshold": "the case must be in the registered library",
+      "detail": "registered case cube/drifting_wake",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "numerical_health",
+      "passed": true,
+      "measured": {
+        "solver_completed": true,
+        "end_time_reached": 79.98
+      },
+      "threshold": "the solver must complete without a fatal error",
+      "detail": "the archived run completed to its requested end time and reported no numerical failure",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "convergence",
+      "passed": true,
+      "measured": {
+        "streamwise_force_drift_fraction": 0.0007529082884745507
+      },
+      "threshold": "drift over the window <= 0.02 of the mean streamwise force",
+      "detail": "the drag looks converged -- this is exactly why watching only the drag would have accepted the run",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "stationarity",
+      "passed": false,
+      "measured": {
+        "lateral_growth_ratio": 2.098378164488468,
+        "mean_abs_fz_first_half": 0.0018326531209671001,
+        "mean_abs_fz_second_half": 0.003845599292119006
+      },
+      "threshold": "lateral force growth ratio <= 1.25",
+      "detail": "a periodic lateral mode is still growing across the assessment window, so the flow is not developed",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "validation",
+      "passed": null,
+      "measured": "not reached",
+      "threshold": "a validated result requires a stationary flow first",
+      "detail": "validation was never attempted: a run that is still developing cannot be compared against a reference",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "permitted_actions",
+      "passed": true,
+      "measured": {
+        "proposed": [
+          "CONTINUE_RUN to let the lateral mode settle"
+        ],
+        "allowed": [
+          "CONTINUE_RUN",
+          "FAIL_SAFELY",
+          "REJECT_UNSUPPORTED"
+        ]
+      },
+      "threshold": "a proposed action must be in the family's registered vocabulary",
+      "detail": "an action outside the vocabulary is refused, not executed",
+      "decided_by": "deterministic"
+    }
+  ],
+  "failed": [
+    "stationarity"
+  ],
+  "unresolved": [
+    "validation"
+  ],
+  "llm_proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic_keyword",
+        "prompt": "run the registered cube case drifting_wake",
+        "proposed_family": "cube",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "cube": [
+            "cube"
+          ]
+        },
+        "confidence_note": "matched on ['cube'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic_keyword",
+      "accepted_by_authority": null,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reaching a statistically steady state",
+      "model": "archived diagnosis",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "CONTINUE_RUN to let the lateral mode settle",
+      "model": "archived diagnosis",
+      "accepted_by_authority": false,
+      "binding": false
+    }
+  ],
+  "verdict": "REJECT",
+  "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+}
