@@ -1,232 +1,247 @@
-# Physics-Constrained Multimodal CFD Agent
+# Physics-Constrained Autonomous CFD Agent
 
-A reproducible research prototype that couples an LLM with deterministic CFD tools for compressible internal nozzle flow.
+A CFD agent in which a language model interprets engineering requests, routes
+them, diagnoses simulation evidence and proposes corrective actions — and in
+which **no model output can accept a result**. Every scientific decision is made
+by deterministic code that the model cannot reach: geometry admissibility, mesh
+quality, numerical health, conservation, convergence, stationarity, validation,
+permitted actions and the final verdict. The contribution is not a faster solver.
+It is an architecture in which an autonomous agent cannot produce a confident
+false acceptance, demonstrated by the cases where it refuses: a three-dimensional
+turbulent run that executed cleanly and was rejected because a lateral flow mode
+was still growing, and a fourth family whose every candidate mesh was refused so
+that no CFD was ever run.
 
-The core design principle is simple:
+---
 
-> **LLM reasoning, deterministic scientific authority.**
-
-The LLM interprets an engineering request, reviews mesh evidence, examines numerical CFD diagnostics and field images, diagnoses the current simulation state, and proposes the next action. Deterministic code decides whether that action is allowed and whether the CFD result is scientifically acceptable.
-
-This repository is intentionally scoped. It is not a universal CFD agent. The demonstrated domain is axisymmetric, inviscid, compressible flow through a converging-diverging nozzle using OpenFOAM Foundation v14.
-
-## What is demonstrated
-
-Three cases use the same parameterized agent pipeline:
-
-| Case | Change | Feedback behavior | Final deterministic result |
-| --- | --- | --- | --- |
-| A | Canonical geometry, p0 = 200 kPa | `CONTINUE_RUN -> ACCEPT` | `PASS_SINGLE_MESH` after 2 CFD iterations |
-| B | Exit radius 35.4 mm -> 37.0 mm | `ACCEPT` | `PASS_SINGLE_MESH` after 1 CFD iteration |
-| C | Reservoir total pressure 200 -> 220 kPa | `ACCEPT` | `PASS_SINGLE_MESH` after 1 CFD iteration |
-
-Case A is deliberately started at 0.001 s in the feedback demonstration so that the first state is physically healthy but not yet stationary. The LLM identifies the incomplete convergence, proposes `CONTINUE_RUN`, the deterministic action gate approves it, and the existing OpenFOAM solution is continued to 0.006 s. The second reasoning step accepts only after the deterministic checks pass.
-
-Cases B and C demonstrate that the same workflow can handle a nearby geometry change and a nearby operating-condition change without hand-editing the OpenFOAM case.
-
-See [`docs/CASES.md`](docs/CASES.md) and [`demo/published_campaign/CAMPAIGN_SUMMARY.json`](demo/published_campaign/CAMPAIGN_SUMMARY.json).
-
-## Agent architecture
+## 1. Architecture
 
 ```mermaid
-flowchart TD
-    A[Natural-language engineering request] --> B[LLM case interpretation]
-    B --> C[Deterministic scope gate]
-    C --> D[Parameterized mesh generation]
-    D --> E[checkMesh + deterministic mesh gate]
-    E --> F[LLM mesh review]
-    F --> G[OpenFOAM setup + verified initialization]
-    G --> H[OpenFOAM shockFluid execution]
-    H --> I[Deterministic numerical diagnostics]
-    I --> J[Native CFD field images]
-    J --> K[Multimodal LLM reasoning]
-    I --> K
-    K --> L[Proposed action]
-    L --> M[Deterministic action validator]
-    M -->|approved non-ACCEPT action| N[Deterministic action executor]
-    N --> H
-    M -->|approved ACCEPT| O[Deterministic scientific validator]
-    O --> P[Engineering report]
+flowchart LR
+    A["prompt<br/>(+ optional STEP)"] --> B[interpreter]
+    B -->|proposal| C[geometry<br/>characterization]
+    C --> D{admissible?}
+    D -->|no| X["INCONCLUSIVE<br/>UNSUPPORTED"]
+    D -->|yes| E[family router]
+    E --> F[registered<br/>contract]
+    F --> G[case + mesh]
+    G --> H[OpenFOAM]
+    H --> I[evidence]
+    I --> J[LLM diagnosis]
+    I --> K[deterministic<br/>authority]
+    J -->|proposed action| K
+    K --> L{permitted?}
+    L -->|yes| M[bounded correction] --> G
+    L -->|no| N["ACCEPT / REJECT<br/>INCONCLUSIVE"]
+    N --> O["report + evidence<br/>plots + contours + video"]
+
+    style B fill:#0d47a1,color:#fff
+    style J fill:#0d47a1,color:#fff
+    style K fill:#1b5e20,color:#fff
+    style N fill:#1b5e20,color:#fff
+    style X fill:#b71c1c,color:#fff
 ```
 
-The LLM can propose high-level actions such as:
+Blue: a language model contributes. Green: deterministic code decides. Details in
+[`docs/architecture.md`](docs/architecture.md) and
+[`docs/scientific_authority.md`](docs/scientific_authority.md).
 
-- `ACCEPT`
-- `CONTINUE_RUN`
-- `REQUEST_DIAGNOSTIC`
-- `REFINE_THROAT`
-- `REFINE_GRADIENT_REGION`
-- `RESTART_CLEAN`
+## 2. What the system does
 
-The LLM does **not** directly edit OpenFOAM dictionaries, invent mesh counts, override conservation thresholds, or declare a failed CFD state acceptable.
+- Interprets a natural-language engineering request into a structured problem
+  statement.
+- Characterises the geometry (parametric today; STEP is classified and refused).
+- Routes to a registered family, and **checks** the route rather than trusting it.
+- Builds the case and mesh under that family's frozen scientific contract.
+- Executes OpenFOAM Foundation v14.
+- Extracts evidence, asks a model to diagnose it, and lets the model propose one
+  of a closed set of corrective actions.
+- Runs every deterministic gate and computes the verdict from the gates alone.
+- Emits a complete artifact directory: report, evidence, diagnostics, plots,
+  contours, video and provenance.
 
-See [`docs/architecture.md`](docs/architecture.md).
+## 3. What it deliberately does **not** claim
 
-## Physics and numerical method
+1. That arbitrary engineering prompts can be simulated. Two families are
+   validated, both inviscid compressible Euler, both 2-D.
+2. That arbitrary CAD can be meshed or solved. **No family accepts STEP.**
+3. That the cube case is a validated simulation of flow over a cube. It was
+   executed and **rejected**.
+4. That the NACA0012 work reproduces NASA results. **No CFD was run** for it,
+   and its rejection rests on in-plane stretching alone — Foundation-v14
+   skewness passes on all three levels, and the orientation and in-plane defects
+   in the first diagnosis were **ours**, not the grid's.
+5. That LLM diagnosis improves accuracy. The claim is narrower: it cannot
+   compromise it, because it cannot overrule the gates.
 
-Current supported physics:
+Full accounting: [`docs/limitations.md`](docs/limitations.md).
 
-- internal axisymmetric converging-diverging nozzle
-- calorically perfect air
-- gamma = 1.4
-- R = 287 J/(kg K)
-- inviscid compressible Euler equations
-- adiabatic slip walls
-- reservoir total-pressure / total-temperature inlet
-- pressure-free computational outlet
-- structured axisymmetric wedge mesh
-- OpenFOAM Foundation v14 `shockFluid`
-- Kurganov fluxes
-- Minmod reconstruction
-- Euler time integration
-- adjustable timestep with maxCo = 0.4 in the demonstrated cases
+## 4. Three headline cases
 
-The nominal 30 kPa downstream pressure is **external-environment metadata** for regime interpretation. It is not imposed as a fixed static pressure at the computational outlet when the computed outlet is fully supersonic.
+| | Family | Case | Outcome | Why it is here |
+|---|---|---|---|---|
+| **F1** | `nozzle` | `canonical_reference` (+2) | **ACCEPTED** | validated acceptance, continuation and correction |
+| **F2** | `forward_step_2d` | `mach20_canonical` (+7) | **ACCEPTED** (5) / **safe stop** (3) | variations, mesh sensitivity, and an inadmissible variation refused |
+| **F3** | `cube` | `drifting_wake` | **RUNTIME REJECTED** | 3-D turbulent execution refused on flow development |
+| S1 | `airfoil` | `mesh_rejection` | **MESH REJECTED, `CFD_NOT_RUN`** | supplementary: in-plane stretching 3.2e7–3.9e7 against a limit of 10,000 |
 
-See [`docs/PHYSICS_SCOPE.md`](docs/PHYSICS_SCOPE.md), [`docs/NUMERICAL_METHOD.md`](docs/NUMERICAL_METHOD.md), and [`docs/REFERENCE_VALIDATION.md`](docs/REFERENCE_VALIDATION.md).
+### The F3 refusal, in numbers
 
-## Quick reproduction on Windows + WSL2
+| Quantity | Measured | Limit | Result |
+|---|---|---|---|
+| Streamwise force drift over the final window | **0.08%** | ≤ 2% | PASS |
+| Mean lateral force / mean drag | 6.3e-4 | ≤ 0.05 | PASS |
+| **Lateral force growth across the window** | **2.10×** | **≤ 1.25×** | **FAIL** |
 
-Validated development environment:
+The lateral force is a periodic mode of period ≈ 10.1 time units whose amplitude
+grew **68×** (1.01e-4 → 6.91e-3) at 0.091 per time unit, e-folding in 11.0, and
+had not saturated when the run ended. Every conventional convergence indicator
+passed; the drag was settled to 0.08%. A pipeline watching the drag would have
+accepted a flow that was still developing.
 
-- Windows
-- Python 3.13 on the host, Python 3.11+ expected
-- WSL2 with Ubuntu 24.04
-- OpenFOAM Foundation v14 at `/opt/openfoam14/etc/bashrc`
-- Python 3 + NumPy available inside WSL
-- a Gemini API key for the current LLM backend
+## 5. Results and status
 
-Create a host virtual environment and install dependencies:
+| Family | Status | Cases | Accepted | Rejected | Solver run |
+|---|---|---|---|---|---|
+| `nozzle` | ACCEPTED | 3 | 3 | 0 | yes |
+| `forward_step_2d` | ACCEPTED | 8 | 5 | 3 | yes |
+| `cube` | RUNTIME_REJECTED | 1 | 0 | 1 | yes |
+| `airfoil` | SUPPLEMENTARY | 1 | 0 | 1 | **no** (`CFD_NOT_RUN`) |
+| `backward_step` | NOT_IMPLEMENTED | 0 | — | — | no |
 
-```powershell
-py -3.13 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
+Replaying all 13 registered cases reproduces every archived verdict — a measured
+**false-acceptance rate of 0.0** and **correct-rejection rate of 1.0** over 13
+runs. This is a **registered-case safety regression / replay-consistency test**,
+not the paper's evaluation, and it says nothing about model generalisation. The
+ablation study is `NOT_RUN`. Details: [`docs/results.md`](docs/results.md).
+
+## 6. Quickstart
+
+```bash
+git clone <this repository> && cd physics-constrained-cfd-agent
 python -m pip install -r requirements.txt
+
+python scripts/run_demo.py --list
+python scripts/run_demo.py --family cube --case drifting_wake --mode replay
 ```
 
-Configure the LLM backend for the current PowerShell session:
+The last command needs no solver and no API key. It re-runs the stationarity gate
+over 2003 archived force samples and prints the rejection with its reasoning.
 
-```powershell
-$env:GEMINI_API_KEY = "YOUR_API_KEY"
-$env:GEMINI_MODEL = "gemini-3.5-flash-lite"
+## 7. Live vs replay
+
+| Mode | Solver | Reads archive | Needs OpenFOAM | Use |
+|---|---|---|---|---|
+| `--mode dry-run` | no | no | no | check routing and the contract |
+| `--mode replay` | no | yes | no | reproduce any registered case |
+| `--mode live` | yes | no | **v14** | execute a new run |
+
+Live execution additionally requires `--i-want-to-run-cfd`. Replay never claims a
+solver ran: every artifact it writes carries `solver_invoked: false`.
+
+## 7a. Agent backends
+
+```bash
+--agent-backend deterministic   # default. No API key. NOT an LLM run.
+--agent-backend gemini          # a real model call; needs GEMINI_API_KEY
+--agent-backend replay          # a recorded model response
 ```
 
-Check the environment:
+The model interprets the request and diagnoses the evidence. Its proposed action
+must be in the family's registered vocabulary or it is refused, and it can never
+reach the verdict. Every call records provider, model, temperature,
+prompt-schema version, the raw response, the proposed action, whether authority
+accepted it, and token counts where the provider reports them. Without a key the
+`gemini` backend **refuses** rather than quietly falling back — a deterministic
+run is never described as an LLM run.
 
-```powershell
-python .\scripts\check_environment.py
+## 8. Natural-language and STEP interface
+
+```bash
+python scripts/run_agent.py --prompt "Simulate a supersonic converging-diverging \
+    nozzle with throat radius 0.01 m" --mode dry-run
+
+python scripts/run_agent.py --prompt "analyse this part" --geometry part.step
 ```
 
-Run the complete demonstrated campaign:
+The second returns **INCONCLUSIVE / UNSUPPORTED** without meshing anything. The
+STEP header and entity histogram are read; no bounding box or characteristic
+dimension is invented; no family declares `step: true`.
+See [`docs/cad_and_step_input.md`](docs/cad_and_step_input.md).
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run_repro_campaign.ps1
+## 9. Reproduction commands
+
+```bash
+# every registered case, replayed
+python scripts/run_demo.py --family nozzle       --case canonical_reference            --mode replay
+python scripts/run_demo.py --family forward_step --case mach20_canonical               --mode replay
+python scripts/run_demo.py --family forward_step --case step_height_030_short_horizon  --mode replay
+python scripts/run_demo.py --family cube         --case drifting_wake                  --mode replay
+python scripts/run_demo.py --family airfoil      --case mesh_rejection                 --mode replay
+
+# or from the case directory
+cd cases/cube/drifting_wake && ./reproduce.sh
+
+# live (requires OpenFOAM Foundation v14)
+python scripts/run_demo.py --family nozzle --case canonical_reference --mode live --i-want-to-run-cfd
 ```
 
-That command runs:
+Each run writes `runs/<timestamp>_<family>_<case>/` with `report/`, `evidence/`,
+`diagnostics/`, `plots/`, `contours/`, `video/`, `provenance.json` and
+`final_decision.json`. Pre-generated copies for the headline cases are committed
+under `evidence/`.
 
-1. Case A with a deliberately short first CFD horizon to exercise the feedback loop.
-2. Case B with the changed exit radius.
-3. Case C with the changed reservoir pressure.
-4. A sanitized combined campaign summary.
+## 10. Evaluation
 
-Runtime outputs are written under `demo/runs/` and are ignored by Git.
-
-For Linux-host instructions and manual per-case commands, see [`docs/reproducibility.md`](docs/reproducibility.md).
-
-## Try your own nearby nozzle request
-
-The natural-language prompt is the real entry point. Start from:
-
-[`examples/nozzle_e2e/PROMPT_TEMPLATE.txt`](examples/nozzle_e2e/PROMPT_TEMPLATE.txt)
-
-and fill in geometry and operating conditions.
-
-The deterministic scope gate currently enforces explicit software bounds on geometry, pressure, temperature, area ratio, pressure ratio, mesh scale, wedge angle, integration horizon, and Courant limit. Those bounds are **guardrails**, not a claim that every point inside them has been experimentally validated.
-
-The demonstrated transfer evidence is local:
-
-- exit radius: 35.4 mm -> 37.0 mm
-- reservoir total pressure: 200 kPa -> 220 kPa
-
-See [`docs/PARAMETER_GUIDE.md`](docs/PARAMETER_GUIDE.md) before trying a new case.
-
-Example custom **closed-loop** prompt:
-
-```powershell
-python .\scripts\run_nozzle_feedback.py `
-    --prompt-file .\examples\nozzle_e2e\PROMPT_TEMPLATE.txt `
-    --out .\demo\runs\custom_nozzle `
-    --end-time 0.006 `
-    --max-end-time 0.020 `
-    --feedback-increment 0.005 `
-    --max-iterations 4 `
-    --max-diagnostic-requests 2 `
-    --require-visuals
+```bash
+python scripts/run_evaluation.py --arm full_agent --mode replay
+python scripts/run_evaluation.py --summarise
 ```
 
-The LLM interprets the new values, the deterministic scope gate checks them, and the same feedback controller is used if the case is admitted.
+Arms: full agent, fixed recipe + fixed rules, agent without deterministic gates,
+gates without diagnosis. Only the first has been run; the others print `NOT_RUN`
+rather than a fabricated zero. See [`evaluation/README.md`](evaluation/README.md).
 
-## Scientific acceptance
+## 11. Adding a family
 
-Final acceptance is deterministic. The validator checks, among other items:
+Five files and a case directory; no change to `src/agent/` or `src/authority/`.
+See [`docs/adding_a_family.md`](docs/adding_a_family.md).
 
-- solver completed normally
-- mesh is valid
-- initialization was verified by read-back
-- no fatal solver errors / NaNs / infinities
-- pressure, temperature, and density remain positive and finite
-- Courant limit is respected
-- requested physical time is reached
-- outlet flow is outward and supersonic
-- inlet behavior is admissible
-- reservoir conditions are respected
-- throat is sonic within the declared criterion
-- mass conservation passes
-- transient continuity passes
-- monitor stationarity passes
-- full-field stationarity passes
-- stagnation enthalpy consistency passes
-- numerical and physical fluxes are consistent
+## 12. Repository layout
 
-The LLM sees a theory-blind evidence packet for its CFD decision. Analytical/quasi-1D targets are withheld from the autonomous decision loop and may be used only for initialization where documented and for post-hoc comparison.
-
-## Repository map
-
-The most important entry points are:
-
-```text
-scripts/run_nozzle_feedback.py   closed-loop multimodal agent
-scripts/run_nozzle_e2e.py        one-pass parameterized A/B/C pipeline
-scripts/run_repro_campaign.ps1   complete demonstrated campaign
-src/pipeline/nozzle/             deterministic nozzle CFD pipeline
-src/reasoning/                   evidence, scope and action guards
-src/agents/                      LLM interpretation/reasoning components
-validation/canonical_reference/  frozen numerical reference campaign
-examples/nozzle_e2e/             natural-language prompts
-configs/nozzles/                 three declared case specifications
-tests/nozzle_e2e/                regression and scientific-equivalence tests
-demo/published_campaign/         compact public result summary
+```
+src/agent/          request interpretation and the pipeline
+src/authority/      the agent/authority boundary, gates, verdicts
+src/geometry/       STEP reading, features, family matching, admissibility
+src/families/       capability declarations, recipes, adapters, per-family gates
+src/pipeline/       per-family build / execute / diagnose / validate
+src/orchestration/  replay and live execution
+src/reporting/      report builder, plots, ParaView contours, video
+src/evaluation/     ablation metrics
+cases/              registered cases: case.yaml, expected_result.json, reproduce.*
+evidence/           pre-generated artifact directories for the headline cases
+demo/, handoff/     archived campaign evidence
+docs/, paper/       documentation and the manuscript outline
+tests/              the test suite
 ```
 
-For a file-by-file explanation, see [`docs/REPO_GUIDE.md`](docs/REPO_GUIDE.md).
+## 13. Scientific limitations
 
-## Tests
+Two validated families, both inviscid and 2-D. No turbulent validation: the one
+turbulent family that executed was rejected. No STEP support. No quantified
+grid-convergence index, no uncertainty quantification. Live results are claimed
+only for OpenFOAM Foundation v14. Read
+[`docs/limitations.md`](docs/limitations.md) before citing anything.
 
-Run:
+## 14. Citation
 
-```powershell
-python -m pytest -q
-python .\validation\canonical_reference\test_validation.py
+```bibtex
+@misc{physics_constrained_cfd_agent,
+  title  = {A Physics-Constrained Autonomous CFD Agent with Deterministic
+            Scientific Authority},
+  author = {Oza, Aakash},
+  year   = {2026},
+  note   = {Research artifact; manuscript in preparation.
+            See docs/paper_overview.md and paper/manuscript_outline.md}
+}
 ```
-
-The clean package was assembled from the working closed-loop code after the demonstrated A/B/C campaign and its unit/regression suite passed locally.
-
-## Scope and limitations
-
-This repository provides strong numerical evidence for the declared nozzle problem, but it does not establish universal CFD reliability. It does not currently validate viscous boundary layers, turbulence, heat transfer, arbitrary back-pressure branches, external jets, real-gas effects, or general three-dimensional geometries.
-
-Case B and Case C are single-grid transfer demonstrations, not new grid-convergence studies. The canonical reference campaign contains the mesh and numerical-control sensitivity evidence.
-
-See [`docs/limitations.md`](docs/limitations.md).

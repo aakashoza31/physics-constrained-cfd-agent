@@ -1,0 +1,16 @@
+{
+  "case_id": "mesh_sensitivity",
+  "family": "forward_step",
+  "original_id": "case_I_mesh_sensitivity",
+  "expected": {
+    "verdict": "REJECT",
+    "archived_status": "STOPPED_ACTION_REFUSED",
+    "validation_status": null,
+    "iterations": 2,
+    "failed_checks": [],
+    "message": "ACCEPT refused: ACCEPT refused: this request asked for a numerical-sensitivity assessment, and the registered cross-grid requirement is not met (SENSITIVITY_CRITERION_NOT_REGISTERED). NOT REGISTERED. No cross-grid tolerance exists in this repository: validate.py lists mesh independence under 'unresolved' and disclaims a mesh-independence claim, and no reference package for this family is present from which a published band could be adopted. The comparison is measured and reported; the verdict is withheld until a criterion is supplied. No tolerance is invented here.",
+    "solver_invoked_in_archive": true
+  },
+  "source_of_truth": "demo/forward_step_2d/case_I_mesh_sensitivity",
+  "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+}

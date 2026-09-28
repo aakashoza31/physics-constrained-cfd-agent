@@ -336,6 +336,31 @@ class FoamRuntime:
         local_path.write_text(result.stdout, encoding="utf-8")
         return True
 
+    def fetch_head(
+        self, runtime_path: PurePosixPath, local_path: Path, lines: int = 400
+    ) -> bool:
+        """Copy the opening of a large runtime log to the host.
+
+        The head carries the build banner, the case path, the signal-handler
+        configuration and any dictionary error raised before the time loop
+        starts. Fetching it alongside the tail means a returned run directory
+        contains both ends of the solver log, which is what a later audit of a
+        log-derived check needs.
+        """
+        result = self.bash(
+            f'test -f {shlex.quote(str(runtime_path))} && '
+            f'head -n {int(lines)} -- {shlex.quote(str(runtime_path))}',
+            foam=False,
+            timeout=300,
+        )
+
+        if not result.ok:
+            return False
+
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+        local_path.write_text(result.stdout, encoding="utf-8")
+        return True
+
     def fetch(self, runtime_path: PurePosixPath, local_path: Path) -> bool:
         """Copy one runtime text file to the host. Returns False if absent."""
         result = self.bash(

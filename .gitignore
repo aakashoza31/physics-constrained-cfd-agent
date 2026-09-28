@@ -31,3 +31,25 @@ demo/nozzle_feedback/
 demo/nozzle_feedback_final/
 demo/nozzle_feedback_v2/
 demo/nozzle_feedback_v2_hotfix/
+
+# --- paper-repo consolidation -------------------------------------------
+# Large archived CFD evidence and generated assets stay out of git. Their
+# inventory and digests are committed in manifests/large_assets.json, and the
+# small extracted series each registered case needs live in
+# cases/<family>/<case>/reference/ and evidence/.
+handoff/
+outputs/
+build/
+backups/
+assets/
+demo/
+presentation/
+Claude outputs/
+evaluation/records/
+*.tar.gz
+
+# The canonical-reference validation records ARE the reference the nozzle tests
+# read. They are small (420 KB of JSON/CSV) and must ship, so they are excepted
+# from the blanket results/ rule above.
+!validation/canonical_reference/results/
+!validation/canonical_reference/results/**

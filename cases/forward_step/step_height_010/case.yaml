@@ -1,0 +1,11 @@
+case_id: "step_height_010"
+original_id: "case_E_step010"
+family: "forward_step"
+title: "Reduced step height 0.10"
+purpose: "accepted geometry variation"
+evidence_root: "demo/forward_step_2d/case_E_step010"
+evidence_present: true
+config: null
+related_campaigns: []
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

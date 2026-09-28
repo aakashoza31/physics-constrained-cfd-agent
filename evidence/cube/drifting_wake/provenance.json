@@ -1,0 +1,27 @@
+{
+  "report_version": "report-builder/1.0.0",
+  "generated_utc": "2026-09-28T03:04:17Z",
+  "prompt": "run the registered cube case drifting_wake",
+  "mode": "replay",
+  "family": "cube",
+  "case": "drifting_wake",
+  "solver_invoked": false,
+  "solver": "OpenFOAM Foundation v14",
+  "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+  "case_directory": "cases/cube/drifting_wake",
+  "python": "3.10.12",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "git_commit": "NOT_AVAILABLE",
+  "pipeline_stages": [
+    "request_interpretation",
+    "geometry_characterization",
+    "family_routing",
+    "family_contract",
+    "case_and_mesh",
+    "execution",
+    "evidence_extraction",
+    "llm_diagnosis",
+    "bounded_correction"
+  ],
+  "note": "a replay reads archived evidence and re-derives the decision; it never implies that a solver was executed"
+}

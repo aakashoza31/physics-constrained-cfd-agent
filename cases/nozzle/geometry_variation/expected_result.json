@@ -1,0 +1,17 @@
+{
+  "case_id": "geometry_variation",
+  "family": "nozzle",
+  "original_id": "case_B_geometry",
+  "expected": {
+    "verdict": "ACCEPT",
+    "archived_status": "PASS_SINGLE_MESH",
+    "failed_checks": [],
+    "llm_diagnosis": "ACCEPTABLE",
+    "llm_proposed_action": "ACCEPT",
+    "llm_action_approved": true,
+    "authority": "deterministic validator (src/pipeline/nozzle/validate.py)",
+    "solver_invoked_in_archive": true
+  },
+  "source_of_truth": "demo/nozzle_e2e/case_B_geometry",
+  "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+}

@@ -1,0 +1,529 @@
+{
+  "report_version": "report-builder/1.0.0",
+  "decision": {
+    "verdict": "ACCEPT",
+    "reason": "replayed from archived evidence: the run recorded PASS_SINGLE_MESH. No solver was executed by this replay.",
+    "family": "nozzle",
+    "case": "canonical_reference",
+    "failed_gates": [],
+    "unresolved_gates": [],
+    "decided_by": "deterministic_authority",
+    "llm_override_possible": false
+  },
+  "run": {
+    "pipeline_version": "agent-pipeline/1.0.0",
+    "started_utc": "2026-09-28T03:03:46Z",
+    "prompt": "run the registered nozzle case canonical_reference",
+    "mode": "replay",
+    "family": "nozzle",
+    "case": "canonical_reference",
+    "interpretation": {
+      "interpreter_version": "request-interpreter/1.0.0",
+      "interpreter": "deterministic",
+      "prompt": "run the registered nozzle case canonical_reference",
+      "proposed_family": "nozzle",
+      "parameters": {},
+      "operating_conditions": {},
+      "geometry_source": "parametric",
+      "keyword_hits": {
+        "nozzle": [
+          "nozzle"
+        ]
+      },
+      "confidence_note": "matched on ['nozzle'] | family supplied explicitly by the caller",
+      "binding": false,
+      "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+    },
+    "stages": [
+      {
+        "stage": "request_interpretation",
+        "status": "PROPOSED",
+        "decided_by": "deterministic",
+        "detail": {
+          "proposed_family": "nozzle",
+          "parameters": {}
+        }
+      },
+      {
+        "stage": "geometry_characterization",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "source": "parametric",
+          "geometry_status": "FEATURES_EXTRACTED",
+          "reason": ""
+        }
+      },
+      {
+        "stage": "family_routing",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "selected": "nozzle",
+          "replay": true,
+          "detail": "registered case nozzle/canonical_reference"
+        }
+      },
+      {
+        "stage": "family_contract",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "family_status": "ACCEPTED",
+          "routable": true
+        }
+      },
+      {
+        "stage": "case_and_mesh",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "source": "registered case",
+          "case_dir": "cases/nozzle/canonical_reference"
+        }
+      },
+      {
+        "stage": "execution",
+        "status": "REPLAYED",
+        "decided_by": "deterministic",
+        "detail": {
+          "solver_invoked": false,
+          "note": "archived evidence was read; no solver was launched"
+        }
+      },
+      {
+        "stage": "evidence_extraction",
+        "status": "OK",
+        "decided_by": "deterministic",
+        "detail": {
+          "evidence_root": "demo/nozzle_e2e/case_A_reference"
+        }
+      },
+      {
+        "stage": "llm_diagnosis",
+        "status": "PROPOSED",
+        "decided_by": "deterministic",
+        "detail": {
+          "proposals": 2
+        }
+      },
+      {
+        "stage": "bounded_correction",
+        "status": "SKIPPED",
+        "decided_by": "deterministic",
+        "detail": {
+          "reason": "replay does not issue new corrective actions"
+        }
+      }
+    ],
+    "stopped_at": "execution",
+    "authority_trace": {
+      "family": "nozzle",
+      "case": "canonical_reference",
+      "started_utc": "2026-09-28T03:03:46Z",
+      "authority_questions": [
+        "family_compatibility",
+        "geometry_admissibility",
+        "mesh_quality",
+        "physical_model",
+        "boundary_condition_consistency",
+        "numerical_health",
+        "conservation",
+        "convergence",
+        "stationarity",
+        "validation",
+        "permitted_actions",
+        "final_decision"
+      ],
+      "model_activities": [
+        "interpret_user_intent",
+        "propose_family_route",
+        "diagnose_evidence",
+        "propose_bounded_action",
+        "explain_result",
+        "draft_narrative"
+      ],
+      "gates": [
+        {
+          "question": "geometry_admissibility",
+          "passed": true,
+          "measured": "FEATURES_EXTRACTED",
+          "threshold": "the geometry must be characterisable",
+          "detail": "",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "family_compatibility",
+          "passed": true,
+          "measured": {
+            "family": "nozzle",
+            "case": "canonical_reference"
+          },
+          "threshold": "the case must be in the registered library",
+          "detail": "registered case nozzle/canonical_reference",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "numerical_health",
+          "passed": true,
+          "measured": {
+            "archived_status": "PASS_SINGLE_MESH"
+          },
+          "threshold": "the solver must complete without a fatal error",
+          "detail": "read from the archived run record",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "conservation",
+          "passed": true,
+          "measured": {
+            "failed_checks": []
+          },
+          "threshold": "the family's registered conservation criterion",
+          "detail": "re-read from the archived validation record",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "convergence",
+          "passed": true,
+          "measured": {
+            "iterations": null
+          },
+          "threshold": "the family's registered convergence criterion",
+          "detail": "",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "validation",
+          "passed": true,
+          "measured": {
+            "validation_status": "PASS_SINGLE_MESH",
+            "failed_checks": []
+          },
+          "threshold": "every registered validation check must pass",
+          "detail": "",
+          "decided_by": "deterministic"
+        },
+        {
+          "question": "permitted_actions",
+          "passed": true,
+          "measured": {
+            "proposed": [
+              "ACCEPT"
+            ],
+            "allowed": [
+              "ACCEPT",
+              "CONTINUE_RUN",
+              "REFINE_MESH",
+              "REQUEST_CLARIFICATION",
+              "REJECT_UNSUPPORTED",
+              "FAIL_SAFELY"
+            ]
+          },
+          "threshold": "a proposed action must be in the family's registered vocabulary",
+          "detail": "an action outside the vocabulary is refused, not executed",
+          "decided_by": "deterministic"
+        }
+      ],
+      "failed": [],
+      "unresolved": [],
+      "llm_proposals": [
+        {
+          "activity": "interpret_user_intent",
+          "content": {
+            "interpreter_version": "request-interpreter/1.0.0",
+            "interpreter": "deterministic",
+            "prompt": "run the registered nozzle case canonical_reference",
+            "proposed_family": "nozzle",
+            "parameters": {},
+            "operating_conditions": {},
+            "geometry_source": "parametric",
+            "keyword_hits": {
+              "nozzle": [
+                "nozzle"
+              ]
+            },
+            "confidence_note": "matched on ['nozzle'] | family supplied explicitly by the caller",
+            "binding": false,
+            "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+          },
+          "model": "deterministic",
+          "accepted_by_authority": null,
+          "binding": false
+        },
+        {
+          "activity": "diagnose_evidence",
+          "content": "ACCEPTABLE",
+          "model": "archived diagnosis",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "propose_bounded_action",
+          "content": "ACCEPT",
+          "model": "archived diagnosis",
+          "accepted_by_authority": true,
+          "binding": false
+        }
+      ],
+      "verdict": "ACCEPT",
+      "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+    },
+    "final_decision": {
+      "verdict": "ACCEPT",
+      "reason": "replayed from archived evidence: the run recorded PASS_SINGLE_MESH. No solver was executed by this replay.",
+      "family": "nozzle",
+      "case": "canonical_reference",
+      "failed_gates": [],
+      "unresolved_gates": [],
+      "decided_by": "deterministic_authority",
+      "llm_override_possible": false
+    },
+    "artifacts": {
+      "geometry": {
+        "features_version": "geometry-features/1.0.0",
+        "source": "parametric",
+        "status": "FEATURES_EXTRACTED",
+        "usable": true,
+        "dimensions": {},
+        "characteristic_dimension": null,
+        "characteristic_name": "throat_radius",
+        "topology": {},
+        "provenance": {
+          "origin": "request parameters; geometry is generated from these values, so the features are exact"
+        },
+        "reason": ""
+      },
+      "contract": {
+        "capabilities": {
+          "family": "nozzle",
+          "status": "ACCEPTED",
+          "routable": true,
+          "geometry_inputs": {
+            "parametric": true,
+            "step": false,
+            "step_note": "this family meshes a parametric geometry it generates itself; no STEP import, healing or feature-recognition path is implemented for it"
+          },
+          "physics": {
+            "compressible": true,
+            "turbulent": false,
+            "transient": false,
+            "dimensionality": "2-D axisymmetric-equivalent planar",
+            "model": "inviscid compressible (Euler)"
+          },
+          "allowed_actions": [
+            "ACCEPT",
+            "CONTINUE_RUN",
+            "REFINE_MESH",
+            "REQUEST_CLARIFICATION",
+            "REJECT_UNSUPPORTED",
+            "FAIL_SAFELY"
+          ],
+          "characteristic_dimension": "throat_radius",
+          "envelope": {
+            "regime": "supersonic converging-diverging",
+            "validation": "isentropic / normal-shock analytic reference"
+          },
+          "cases": [
+            "canonical_reference",
+            "geometry_variation",
+            "condition_variation"
+          ],
+          "solver": "OpenFOAM Foundation v14",
+          "notes": "F1 headline demonstration; ACCEPTED."
+        },
+        "registered": true,
+        "register_status": "CORE",
+        "recipe_reference": "quasi-1D isentropic compressible-flow theory for a converging-diverging nozzle; frozen canonical case validated analytically",
+        "unresolved_constants": [],
+        "allowed_actions": [
+          "ACCEPT",
+          "CONTINUE_RUN",
+          "REQUEST_DIAGNOSTIC",
+          "REFINE_THROAT",
+          "REFINE_GRADIENT_REGION",
+          "REPAIR_MESH",
+          "RESTART_CLEAN",
+          "REJECT_OUTSIDE_DOMAIN"
+        ]
+      },
+      "evidence_root": "demo/nozzle_e2e/case_A_reference",
+      "evidence_present": true,
+      "archived_record": {
+        "verdict": "ACCEPT",
+        "archived_status": "PASS_SINGLE_MESH",
+        "failed_checks": [],
+        "llm_diagnosis": "ACCEPTABLE",
+        "llm_proposed_action": "ACCEPT",
+        "llm_action_approved": true,
+        "authority": "deterministic validator (src/pipeline/nozzle/validate.py)",
+        "solver_invoked_in_archive": true
+      },
+      "solver_invoked": false,
+      "replay_version": "replay/1.0.0",
+      "case": {
+        "case_dir": "cases/nozzle/canonical_reference",
+        "case_id": "canonical_reference",
+        "original_id": "case_A_reference",
+        "family": "nozzle",
+        "title": "Canonical converging-diverging nozzle",
+        "purpose": "the validated reference case for F1",
+        "evidence_root": "demo/nozzle_e2e/case_A_reference",
+        "evidence_present": true,
+        "config": "configs/nozzles/case_A_reference.yaml",
+        "related_campaigns": [
+          "demo/nozzle_feedback/case_A_reference",
+          "demo/nozzle_feedback_v2/case_A_reference",
+          "demo/nozzle_feedback_v2_hotfix/case_A_reference",
+          "demo/published_campaign/case_A_reference"
+        ],
+        "solver": "OpenFOAM Foundation v14",
+        "builder_version": "case-library/1.0.0",
+        "expected": {
+          "case_id": "canonical_reference",
+          "family": "nozzle",
+          "original_id": "case_A_reference",
+          "expected": {
+            "verdict": "ACCEPT",
+            "archived_status": "PASS_SINGLE_MESH",
+            "failed_checks": [],
+            "llm_diagnosis": "ACCEPTABLE",
+            "llm_proposed_action": "ACCEPT",
+            "llm_action_approved": true,
+            "authority": "deterministic validator (src/pipeline/nozzle/validate.py)",
+            "solver_invoked_in_archive": true
+          },
+          "source_of_truth": "demo/nozzle_e2e/case_A_reference",
+          "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
+        }
+      }
+    },
+    "agent_backend": {
+      "backends_version": "agent-backends/1.0.0",
+      "backend": "deterministic",
+      "calls": [
+        {
+          "stage": "interpretation",
+          "backend": "deterministic",
+          "provider": "",
+          "model": "",
+          "temperature": null,
+          "prompt_schema_version": "agent-prompts/1.0.0",
+          "prompt": "run the registered nozzle case canonical_reference",
+          "raw_response": null,
+          "parsed": {
+            "interpreter_version": "request-interpreter/1.0.0",
+            "interpreter": "deterministic",
+            "prompt": "run the registered nozzle case canonical_reference",
+            "proposed_family": "nozzle",
+            "parameters": {},
+            "operating_conditions": {},
+            "geometry_source": "parametric",
+            "keyword_hits": {
+              "nozzle": [
+                "nozzle"
+              ]
+            },
+            "confidence_note": "matched on ['nozzle']",
+            "binding": false,
+            "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+          },
+          "proposed_action": null,
+          "action_in_vocabulary": null,
+          "authority_accepted": null,
+          "latency_s": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "error": "",
+          "dropped": [],
+          "is_llm": false,
+          "binding": false,
+          "label": "DETERMINISTIC"
+        }
+      ],
+      "llm_calls": 0,
+      "note": "a backend proposes; deterministic authority decides. No model output here altered a threshold or a verdict."
+    },
+    "solver_invoked": false
+  },
+  "evidence": {
+    "convergence": {
+      "question": "convergence",
+      "passed": true,
+      "measured": {
+        "iterations": null
+      },
+      "threshold": "the family's registered convergence criterion",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    "conservation": {
+      "question": "conservation",
+      "passed": true,
+      "measured": {
+        "failed_checks": []
+      },
+      "threshold": "the family's registered conservation criterion",
+      "detail": "re-read from the archived validation record",
+      "decided_by": "deterministic"
+    },
+    "validation": {
+      "question": "validation",
+      "passed": true,
+      "measured": {
+        "validation_status": "PASS_SINGLE_MESH",
+        "failed_checks": []
+      },
+      "threshold": "every registered validation check must pass",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    "stationarity": {
+      "status": "NOT_AVAILABLE",
+      "reason": "the stationarity gate was not evaluated in this run (mode: replay)"
+    }
+  },
+  "media": {
+    "plots": [
+      "physics_specific_axial_profile.png",
+      "residuals.png",
+      "convergence.png"
+    ],
+    "contours": [
+      "mach.png",
+      "mesh.png",
+      "pressure.png",
+      "temperature.png",
+      "velocity.png"
+    ],
+    "video": null
+  },
+  "provenance": {
+    "report_version": "report-builder/1.0.0",
+    "generated_utc": "2026-09-28T03:03:48Z",
+    "prompt": "run the registered nozzle case canonical_reference",
+    "mode": "replay",
+    "family": "nozzle",
+    "case": "canonical_reference",
+    "solver_invoked": false,
+    "solver": "OpenFOAM Foundation v14",
+    "evidence_root": "demo/nozzle_e2e/case_A_reference",
+    "case_directory": "cases/nozzle/canonical_reference",
+    "python": "3.10.12",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "git_commit": "NOT_AVAILABLE",
+    "pipeline_stages": [
+      "request_interpretation",
+      "geometry_characterization",
+      "family_routing",
+      "family_contract",
+      "case_and_mesh",
+      "execution",
+      "evidence_extraction",
+      "llm_diagnosis",
+      "bounded_correction"
+    ],
+    "note": "a replay reads archived evidence and re-derives the decision; it never implies that a solver was executed"
+  }
+}

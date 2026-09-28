@@ -1,0 +1,10 @@
+{
+  "question": "convergence",
+  "passed": true,
+  "measured": {
+    "streamwise_force_drift_fraction": 0.0007529082884745507
+  },
+  "threshold": "drift over the window <= 0.02 of the mean streamwise force",
+  "detail": "the drag looks converged -- this is exactly why watching only the drag would have accepted the run",
+  "decided_by": "deterministic"
+}

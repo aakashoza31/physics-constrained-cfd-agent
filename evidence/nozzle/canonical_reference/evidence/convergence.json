@@ -1,0 +1,10 @@
+{
+  "question": "convergence",
+  "passed": true,
+  "measured": {
+    "iterations": null
+  },
+  "threshold": "the family's registered convergence criterion",
+  "detail": "",
+  "decided_by": "deterministic"
+}

@@ -1,0 +1,14 @@
+Simulate a 2D forward-facing step in the validated supersonic channel family
+with an inlet Mach number of 3.0, a step height of 0.30 channel heights,
+and the step located at x = 0.6.
+
+Use the registered inviscid compressible Euler forward-step family and its
+validated OpenFOAM shockFluid numerical recipe.
+
+Construct and run the CFD case from this engineering request, inspect the
+transient numerical diagnostics and native CFD field evidence, take only
+scientifically justified bounded actions if required, and determine whether
+the final result passes deterministic scientific validation.
+
+Report the resulting compression and shock structure, any interventions
+performed by the agent, and the final scientific disposition.

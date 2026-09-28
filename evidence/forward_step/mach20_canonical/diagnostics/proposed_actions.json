@@ -1,0 +1,4 @@
+{
+  "actions": [],
+  "note": "an action outside the family's registered vocabulary is refused by the action validator, not executed"
+}

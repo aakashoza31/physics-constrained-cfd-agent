@@ -1,0 +1,11 @@
+{
+  "question": "validation",
+  "passed": true,
+  "measured": {
+    "validation_status": "PASS_2D_FORWARD_STEP",
+    "failed_checks": []
+  },
+  "threshold": "every registered validation check must pass",
+  "detail": "PASS_2D_FORWARD_STEP",
+  "decided_by": "deterministic"
+}

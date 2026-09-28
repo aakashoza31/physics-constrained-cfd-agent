@@ -1,0 +1,15 @@
+case_id: "canonical_reference"
+original_id: "case_A_reference"
+family: "nozzle"
+title: "Canonical converging-diverging nozzle"
+purpose: "the validated reference case for F1"
+evidence_root: "demo/nozzle_e2e/case_A_reference"
+evidence_present: true
+config: "configs/nozzles/case_A_reference.yaml"
+related_campaigns:
+  - "demo/nozzle_feedback/case_A_reference"
+  - "demo/nozzle_feedback_v2/case_A_reference"
+  - "demo/nozzle_feedback_v2_hotfix/case_A_reference"
+  - "demo/published_campaign/case_A_reference"
+solver: "OpenFOAM Foundation v14"
+builder_version: "case-library/1.0.0"

@@ -1,0 +1,14 @@
+{
+  "verdict": "REJECT",
+  "reason": "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after our own converter defects were corrected, so neither is a NASA-grid failure. No solver was ever launched.",
+  "family": "airfoil",
+  "case": "mesh_rejection",
+  "failed_gates": [
+    "mesh_quality"
+  ],
+  "unresolved_gates": [
+    "numerical_health"
+  ],
+  "decided_by": "deterministic_authority",
+  "llm_override_possible": false
+}

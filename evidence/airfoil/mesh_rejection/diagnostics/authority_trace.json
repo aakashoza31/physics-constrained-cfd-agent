@@ -1,0 +1,166 @@
+{
+  "family": "airfoil",
+  "case": "mesh_rejection",
+  "started_utc": "2026-09-28T03:04:17Z",
+  "authority_questions": [
+    "family_compatibility",
+    "geometry_admissibility",
+    "mesh_quality",
+    "physical_model",
+    "boundary_condition_consistency",
+    "numerical_health",
+    "conservation",
+    "convergence",
+    "stationarity",
+    "validation",
+    "permitted_actions",
+    "final_decision"
+  ],
+  "model_activities": [
+    "interpret_user_intent",
+    "propose_family_route",
+    "diagnose_evidence",
+    "propose_bounded_action",
+    "explain_result",
+    "draft_narrative"
+  ],
+  "gates": [
+    {
+      "question": "geometry_admissibility",
+      "passed": true,
+      "measured": "FEATURES_EXTRACTED",
+      "threshold": "the geometry must be characterisable",
+      "detail": "",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "family_compatibility",
+      "passed": true,
+      "measured": {
+        "family": "airfoil",
+        "case": "mesh_rejection"
+      },
+      "threshold": "the case must be in the registered library",
+      "detail": "registered case airfoil/mesh_rejection",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "mesh_quality",
+      "passed": false,
+      "measured": {
+        "decisive_failure": {
+          "check": "max_in_plane_stretching",
+          "frozen_limit": 10000.0,
+          "levels": {
+            "coarse": {
+              "max": 31734384.049936082,
+              "cells_over_limit": 974,
+              "cells_total": 14336
+            },
+            "medium": {
+              "max": 36320937.1389407,
+              "cells_over_limit": 3924,
+              "cells_total": 57344
+            },
+            "fine": {
+              "max": 38855541.17768772,
+              "cells_over_limit": 15678,
+              "cells_total": 229376
+            }
+          }
+        },
+        "foundation_v14_metrics": {
+          "coarse": {
+            "max_non_orthogonality": 79.7474,
+            "max_skewness": 0.857067,
+            "min_interpolation_weight": 0.123368,
+            "min_face_volume_ratio": 0.162489,
+            "face_tet_checks": {
+              "warning_faces": 72
+            }
+          },
+          "medium": {
+            "max_non_orthogonality": 57.8856,
+            "max_skewness": 0.82043,
+            "min_interpolation_weight": 0.15772,
+            "min_face_volume_ratio": 0.213368,
+            "face_tet_checks": {
+              "warning_faces": 214
+            }
+          },
+          "fine": {
+            "max_non_orthogonality": 31.5684,
+            "max_skewness": 0.727893,
+            "min_interpolation_weight": 0.213019,
+            "min_face_volume_ratio": 0.301691,
+            "face_tet_checks": {
+              "warning_faces": 625
+            }
+          }
+        },
+        "failed_checks": [
+          "max_in_plane_stretching",
+          "max_non_orthogonality"
+        ]
+      },
+      "threshold": "max_in_plane_stretching <= 10000.0",
+      "detail": "the decisive genuine failure is in-plane stretching, measured on the correctly selected constant-span flow-plane quad. Foundation-v14 skewness PASSES on all three levels, and cell orientation and in-plane validity are clean once our own converter defects are corrected -- neither is a NASA-grid failure.",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "numerical_health",
+      "passed": null,
+      "measured": "CFD_NOT_RUN",
+      "threshold": "not reachable without a qualified mesh",
+      "detail": "no solver was launched for this family",
+      "decided_by": "deterministic"
+    },
+    {
+      "question": "permitted_actions",
+      "passed": true,
+      "measured": {
+        "proposed": [],
+        "allowed": [
+          "FAIL_SAFELY",
+          "REJECT_UNSUPPORTED"
+        ]
+      },
+      "threshold": "a proposed action must be in the family's registered vocabulary",
+      "detail": "an action outside the vocabulary is refused, not executed",
+      "decided_by": "deterministic"
+    }
+  ],
+  "failed": [
+    "mesh_quality"
+  ],
+  "unresolved": [
+    "numerical_health"
+  ],
+  "llm_proposals": [
+    {
+      "activity": "interpret_user_intent",
+      "content": {
+        "interpreter_version": "request-interpreter/1.0.0",
+        "interpreter": "deterministic",
+        "prompt": "run the registered airfoil case mesh_rejection",
+        "proposed_family": "airfoil",
+        "parameters": {},
+        "operating_conditions": {},
+        "geometry_source": "parametric",
+        "keyword_hits": {
+          "airfoil": [
+            "airfoil"
+          ]
+        },
+        "confidence_note": "matched on ['airfoil'] | family supplied explicitly by the caller",
+        "binding": false,
+        "note": "an interpretation is a PROPOSAL; family compatibility and geometry admissibility are decided by deterministic code"
+      },
+      "model": "deterministic",
+      "accepted_by_authority": null,
+      "binding": false
+    }
+  ],
+  "verdict": "REJECT",
+  "rule": "the verdict is computed from the gates alone; a model proposal is recorded but never binding"
+}

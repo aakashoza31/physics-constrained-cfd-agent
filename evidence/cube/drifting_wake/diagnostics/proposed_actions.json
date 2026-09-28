@@ -1,0 +1,12 @@
+{
+  "actions": [
+    {
+      "activity": "propose_bounded_action",
+      "content": "CONTINUE_RUN to let the lateral mode settle",
+      "model": "archived diagnosis",
+      "accepted_by_authority": false,
+      "binding": false
+    }
+  ],
+  "note": "an action outside the family's registered vocabulary is refused by the action validator, not executed"
+}

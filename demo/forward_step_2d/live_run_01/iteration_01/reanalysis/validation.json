@@ -1,0 +1,191 @@
+{
+  "status": "PASS_2D_FORWARD_STEP",
+  "family": "forward_step_2d",
+  "failed_checks": [],
+  "hard_checks": {
+    "solver_completed": true,
+    "no_fatal_error": true,
+    "mesh_ok": true,
+    "two_solution_directions": true,
+    "mesh_stage_clean": true,
+    "cell_count_matches_spec": true,
+    "expected_boundaries_present": true,
+    "planar_empty_patches": true,
+    "fixed_recipe_unchanged": true,
+    "finite_all_saved": true,
+    "positive_all_saved": true,
+    "positive_every_step": true,
+    "courant_finite_positive": true,
+    "supersonic_inlet": true,
+    "initial_state_as_specified": true,
+    "impermeable_walls": true,
+    "transient_mass_closure": true
+  },
+  "shock_compression": {
+    "p_rises_across_front": true,
+    "rho_rises_across_front": true,
+    "T_rises_across_front": true
+  },
+  "horizon": {
+    "requested_end_time": 4.0,
+    "final_time": 4.0,
+    "reached": true,
+    "saved_states": 40,
+    "solver_runs": 1,
+    "continuation_used": false
+  },
+  "measured": {
+    "fatal_scan": {
+      "status": "MEASURED",
+      "data": {
+        "fatal_error": false,
+        "hits": [],
+        "scan": {
+          "logs_scanned": [
+            {
+              "log": "log.foamRun.tail",
+              "bytes": 203657,
+              "excerpt": true
+            }
+          ],
+          "solver_log": "log.foamRun.tail",
+          "solver_log_bytes": 203657,
+          "solver_log_complete": false,
+          "signatures_checked": [
+            "foam_fatal_io_error",
+            "foam_fatal_error",
+            "foam_error_stack",
+            "sigfpe_trapped",
+            "sigsegv_trapped",
+            "floating_point_exception",
+            "segmentation_fault",
+            "core_dumped",
+            "abnormal_termination",
+            "non_finite_value"
+          ],
+          "benign_excluded": "FOAM_SIGFPE / sigSegv / sigInt / sigQuit startup banner",
+          "end_line_present": true,
+          "partial_log_note": "Only excerpts of the solver log are present in this run directory. Normal termination is established independently by the executor record (return code 0, status COMPLETED) and by the terminating 'End' line: OpenFOAM writes End only after the time loop completes, and a FOAM FATAL ERROR aborts the process before it, so the two cannot coexist. For a scan over the complete log, reanalyse the runtime case directory with --case."
+        }
+      },
+      "note": "Specific OpenFOAM fatal signatures, searched on the raw solver log only. The FOAM_SIGFPE startup banner announces that exception trapping is enabled and is excluded: it is normal Foundation startup output, not a trapped exception."
+    },
+    "courant": {
+      "status": "MEASURED",
+      "data": {
+        "target": 0.2,
+        "time_loop_max": 0.2019853283885892,
+        "last": 0.1805601936876798,
+        "samples": 5895
+      },
+      "note": "maxCo is a controller target, not a strict per-step cap. Small overshoots are expected and are not graded."
+    },
+    "transient_conservation": {
+      "status": "MEASURED",
+      "data": {
+        "final_inlet": 0.3500013642665481,
+        "final_outlet": 0.32872827225243983,
+        "instantaneous_mismatch_fraction": -0.06078002598272009,
+        "relative_residual_max": 3.858263736691906e-11,
+        "relative_residual_p99": 2.5086719956570165e-11,
+        "cumulative_defect_fraction_initial_mass": 8.718641148077654e-14,
+        "cumulative_defect_max_abs_fraction": 1.1161137300887523e-13,
+        "impermeable_flux_max_abs": 1.7780915628762273e-17,
+        "note": "Mass closure only. shockFluid's momentum/energy boundary fluxes are local predictor temporaries, so no momentum or energy closure is claimed."
+      }
+    },
+    "transient_evolution": {
+      "status": "MEASURED_NOT_REQUIRED_STEADY",
+      "data": {
+        "p": {
+          "relative_L2": 0.03578906948176809,
+          "relative_Linf": 0.20287493132036144
+        },
+        "rho": {
+          "relative_L2": 0.02742719173751326,
+          "relative_Linf": 0.1723813153530898
+        },
+        "T": {
+          "relative_L2": 0.014079368217371137,
+          "relative_Linf": 0.21681520204563226
+        },
+        "U": {
+          "relative_L2": 0.019789509840974277,
+          "relative_Linf": 0.3536131934493276
+        }
+      },
+      "note": "The canonical forward-step solution is still evolving at t = 4. No stationarity criterion is applied to this family."
+    },
+    "shock_structure": {
+      "status": "MEASURED",
+      "data": {
+        "available": true,
+        "upper_stem_x": 0.7375000000000002,
+        "regional_angle_deg": 61.34243645186172,
+        "qualification": "Gradient-based regional measurements on a moving, curved shock system. Not an exact stationary-shock interpretation and not a grid-converged measurement.",
+        "lower_front_x": 0.34062500000000007,
+        "sample_counts": [
+          24,
+          16
+        ],
+        "jumps": {
+          "p": 7.491963903057417,
+          "rho": 3.4434221049317926,
+          "T": 2.1756504294115264
+        },
+        "sample_upstream_Mach": 2.5000078679923923,
+        "stationary_normal_shock_sanity": {
+          "p": 7.125041307014725,
+          "rho": 3.3333508177884177,
+          "T": 2.1375011801914043,
+          "note": "Sanity reference for a stationary normal shock; not an acceptance band."
+        }
+      }
+    },
+    "field_ranges": {
+      "status": "MEASURED",
+      "data": {
+        "p": [
+          0.04922088908052804,
+          8.517730829471212
+        ],
+        "rho": [
+          0.08616491078695113,
+          5.444225766930155
+        ],
+        "T": [
+          0.7744786237383571,
+          2.258301901429935
+        ],
+        "speed": [
+          0.03828074758599033,
+          2.6262373210241883
+        ],
+        "Mach": [
+          0.025473626526530974,
+          2.887364080945679
+        ]
+      }
+    },
+    "mesh_quality": {
+      "status": "MEASURED",
+      "data": {
+        "max_nonorthogonality": 0.0,
+        "max_skewness": 2.123155977418898e-13,
+        "max_aspect_ratio": 1.000000000000158
+      }
+    }
+  },
+  "reference_comparison": {
+    "status": "PENDING_NO_REFERENCE_PACKAGE",
+    "note": "The trusted 2D reference evidence package is not present in this repository. No reference numbers are invented. Supply a reference .npz to enable this comparison."
+  },
+  "canonical_case": false,
+  "unresolved": [
+    "Mesh and time-step independence for this family",
+    "Exact numerical momentum and energy boundary-flux closure",
+    "Independent quantitative benchmark uncertainty",
+    "Corner-singularity sensitivity at the step shoulder"
+  ],
+  "claim_boundary": "Within the registered 2D forward-step Euler family only. This is not a general CFD validity claim, not a mesh-independence claim, not a steady-state claim and not experimental validation."
+}

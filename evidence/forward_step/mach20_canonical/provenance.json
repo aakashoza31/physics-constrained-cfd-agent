@@ -1,0 +1,27 @@
+{
+  "report_version": "report-builder/1.0.0",
+  "generated_utc": "2026-09-28T03:03:54Z",
+  "prompt": "run the registered forward_step case mach20_canonical",
+  "mode": "replay",
+  "family": "forward_step_2d",
+  "case": "mach20_canonical",
+  "solver_invoked": false,
+  "solver": "OpenFOAM Foundation v14",
+  "evidence_root": "demo/forward_step_2d/case_B_mach20",
+  "case_directory": "cases/forward_step/mach20_canonical",
+  "python": "3.10.12",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "git_commit": "NOT_AVAILABLE",
+  "pipeline_stages": [
+    "request_interpretation",
+    "geometry_characterization",
+    "family_routing",
+    "family_contract",
+    "case_and_mesh",
+    "execution",
+    "evidence_extraction",
+    "llm_diagnosis",
+    "bounded_correction"
+  ],
+  "note": "a replay reads archived evidence and re-derives the decision; it never implies that a solver was executed"
+}
