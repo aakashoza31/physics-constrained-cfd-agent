@@ -11,3 +11,4 @@ pydantic>=2.0
 #   h5py>=3.0          reading the NASA CGNS grids (supplementary S1 only)
 #   gmsh>=4.11         the archived Gmsh mesh generator (historical)
 #   google-genai       the --agent-backend gemini path (needs GEMINI_API_KEY)
+#   imageio-ffmpeg      MP4 history encoder when ffmpeg is not on the host PATH

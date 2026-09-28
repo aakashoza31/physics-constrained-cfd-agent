@@ -77,7 +77,7 @@ def test_a_steady_case_gets_no_fabricated_time_evolution(tmp_path):
     run = run_pipeline("replay nozzle", mode=REPLAY, family="nozzle",
                        case="canonical_reference")
     name = visuals.make_video(run, tmp_path / "video")
-    status = json.loads((tmp_path / "video" / "video_status.json").read_text())
+    status = json.loads((tmp_path / "video" / "history_status.json").read_text())
     if name is None:
         assert status["status"] == visuals.NOT_AVAILABLE
         assert "nothing to animate" in status["reason"]
@@ -111,7 +111,7 @@ def test_the_cube_animation_is_not_presented_as_a_flow_field(tmp_path):
     run = run_pipeline("replay cube", mode=REPLAY, family="cube",
                        case="drifting_wake")
     name = visuals.make_video(run, tmp_path / "video")
-    status = json.loads((tmp_path / "video" / "video_status.json").read_text())
+    status = json.loads((tmp_path / "video" / "history_status.json").read_text())
     assert name, "the archived force history must still produce an animation"
     assert status["status"] == "RENDERED"
     assert status["is_flow_field_animation"] is False

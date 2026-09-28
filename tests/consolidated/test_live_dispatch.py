@@ -42,10 +42,10 @@ class RecordingDispatch:
 def test_the_runner_command_is_the_validated_family_runner():
     command = live.build_command("nozzle", "a prompt", Path("/tmp/x"))
     assert command[0] == sys.executable
-    assert command[1].endswith("scripts/run_nozzle_e2e.py")
+    assert Path(command[1]).as_posix().endswith("scripts/run_nozzle_e2e.py")
     assert "--prompt" in command and "--out" in command
     command = live.build_command("forward_step_2d", "a prompt", Path("/tmp/x"))
-    assert command[1].endswith("scripts/run_forward_step_2d.py")
+    assert Path(command[1]).as_posix().endswith("scripts/run_forward_step_2d.py")
     assert "--request" in command
 
 

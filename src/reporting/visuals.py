@@ -331,7 +331,7 @@ def make_contours(run: Any, out_dir: Path) -> List[str]:
     return []
 
 
-def make_video(run: Any, out_dir: Path) -> Optional[str]:
+def make_history_video(run: Any, out_dir: Path) -> Optional[str]:
     """Animate what genuinely evolves. Never invent time for a steady solver."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -347,8 +347,8 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
         # A transient family without forces may still have a time-resolved
         # front history. Animate that, and say which quantity it is.
         root = (run.artifacts or {}).get("evidence_root")
-        shock = (next(iter(sorted(Path(root).glob(
-            "iteration_*/shock_front_history.csv"))), None) if root else None)
+        shock = (next(iter(sorted(Path(root).rglob(
+            "shock_front_history.csv"))), None) if root else None)
         if shock is not None:
             header, rows = _csv(shock)
             index = {name: i for i, name in enumerate(header)}
@@ -360,11 +360,29 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
                            for r in rows]
                 series_label = "shock front"
     if not samples:
+        # Compact tracked evidence may retain the genuine historical animation
+        # but not its source CSV. Preserve it only when its manifest explicitly
+        # identifies it as a history, never as a field movie.
+        from src.reporting.report_builder import REPO_ROOT
+        case_dir = ((run.artifacts or {}).get('case') or {}).get('case_dir')
+        if case_dir:
+            parts = Path(case_dir).parts
+            archived = REPO_ROOT / 'evidence' / parts[-2] / parts[-1] / 'video'
+            try:
+                old = json.loads((archived/'video_status.json').read_text())
+                if old.get('is_flow_field_animation') is False and (archived/'simulation.mp4').is_file():
+                    shutil.copyfile(archived/'simulation.mp4', out_dir/'history_evolution.mp4')
+                    old.update(file='history_evolution.mp4', source='tracked archived history animation',
+                               status='ARCHIVED_HISTORY', is_flow_field_animation=False)
+                    _record(out_dir/'history_status.json',old)
+                    return 'history_evolution.mp4'
+            except (OSError, ValueError, IndexError):
+                pass
         status["reason"] = (
             "no time-resolved series is archived for this case, so there is "
             "nothing to animate. A steady solver never receives a fabricated "
             "time evolution here.")
-        _record(out_dir / "video_status.json", status)
+        _record(out_dir / "history_status.json", status)
         return None
 
     try:
@@ -372,7 +390,7 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
         import matplotlib.animation as animation
     except Exception as exc:                        # noqa: BLE001
         status["reason"] = f"matplotlib unavailable: {exc}"
-        _record(out_dir / "video_status.json", status)
+        _record(out_dir / "history_status.json", status)
         return None
 
     times = [s["t"] for s in samples]
@@ -400,7 +418,7 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
     title = ax1.set_title("")
 
     step = max(1, len(times) // 200)
-    frames = list(range(step, len(times), step))
+    frames = sorted(set([1, *range(step, len(times), step), len(times)]))
 
     def update(index: int):
         line1.set_data(times[:index], fx[:index])
@@ -410,14 +428,22 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
         return line1, line2, title
 
     anim = animation.FuncAnimation(fig, update, frames=frames, blit=False)
-    target = out_dir / "simulation.mp4"
-    writer = "ffmpeg" if shutil.which("ffmpeg") else None
+    target = out_dir / "history_evolution.mp4"
+    encoder = shutil.which("ffmpeg")
+    if not encoder:
+        try:
+            import imageio_ffmpeg
+            encoder = imageio_ffmpeg.get_ffmpeg_exe()
+        except ImportError:
+            pass
+    writer = "ffmpeg" if encoder else None
     try:
         if writer:
+            plt.rcParams['animation.ffmpeg_path'] = encoder
             anim.save(target, writer=writer, fps=25, dpi=120)
             name = target.name
         else:
-            target = out_dir / "simulation.gif"
+            target = out_dir / "history_evolution.gif"
             anim.save(target, writer="pillow", fps=20, dpi=100)
             name = target.name
         status.update({"status": "RENDERED", "file": name, "represents": label,
@@ -433,7 +459,7 @@ def make_video(run: Any, out_dir: Path) -> Optional[str]:
         name = None
     finally:
         plt.close(fig)
-    _record(out_dir / "video_status.json", status)
+    _record(out_dir / "history_status.json", status)
     return name if status["status"] == "RENDERED" else None
 
 
@@ -529,3 +555,7 @@ def _physics_plots(run: Any, out_dir: Path, plt, missing: List[str]) -> List[str
                 plt.close(fig)
                 written.append("conservation.png")
     return written
+
+
+# Compatibility API: this produces only an explicitly named history animation.
+make_video = make_history_video
