@@ -253,7 +253,12 @@ combined with inlet-total-condition, sonic-throat
 stagnation-enthalpy, and flux-consistency checks, twenty checks in total.
 The accepted parameterized run is classified as
 \texttt{PASS\_SINGLE\_MESH}; it is not itself a grid-convergence
-study.
+study. The family recipe was frozen beforehand from a manually constructed,
+LLM-free reference campaign of the same nozzle on four systematically refined
+wedge meshes ($132\times16$ to $330\times40$ cells) and three control cases
+(halved Courant number, halved wedge angle, and a 2\% startup-pressure
+perturbation), whose acceptance required last-pair changes below $0.5\%$ and
+control changes below $0.2\%$.
 
 \subsection{Mach-2 Forward-Facing Step}
 \label{sec:step_setup}
@@ -273,8 +278,12 @@ channel boundaries are symmetry planes. The outlet
 uses zero-gradient pressure with inlet--outlet treatment
 for velocity and temperature. The scheme uses Kurganov
 fluxes, van Leer reconstruction, and Euler time integration,
-copied unchanged from the Foundation forward-step tutorial recipe and
-hash-checked at run time.
+copied unchanged from the Foundation v14 \texttt{shockFluid/forwardStep}
+tutorial and hash-checked at run time. This recipe was frozen after a manual
+reproduction of the Mach-3 tutorial on the same 16,128-cell mesh, whose
+large-scale shock structure is qualitatively consistent with the classical
+problem~\cite{woodward1984strong}; that reproduction is not a quantitative
+or mesh-independent reference solution.
 The target maximum Courant number is 0.2, and the canonical
 simulation advances to normalized time $t=4$, with 40 saved states.
 
@@ -416,6 +425,40 @@ minimum face-normal outlet Mach number is 1.46, so no internal normal shock
 forms and the entire exit plane is supersonic. The exit static pressure,
 53.1\,kPa, exceeds the 30\,kPa nominal ambient pressure, which is consistent
 with an underexpanded nozzle.
+
+The agent-constructed canonical run reproduces the coarsest mesh of the
+LLM-free reference campaign exactly: every reported quantity, the 30,471
+time steps, and the stationarity metrics agree to machine precision. The
+reference refinement study (Table~\ref{tab:nozzle_grid}) passed its
+registered criteria, with last-pair changes of at most $0.41\%$ (throat
+Mach number) and $0.27\%$ (exit pressure). Refinement increases the exit Mach
+number from 1.513 to 1.524 and moves the solution slightly further from
+quasi-one-dimensional theory, to $-3.16\%$ in exit pressure on the finest
+mesh, which is still within the $5\%$ limit. This trend is consistent with
+resolving multidimensional corner effects that the one-dimensional model
+omits. No formal grid-convergence index is reported.
+
+\begin{table}[t]
+\centering
+\caption{Frozen LLM-free nozzle reference campaign: mesh refinement at
+$t=6$\,ms. Mesh 1 is identical to the agent's canonical run. Coarse-mesh
+controls (halved Courant number, halved wedge angle, $2\%$ startup
+perturbation) changed all reported quantities by at most $0.036\%$.}
+\label{tab:nozzle_grid}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Mesh (axial $\times$ radial) & Cells & Throat $M$ & Exit $M$ & Exit $p$ (kPa) & $\dot m$ (kg\,s$^{-1}$) \\
+\midrule
+$132\times16$ & 2,112 & 1.0290 & 1.5133 & 53.14 & 1.5409 \\
+$198\times24$ & 4,752 & 1.0432 & 1.5189 & 52.78 & 1.5378 \\
+$264\times32$ & 8,448 & 1.0512 & 1.5221 & 52.57 & 1.5361 \\
+$330\times40$ & 13,200 & 1.0555 & 1.5244 & 52.43 & 1.5349 \\
+\midrule
+Last-pair change & & $0.41\%$ & $0.15\%$ & $0.27\%$ & $0.07\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Table~\ref{tab:nozzle} lists the deterministic comparison with theory.
 All differences are below $2\%$; the largest is the exit static pressure
@@ -587,8 +630,7 @@ suppress an alternating signal whose amplitude is still growing.
 
 Table~\ref{tab:assessment} summarizes the registered outcomes, and
 Table~\ref{tab:actions} lists recorded decision points in which a model
-proposal met the deterministic action validator. In each case the proposed
-action was consistent with the deterministic evidence and was approved. In
+proposal met the deterministic action validator. In
 the nozzle continuation, the model read the stationarity failures and
 proposed \texttt{CONTINUE\_RUN}. In a Mach-3 step run that was healthy but
 had reached only $t=2$ of the registered $t=4$ horizon, the model proposed
@@ -600,8 +642,20 @@ shock system and proposed \texttt{FAIL\_SAFELY}. This outcome is consistent with
 above, since the post-shock sonic area at Mach 3 (0.719) exceeds the 0.7
 opening. That run was preserved and rejected rather than tuned.
 
+One recorded run shows the validator overruling the model. A Mach-3 request
+asked for a numerical-sensitivity assessment. The model first proposed
+\texttt{REFINE\_MESH}, which was approved under the registered bounded policy
+(linear refinement by a factor of 2, from 4,032 to 16,128 cells, as a fresh
+solve). Both grids then passed their hard checks, and the model proposed
+\texttt{ACCEPT}. The action validator refused this, because no cross-grid
+tolerance is registered for the step family, and the requested sensitivity
+assessment therefore could not be certified. The run ended as
+\texttt{STOPPED\_ACTION\_REFUSED} and is recorded as a rejection, although
+each individual solution was healthy.
+
 These records demonstrate that the interface between model reasoning and
-deterministic authority functions as designed. In every recorded case the
+deterministic authority functions as designed, including when the model's
+proposal is not admissible. In every recorded case the
 terminal verdict was computed by the validators, and continuation or
 extension occurred only through permitted actions. The records do not
 measure whether model reasoning improves on a fixed rule. In these examples
@@ -634,7 +688,7 @@ Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \t
 \begin{table}[t]
 \centering
 \caption{Recorded decision points with genuine model calls
-(\texttt{gemini-3.5-flash-lite}). ``Approved'' denotes a ruling of the
+(\texttt{gemini-3.5-flash-lite}). ``Approved'' and ``Refused'' denote rulings of the
 deterministic action validator; the verdict column is computed by the
 scientific validator.}
 \label{tab:actions}
@@ -652,6 +706,8 @@ Step, Mach 2, $t=4$ & 17/17 hard checks; compression rises measured & \texttt{AC
 Step, Mach 3, $t=2$ of 4 & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Healthy, not final $\rightarrow$ extend \\
 Step, Mach 3, $t=4$ & 17/17 hard checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
 Step, Mach 3, $h=0.3$ & Compression front not measurable & \texttt{FAIL\_SAFELY} & Approved & \texttt{FAIL} (preserved) \\
+Step, Mach 3, sensitivity request, 4,032 cells & Hard checks pass; one grid cannot establish sensitivity & \texttt{REFINE\_MESH} ($\times2$) & Approved & Healthy $\rightarrow$ refine \\
+Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \texttt{ACCEPT} & \textbf{Refused} & \texttt{STOPPED\_ACTION\_\allowbreak REFUSED} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -664,8 +720,10 @@ flows are the validated, routable families. The cube is supporting diagnostic
 evidence and is not routable. Each new physics family requires its own
 scientific contract, and acceptance under a family contract is not a general
 statement of CFD correctness. The accepted runs are single-mesh
-verifications. Grid and time-step independence are not re-established per
-case, and the step case has no quantitative reference-field comparison. The
+verifications. The nozzle family rests on a frozen four-mesh reference
+campaign, but no grid-convergence index is reported, and the step family has
+neither a registered cross-grid criterion nor a quantitative reference-field
+comparison. The
 cube wall treatment is uncertain: at $t^*=80$ the cube-surface $y^+$ has a
 median of 24.7 and a range of 2.8--96.5, with $67\%$ of the area below
 $y^+=30$. A provisional comparison of its evolving mean wake with

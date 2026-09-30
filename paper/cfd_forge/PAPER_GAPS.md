@@ -19,6 +19,16 @@ needs any data movement at all, and none needs a new solver run.
 | 12 | Grid/time-step independence per case not established | Sec. 5 | Stated as a limitation (runs are `PASS_SINGLE_MESH`) | Future compute | n/a | Yes (deferred per Prof. Amir) | Out of scope |
 | 13 | Cube experimental comparison is poor | Sec. 5 | Audit RMSE vs ERCOFTAC centre-line profiles is 0.34–0.68 U_b; stated as a limitation, no validation claimed | `audit_t80/FINAL_ASSESSMENT.md` §10 | Yes | No | Done |
 
+## Added after the full repository read (local clone = `origin/main` at `7aecd4d`, last fetched 2026-09-28 03:38 UTC; GitHub itself is private and not reachable from this session)
+| # | Item | Status |
+|---|------|--------|
+| 14 | The frozen LLM-free nozzle reference campaign (`validation/canonical_reference/results/`, `study.json` = `FINAL_REFERENCE`): 4 meshes up to 13,200 cells plus 3 controls. The agent's canonical run is **bit-identical** to reference mesh 1. | Added to Sec. 3.1, Sec. 4.1 and a new mesh table |
+| 15 | Step recipe provenance: manual reproduction of the Foundation v14 Mach-3 `forwardStep` tutorial (`Codex/.../outputs/forward_step_reference/`; this is **outside the repo**) | One sentence in Sec. 3.2; consider committing that package or a digest of it |
+| 16 | `mesh_sensitivity` (`case_I`): model ACCEPT **refused** by the action validator (no registered cross-grid tolerance) → `STOPPED_ACTION_REFUSED` | Added to Sec. 4.4 and Table 5; it is the paper's only direct example of the validator overruling the model |
+| 17 | `docs/results.md` says `step_height_030_extended` is "the same geometry with the horizon extended". The event logs show both case F and case G ran to t = 4; case G moves the step to x = 1.0 (15,360 cells). | Repo doc inconsistency; the paper does not use the "extended horizon" wording. Fix the doc and consider renaming the case. |
+| 18 | `live_run` (`live_run_01`): the archived REJECT came from `no_fatal_error`. A later reanalysis (`REANALYSIS.json`, log excerpt only) finds no fatal signature and returns PASS. The registered verdict remains REJECT. | Not used in the paper; decide whether the case library should record the reanalysis |
+| 19 | Repo docs call the nozzle "compressible Euler, 2-D"; it is an axisymmetric 5° wedge | Paper says axisymmetric; align the docs |
+
 ## TODO markers in `main.tex`
 - Fig. 4 caption: `\textbf{TODO:}` re-render (a,b) from native t = 4 fields (item 1).
 - (Fig. 5a has the same limitation; its caption states the source honestly but carries no TODO. Add one if preferred.)

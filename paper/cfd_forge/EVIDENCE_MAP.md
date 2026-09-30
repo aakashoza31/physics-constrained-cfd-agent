@@ -70,3 +70,15 @@ Thresholds: `src/pipeline/nozzle/validate.py` lines 449–467.
 ## Step decision points (Table 4)
 - Mach 3 iterative run (`case_H_iterative_short_run/events.log`): t = 2 healthy, target 4 → Gemini EXTEND_END_TIME (approved) → t = 4 PASS.
 - Mach 3, h = 0.3 (`case_F_step030/events.log`): `compression_front_measurable` failed → Gemini FAIL_SAFELY (approved) → FAIL.
+
+## Nozzle reference campaign (repo `validation/canonical_reference/results/`)
+| Mesh | Cells | Throat M | Exit M | Exit p (Pa) | ṁ |
+|---|---|---|---|---|---|
+| mesh1 | 2,112 | 1.02904 | 1.51325 | 53,142.7 | 1.54092 (bit-identical to the agent's canonical run, 30,471 steps) |
+| mesh2 | 4,752 | 1.04319 | 1.51889 | 52,775.0 | 1.53781 |
+| mesh3 | 8,448 | 1.05117 | 1.52213 | 52,565.9 | 1.53606 |
+| mesh4 | 13,200 | 1.05553 | 1.52439 | 52,425.2 | 1.53491 (theory exit-p error −3.157 %) |
+Last-pair changes (`study.json`): throat M 0.4147 %, exit p 0.2677 %, exit M 0.1481 %, ṁ 0.0743 %; controls max 0.0358 % (startup, throat M).
+
+## Step mesh-sensitivity refusal (`case_I_mesh_sensitivity/events.log`)
+4,032 cells → Gemini REFINE_MESH (approved, ×2 linear) → 16,128 cells → Gemini ACCEPT → **refused** (SENSITIVITY_CRITERION_NOT_REGISTERED) → case library `STOPPED_ACTION_REFUSED` / REJECT.
