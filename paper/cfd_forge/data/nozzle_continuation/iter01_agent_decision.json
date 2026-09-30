@@ -1,0 +1,52 @@
+{
+  "decision": {
+    "diagnosis": "UNCONVERGED",
+    "evidence_used": [
+      "solver completed normally with Courant number 0.4",
+      "thermodynamic properties remain positive and physically admissible",
+      "mass imbalance is 1.35 percent, exceeding the steady balance criterion",
+      "passes_stationarity is false",
+      "mass flow range and drift indicate ongoing evolution",
+      "no local mesh underresolution flagged by baseline metrics"
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "insufficient_run_time",
+        "evidence_for": [
+          "solver completed its initial run but monitors and fields are not yet stationary",
+          "mass imbalance and drift are slowly decreasing"
+        ],
+        "evidence_against": [
+          "stationarity criteria are currently failed"
+        ]
+      },
+      {
+        "hypothesis": "local_mesh_underresolution",
+        "evidence_for": [
+          "strong gradients present near throat"
+        ],
+        "evidence_against": [
+          "checkMesh passed cleanly",
+          "no candidate underresolved regions flagged by feedback profile diagnostics"
+        ]
+      }
+    ],
+    "reasoning_summary": "The simulation is numerically healthy, physically admissible, and flows correctly, but it has not yet reached the required stationarity and mass conservation criteria (passes_stationarity is false, mass imbalance is 1.35%). Since the run is still evolving and the solver is stable, continuing the run is the most appropriate action.",
+    "action": "CONTINUE_RUN",
+    "target_region": null,
+    "requested_diagnostic": null,
+    "confidence": "high"
+  },
+  "llm_call": {
+    "stage": "theory_blind_diagnosis",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 3.197,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  }
+}

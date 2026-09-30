@@ -1,0 +1,53 @@
+{
+  "decision": {
+    "diagnosis": "ACCEPTABLE",
+    "evidence_used": [
+      "solver completed normally with Courant number 0.40",
+      "thermodynamic states are fully positive and physically admissible",
+      "mass imbalance is 0.059 percent, passing the steady balance criterion",
+      "passes_stationarity is true with all monitored range and drift metrics well within bounds",
+      "boundary flow directions are valid with no reverse flow detected",
+      "mesh check passed cleanly with valid quality metrics"
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "insufficient_run_time",
+        "evidence_for": [
+          "previous iteration was unconvenged and required continuation"
+        ],
+        "evidence_against": [
+          "passes_stationarity is true",
+          "mass imbalance is fully satisfied",
+          "outlet and inlet mass flows are essentially identical"
+        ]
+      },
+      {
+        "hypothesis": "local_mesh_underresolution",
+        "evidence_for": [
+          "strong gradients present in converging-diverging sections"
+        ],
+        "evidence_against": [
+          "checkMesh passed cleanly",
+          "no candidate underresolved regions flagged by feedback profile diagnostics"
+        ]
+      }
+    ],
+    "reasoning_summary": "The simulation has successfully completed its continued run and now satisfies all configured trust, conservation, and stationarity criteria. Solver health is robust, thermodynamic variables remain positive, and mass imbalance is well below tolerance. Therefore, the simulation is acceptable.",
+    "action": "ACCEPT",
+    "target_region": null,
+    "requested_diagnostic": null,
+    "confidence": "high"
+  },
+  "llm_call": {
+    "stage": "theory_blind_diagnosis",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 2.842,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  }
+}

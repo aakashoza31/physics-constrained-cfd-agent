@@ -1,0 +1,45 @@
+{
+  "source": "/home/aakash/family3_cube_sst_20260922/precursor/3000",
+  "maximum_coordinate_mismatch": 0.0,
+  "inlet_coordinate_mismatch": 0.0,
+  "interior_linear_interpolation_allowed": false,
+  "mapped": {
+    "U": {
+      "min": [
+        0.2714997443,
+        -2.954528589e-15,
+        -0.0018773011454524832
+      ],
+      "max": [
+        1.125280358,
+        6.83503217e-16,
+        0.0018773011454526667
+      ]
+    },
+    "k": {
+      "min": [
+        0.001408781647
+      ],
+      "max": [
+        0.007620875227
+      ]
+    },
+    "omega": {
+      "min": [
+        0.3469384796
+      ],
+      "max": [
+        15.30785312
+      ]
+    },
+    "nut": {
+      "min": [
+        6.070929059e-05
+      ],
+      "max": [
+        0.007289849902
+      ]
+    }
+  },
+  "initial_spanwise_seed_amplitude": 0.002
+}

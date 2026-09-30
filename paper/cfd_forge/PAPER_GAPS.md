@@ -1,0 +1,28 @@
+# CFD Forge paper: outstanding gaps (state 2026-09-30)
+
+Scope freeze applies: none of these items requires a new CFD case. Only item 1
+needs any data movement at all, and none needs a new solver run.
+
+| # | Gap | Affects | Why it matters | Likely source | Existing evidence enough? | New CFD? | Priority |
+|---|-----|---------|----------------|---------------|---------------------------|----------|----------|
+| 1 | Field panels are re-axed copies of archived renderings, not renders made directly from native fields | Fig. 4a,b (step Mach, density at t=4); Fig. 5a (cube \|U\| at t*=80) | The pixels are real native-field renders (Mach colour limits confirmed from the colourbar ticks), but a reviewer-grade figure should be rendered straight from the fields | WSL: `/home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case/4/`; `/home/aakash/family3_cube_sst_literature_audit_t4_retry2/80/` | Yes, once copied to Windows (the copy command was sent in chat) | No | High |
+| 2 | No nozzle contour panel | Fig. 3 (optional) | Profiles already carry the validation; a Mach contour would make it easier to read | Same WSL nozzle case, `0.006/` | Yes | No | Low |
+| 3 | Page count: 16 pages including ~2.5 pages of references, in generic `article` 11 pt | Whole paper | The target conference's page limit and template are not recorded anywhere I could find | Prof. Amir / venue call | n/a | No | High |
+| 4 | Four new references added (Kurganov–Tadmor 2000, Woodward–Colella 1984, Menter 1994, Martinuzzi–Tropea 1993); bibliographic details were written from knowledge, not retrieved | References [20–23] | Volume, page and DOI details should be checked before submission | Publisher pages | Needs a quick check | No | Medium |
+| 5 | Registered cube gate and paper criterion were inconsistent in the Overleaf draft | Sec. 3.3 (corrected) | The draft called the 10% complete-cycle test "the registered criterion". The registered gate (`src/families/cube/stationarity.py`, `cube-stationarity/1.0.0`) is the half-window mean \|Fz\| ratio ≤ 1.25 (measured 2.10). The 10% cycle test (measured +112.96%) comes from the separate read-only audit `outputs/family3_cube_reference/audit_t80/`. The text now states both and labels them separately. **Please have Prof. Amir confirm this framing.** | Code + audit | Yes | No | High |
+| 6 | Docstring of `src/families/cube/stationarity.py` is wrong | Code only (not the paper) | It says the run "misses the drift bound by more than an order of magnitude" and misses the growth bound "by a factor of about six". Measured values: drift 0.075% vs 2% (**passes**); growth 2.10 vs 1.25 (factor 1.68). The gate logic and verdict are correct; only the comment is wrong. Left unchanged here (code is outside the paper-only scope). | Repo | n/a | No | Medium |
+| 7 | Nozzle runs: canonical vs continuation | Secs. 2.3, 3.1, 4.1, Table 4 | The handoff described one run with a continuation. The archives show two real runs: canonical `20260921T041731Z` (single execution to 6 ms, accepted first time; the field-video source) and continuation run `20260921T052758Z` (1 ms FAIL → Gemini CONTINUE_RUN → 6 ms PASS). The paper now attributes each result to the correct run. | `demo/nozzle_e2e/`, `demo/nozzle_feedback_v2_hotfix/` in the e2e worktree | Yes | No | Done (please confirm) |
+| 8 | Multimodal observer model id not recorded | Sec. 3.4 | Step runs label it only `LLM:multimodal-visual-observer`; the code default is `gemini-3.6-flash` unless `GEMINI_MODEL` was set. The paper says "Gemini multimodal observer, model id not recorded". | `src/agents/cfd_visual_observer.py`, run environment | Partially | No | Low |
+| 9 | Cube boundary conditions taken from the predecessor pilot's `initial_BC_audit.json`, not from `0/` files of the continuation (which has no `0/`) | Table 1 | The handoff says the 12 initialization files were byte-matched to the predecessor, but I did not re-verify this | WSL predecessor `family3_cube_sst_20260922/cube_pilot/0/` | Probably | No | Medium |
+| 10 | Unified pipeline vs historical runners | Secs. 2, 3.4 | The archived nozzle/step runs were executed by the family runners (`scripts/run_nozzle_e2e.py`, `scripts/run_forward_step_2d.py`) with their own action and scientific validators; the unified `src/authority` layer re-derives the verdicts in replay (`solver_invoked:false`). The paper describes validators generically, which is accurate, but it does not claim the unified live path launched these runs. Decide whether to state this explicitly. | Provenance JSONs | Yes | No | Medium |
+| 11 | Ablation (LLM vs fixed rule vs LLM-only acceptance) not run | Secs. 3.4, 4.4, 5 | Stated as a limitation; no performance claim is made | Future work | n/a | Replay-only evaluation possible | Out of scope |
+| 12 | Grid/time-step independence per case not established | Sec. 5 | Stated as a limitation (runs are `PASS_SINGLE_MESH`) | Future compute | n/a | Yes (deferred per Prof. Amir) | Out of scope |
+| 13 | Cube experimental comparison is poor | Sec. 5 | Audit RMSE vs ERCOFTAC centre-line profiles is 0.34–0.68 U_b; stated as a limitation, no validation claimed | `audit_t80/FINAL_ASSESSMENT.md` §10 | Yes | No | Done |
+
+## TODO markers in `main.tex`
+- Fig. 4 caption: `\textbf{TODO:}` re-render (a,b) from native t = 4 fields (item 1).
+- (Fig. 5a has the same limitation; its caption states the source honestly but carries no TODO. Add one if preferred.)
+
+## Things deliberately NOT changed
+- Abstract, Introduction, Sections 2.1–2.4, Figure 1, title, authors.
+- All historical verdicts: nozzle ACCEPT, step ACCEPT, cube REJECT (STILL_DEVELOPING).

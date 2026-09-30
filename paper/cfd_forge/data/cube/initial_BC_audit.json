@@ -1,0 +1,106 @@
+{
+  "k": {
+    "dimensions": "[0 2 -2 0 0 0 0]",
+    "patch_types": {
+      "inlet": "fixedValue",
+      "outlet": "zeroGradient",
+      "floor": "kqRWallFunction",
+      "roof": "kqRWallFunction",
+      "sideLeft": "kqRWallFunction",
+      "sideRight": "kqRWallFunction",
+      "cube": "kqRWallFunction"
+    },
+    "sha256": "13941389213aad45ebd5ca57ee3ab6d63e5c7d8be15a4cabec9d71aa3e37fe2a"
+  },
+  "omega": {
+    "dimensions": "[0 0 -1 0 0 0 0]",
+    "patch_types": {
+      "inlet": "fixedValue",
+      "outlet": "zeroGradient",
+      "floor": "omegaWallFunction",
+      "roof": "omegaWallFunction",
+      "sideLeft": "omegaWallFunction",
+      "sideRight": "omegaWallFunction",
+      "cube": "omegaWallFunction"
+    },
+    "sha256": "3216c60d5d5dd87f9fdb2d0e56c735d88b8110c4915697c4c845132a2de89a41"
+  },
+  "epsilon": {
+    "dimensions": "[0 2 -3 0 0 0 0]",
+    "patch_types": {
+      "inlet": "fixedValue",
+      "outlet": "zeroGradient",
+      "floor": "epsilonWallFunction",
+      "roof": "epsilonWallFunction",
+      "sideLeft": "epsilonWallFunction",
+      "sideRight": "epsilonWallFunction",
+      "cube": "epsilonWallFunction"
+    },
+    "sha256": "3a25ed300059ab260b3c94d4709170436df47fc2d444c86f8d083ff1e4a35559"
+  },
+  "U": {
+    "dimensions": "[0 1 -1 0 0 0 0]",
+    "patch_types": {
+      "inlet": "fixedValue",
+      "outlet": "zeroGradient",
+      "floor": "noSlip",
+      "roof": "noSlip",
+      "sideLeft": "noSlip",
+      "sideRight": "noSlip",
+      "cube": "noSlip"
+    },
+    "sha256": "2a97837280f090c342f96acd182e77f06f9f4f80041259c32a72a497e1981382"
+  },
+  "v2": {
+    "dimensions": "[0 2 -2 0 0 0 0]",
+    "patch_types": {
+      "inlet": "fixedValue",
+      "outlet": "zeroGradient",
+      "floor": "v2WallFunction",
+      "roof": "v2WallFunction",
+      "sideLeft": "v2WallFunction",
+      "sideRight": "v2WallFunction",
+      "cube": "v2WallFunction"
+    },
+    "sha256": "ba16d7509c7e116b0b72611ff1781d57b5cf522b0308d68041c40762a9cf09af"
+  },
+  "nut": {
+    "dimensions": "[0 2 -1 0 0 0 0]",
+    "patch_types": {
+      "inlet": "calculated",
+      "outlet": "calculated",
+      "floor": "nutUSpaldingWallFunction",
+      "roof": "nutUSpaldingWallFunction",
+      "sideLeft": "nutUSpaldingWallFunction",
+      "sideRight": "nutUSpaldingWallFunction",
+      "cube": "nutUSpaldingWallFunction"
+    },
+    "sha256": "14a7fd12364615e85e4bd91859fcac4bd1d3a84a7f2b8f8a919dfc9b1edfcb85"
+  },
+  "p": {
+    "dimensions": "[0 2 -2 0 0 0 0]",
+    "patch_types": {
+      "inlet": "zeroGradient",
+      "outlet": "fixedValue",
+      "floor": "zeroGradient",
+      "roof": "zeroGradient",
+      "sideLeft": "zeroGradient",
+      "sideRight": "zeroGradient",
+      "cube": "zeroGradient"
+    },
+    "sha256": "87f3a0c9c51c96c9cb5709341512f996b6cbb9da2ed26d484d6d3a564b086d33"
+  },
+  "f": {
+    "dimensions": "[0 0 -1 0 0 0 0]",
+    "patch_types": {
+      "inlet": "zeroGradient",
+      "outlet": "zeroGradient",
+      "floor": "fWallFunction",
+      "roof": "fWallFunction",
+      "sideLeft": "fWallFunction",
+      "sideRight": "fWallFunction",
+      "cube": "fWallFunction"
+    },
+    "sha256": "c735a1888851c9e9dc5ef545f592b57d6084259410cc670dd4d6e6b420e38070"
+  }
+}

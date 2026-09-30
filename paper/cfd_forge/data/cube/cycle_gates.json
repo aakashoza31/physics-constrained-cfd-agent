@@ -1,0 +1,54 @@
+{
+  "cycle_definition": "Successive upward zero crossings of raw Fz; only fully observed cycles, with interior max/min. No partial last cycle accepted.",
+  "complete_cycles": [
+    {
+      "start_rising_zero": 33.64999828725001,
+      "end_rising_zero": 43.443324240445165,
+      "period": 9.793325953195158,
+      "St": 0.10211035605056537,
+      "peak": 0.00018670887998954,
+      "trough": -0.00032764928858289,
+      "peak_to_trough": 0.00051435816857243,
+      "half_range_amplitude": 0.000257179084286215
+    },
+    {
+      "start_rising_zero": 43.443324240445165,
+      "end_rising_zero": 53.60379762235244,
+      "period": 10.160473381907273,
+      "St": 0.09842061116765458,
+      "peak": 0.0006267059255888,
+      "trough": -0.0009605056939218,
+      "peak_to_trough": 0.0015872116195106,
+      "half_range_amplitude": 0.0007936058097553,
+      "amplitude_change_percent": 208.58100764994356
+    },
+    {
+      "start_rising_zero": 53.60379762235244,
+      "end_rising_zero": 63.74267417412492,
+      "period": 10.138876551772483,
+      "St": 0.09863025700073047,
+      "peak": 0.0015557347153091,
+      "trough": -0.0022086632322352003,
+      "peak_to_trough": 0.0037643979475443,
+      "half_range_amplitude": 0.00188219897377215,
+      "amplitude_change_percent": 137.1705134508159
+    },
+    {
+      "start_rising_zero": 63.74267417412492,
+      "end_rising_zero": 73.90683341281999,
+      "period": 10.16415923869507,
+      "St": 0.09838492063298149,
+      "peak": 0.0032901589164619997,
+      "trough": -0.00472634456347,
+      "peak_to_trough": 0.008016503479932,
+      "half_range_amplitude": 0.004008251739966,
+      "amplitude_change_percent": 112.95579244382373
+    }
+  ],
+  "mean_drag_change_percent": 0.03777956610204887,
+  "max_probe_mean_change": 0.0017540908863966087,
+  "Fz_RMS_change_percent": 109.53304323470259,
+  "drag_RMS_change_percent": -73.00126178693593,
+  "late_peak_growth_rate": 0.07339368981323073,
+  "decision": "STOP: nonstationary lateral amplitude; no further automatic continuation"
+}

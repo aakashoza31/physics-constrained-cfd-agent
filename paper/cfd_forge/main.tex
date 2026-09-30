@@ -1,0 +1,884 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+% Generic preview only; use the conference class for submission.
+\usepackage{authblk} \author[1]{Aakash Shailesh Oza} \author[1]{Ryan F. Johnson} \author[1]{Amir Barati Farimani\thanks{Corresponding author: \href{mailto:barati@cmu.edu}{barati@cmu.edu}.}} \affil[1]{Department of Mechanical Engineering, Carnegie Mellon University, 5000 Forbes Avenue, Pittsburgh, PA 15213, USA} \renewcommand{\Affilfont}{\normalsize}
+
+\title{CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD}
+
+%CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations include a converging-diverging nozzle and a two-dimensional Mach-2 forward-facing step that satisfy their registered criteria. A three-dimensional turbulent cube serves as a diagnostic stress test: quantitative wake analysis exposes continuing lateral-mode development despite comparatively stable mean quantities, preventing premature acceptance. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
+\end{abstract}
+
+\section{Introduction}
+
+Computational fluid dynamics (CFD) is central to engineering analysis, but obtaining a useful result requires a sequence of decisions and operations. An analyst prepares a CAD model or parameterized geometry, defines the domain, generates a mesh, selects physical models, and assigns boundary and initial conditions. Solver execution is followed by diagnosis, assessment, interpretation, and reporting. Although individual steps can be scripted, coordinating them remains expertise-intensive. The NASA CFD Vision 2030 study identifies workflow automation as an important requirement for routine computational analysis and design \cite{slotnick2014vision}.
+
+This effort becomes a bottleneck in high-throughput screening and iterative design, where many geometries or operating conditions must be evaluated consistently \cite{forrester2009surrogate,brunton2020mlfluids}. A programmable CFD workflow could turn an engineering objective into a sequence of reusable operations, then return both simulation results and an explanation of their significance. Quantities such as drag, lift, or pressure loss could subsequently guide new evaluations in an active-learning or optimization loop. Recent LLM-assisted CFD optimization work illustrates this broader direction \cite{chen2026optmeta}.
+
+Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM provides a programmable solver foundation \cite{weller1998tensorial}. MetaOpenFOAM and MetaOpenFOAM 2.0 automate simulation and post-processing \cite{chen2024metaopenfoam,chen2025metaopenfoam2}; OpenFOAMGPT and OpenFOAMGPT 2.0 develop retrieval-assisted and end-to-end workflows \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}. CFD-specific fine-tuning \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd} provide further approaches to automation. AI CFD Scientist and PhyNiKCE also address physical reasoning and verification \cite{somasekharan2026aicfd,fan2026phynikce}. These efforts motivate closer integration of workflow execution, diagnosis, and scientific assessment.
+
+That integration requires attention to the meaning of a successful simulation. Solver completion, small residuals, or plausible contours can coexist with incorrect boundary conditions, unresolved numerical errors, or a flow that is still developing. Verification and validation therefore require multiple sources of evidence \cite{oberkampf2002vv,celik2008discretization}. An agent must interpret these signals together and distinguish a useful next action from evidence sufficient to accept the result.
+
+CFD Forge connects engineering intent and geometry parameters to case construction, meshing, boundary and initial conditions, OpenFOAM execution, diagnostics, corrective actions, and reporting. The LLM reasons across solver logs, field diagnostics, conservation measures, and flow histories to interpret behavior, identify likely causes of problems, and propose what should be tried next. Deterministic scientific checks measure explicit criteria, enforce thresholds, and retain final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. This division gives reasoning a substantive role while keeping acceptance reproducible. Modular scientific contracts organize physical assumptions, numerical requirements, and allowed actions so that additional simulation families can be incorporated. The current evaluation uses registered families and parameterized geometries.
+
+We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a Mach-2 forward-facing step assessed for transient numerical health and conservation. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. The framework uses this evidence to prevent premature acceptance under the stationarity criterion, illustrating why several physical signals must be examined together. The contribution is a programmable CFD workflow that combines evidence-based reasoning with explicit scientific assessment and preserves its decisions through case files, diagnostic records, action histories, visualizations, and reports. This architecture provides a basis for larger simulation campaigns and future integration with active-learning and design-optimization loops.
+
+\section{CFD Forge Framework and Scientific Assessment}
+\label{sec:framework}
+
+CFD Forge organizes CFD analysis as a programmable workflow that connects an engineering request to simulation execution, assessment, and reporting. The framework combines language-model reasoning with programmatic case construction and explicit scientific checks. Its central design principle is to separate proposing an interpretation or action from determining whether the resulting simulation satisfies the prescribed acceptance criteria.
+
+\subsection{Workflow Overview}
+\label{sec:workflow}
+
+The workflow begins with a natural-language engineering request describing the intended flow problem and relevant geometry or operating parameters. The request is interpreted and matched to a registered simulation family. Each family supplies a scientific contract defining the physical assumptions, admissible inputs, numerical recipe, required diagnostics, and permitted corrective actions.
+
+For an admissible request, a family-specific runner constructs the case, generates the mesh, assigns boundary and initial conditions, and executes OpenFOAM. Diagnostic routines then extract evidence from the mesh, solver logs, saved fields, and time histories. This evidence supports both model-assisted interpretation and deterministic scientific assessment. Where an allowed corrective action is justified, the runner can update the permitted settings or continue execution before reassessing the result. Otherwise, the workflow terminates with a recorded decision and supporting artifacts.
+
+The present implementation uses parameterized geometries and registered CFD families. This provides a concrete interface between engineering intent and executable simulation operations, while allowing additional families to be incorporated through their own scientific contracts and runners.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{cfd-forge-figure-1.png}\caption{Functional organization of CFD Forge. Language-model
+    outputs are proposals; deterministic checks retain authority
+    over admissibility, permitted actions, and final acceptance.
+    Family-specific runners implement case construction, solver
+    execution, and corrective-action loops.}
+    \label{fig:flowpilot_architecture}
+\end{figure}
+
+\subsection{Reasoning and Scientific Authority}
+\label{sec:authority}
+
+The LLM provides a flexible interface for interpreting engineering requests and reasoning over simulation evidence. Its responsibilities include explaining observed behavior, identifying likely causes of problems, proposing a next action, and supporting the engineering narrative. The evidence supplied to this reasoning process can include solver-health indicators, field extrema, conservation measures, convergence histories, and family-specific diagnostics.
+
+Scientific acceptance is evaluated separately. Deterministic routines calculate the relevant quantities and compare them with the registered criteria. The LLM can propose that a run appears complete or requires further work, but its statement does not override a failed or unresolved check. Similarly, a proposed correction must be permitted by the family contract before it can be applied.
+
+This separation yields three terminal outcomes:
+\begin{itemize}
+    \item \texttt{ACCEPT}: the required checks are satisfied.
+    \item \texttt{REJECT}: the evidence violates a required criterion.
+    \item \texttt{INCONCLUSIVE}: the available evidence is insufficient
+    to resolve the required assessment.
+\end{itemize}
+
+Acceptance therefore refers to the stated scientific contract and
+the evidence available for that run. It does not imply that every
+source of modeling or numerical uncertainty has been eliminated.
+
+\subsection{Scientific Contracts and Corrective Actions}
+\label{sec:contracts}
+
+A scientific contract makes the basis for assessment explicit before
+a result is accepted. It specifies the geometry and operating range,
+physical model, boundary-condition formulation, mesh requirements,
+numerical controls, diagnostic quantities, and reference comparisons
+applicable to a family. The criteria reflect the intended flow
+regime: a steady nozzle requires appropriate stationarity evidence,
+whereas an unsteady compressible step requires conservation checks
+that account for changes in stored mass.
+
+Corrective actions are restricted to those supported by the registered
+workflow. The model proposes an action, while deterministic checks
+establish whether it is admissible and whether another solver attempt
+is warranted. The resulting case is then assessed using the same
+acceptance criteria rather than a revised threshold chosen to match
+the outcome.
+
+The archived nozzle demonstration illustrates this sequence: unmet
+stationarity and mass-balance criteria led to a continuation, followed
+by reassessment and acceptance. Such records show how evidence
+informs execution decisions. They do not, by themselves, establish
+that model-assisted diagnosis outperforms a fixed-rule controller;
+that comparison requires a separate evaluation.
+
+\subsection{Evidence, Reporting, and Reproducibility}
+\label{sec:provenance}
+
+CFD Forge retains the artifacts needed to inspect both the simulation
+and the decisions made around it. These include case configurations,
+mesh information, solver logs, diagnostic measurements, model-call
+records where available, proposed actions, and final assessments.
+Plots, contours, and field-evolution videos connect numerical
+summaries to the computed flow behavior. Field-evolution
+visualizations use saved CFD fields at recorded simulation times.
+
+The framework distinguishes live execution from replay of archived
+evidence. Replay supports inspection and regression checking without
+claiming that a new simulation or model call occurred. Likewise,
+deterministic-backend execution is distinguished from execution using
+an LLM. These distinctions are necessary when interpreting workflow
+results and attributing an action to model reasoning.
+
+Together, the execution records and scientific assessments provide an
+auditable account of what was requested, what was computed, which
+actions were taken, and why the result received its final decision.
+The following sections examine this workflow through the nozzle,
+forward-facing-step, and turbulent-cube studies.
+
+\section{Experimental Setup and Assessment Protocol}
+\label{sec:experiments}
+
+We examine CFD Forge through two compressible-flow demonstrations
+and a three-dimensional turbulent-flow diagnostic study. The
+converging--diverging nozzle provides an analytical consistency
+test, while the forward-facing step exercises transient
+shock-capturing, conservation assessment, and controlled variations.
+The turbulent cube tests whether the assessment process can
+distinguish numerical completion from sufficiently developed flow.
+All three studies use OpenFOAM Foundation v14.
+
+The assessment uses preserved simulation outputs and execution
+records. Case-specific criteria are applied to the underlying
+numerical evidence, while model-call and action records establish
+the role of agent reasoning. Reference agreement, numerical
+acceptance, and physical development are treated as distinct
+questions.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig2_configurations.pdf}
+    \caption{Computational configurations, drawn from the preserved case
+    definitions. (a) Nozzle wedge mesh in the $x$--$r$ plane, reconstructed
+    exactly from the archived \texttt{blockMeshDict} (five linear blocks,
+    uniform grading). (b) Forward-facing-step domain and block structure; every
+    fourth grid line is shown. (c) Floor plan (every second line; cube marker enlarged) and (c$'$) centre-plane views of
+    the cube mesh, plotted from the grid coordinates in the preserved
+    \texttt{constant/polyMesh/points} file. Boundary types are those of the
+    archived \texttt{0/} dictionaries (Table~\ref{tab:setup}).}
+    \label{fig:case_geometries}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Simulation setup. All cases use OpenFOAM Foundation v14 through
+\texttt{foamRun}. The scheme, solution, thermophysical and mesh files quoted
+here match the SHA-256 digests recorded for the native cases in the
+field-evolution manifests; cube boundary types are taken from the preserved
+initial-condition audit of its predecessor pilot.}
+\label{tab:setup}
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.05cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+ & Nozzle & Forward-facing step & Surface-mounted cube \\
+\midrule
+Model & Inviscid compressible Euler, perfect gas ($\gamma=1.4$, $R=287$\,J\,kg$^{-1}$\,K$^{-1}$); \texttt{shockFluid}
+ & Inviscid compressible Euler, normalized perfect gas ($\gamma=1.4$, sound speed 1); \texttt{shockFluid}
+ & Incompressible URANS, $k$--$\omega$ SST~\cite{menter1994sst}, $\nu=2.5\times10^{-5}$, $Re_H=40{,}000$; \texttt{incompressibleFluid} \\
+Mesh & 5$^\circ$ wedge, $132\times16=2{,}112$ hexahedra; max.\ aspect ratio 2.46, non-orthogonality $9.6^\circ$, skewness 0.33
+ & Three blocks, uniform $\Delta x=\Delta y=0.0125$, 16,128 hexahedra, one \texttt{empty} spanwise layer
+ & Rectilinear, $116\times40\times124$ minus the $20^3$ cube cells $=567{,}360$ hexahedra; max.\ aspect ratio 18.4, six partitions \\
+Inlet & \texttt{totalPressure} $p_0=200$\,kPa, \texttt{totalTemperature} $T_0=300$\,K, axial-direction velocity
+ & Fixed $p=1$, $T=1$, $\mathbf{U}=(2,0,0)$
+ & Developed $\mathbf{U}$, $k$, $\omega$ mapped from a precursor channel; $\partial p/\partial n=0$ \\
+Outlet & Zero gradient for $p$, $T$, $\mathbf{U}$ (30\,kPa ambient not imposed)
+ & Zero-gradient $p$; \texttt{inletOutlet} $\mathbf{U}$, $T$
+ & Fixed gauge $p$; zero gradient for $\mathbf{U}$, $k$, $\omega$ \\
+Other boundaries & Slip wall; \texttt{wedge} front/back; axis
+ & Step: slip; top/bottom: \texttt{symmetryPlane}
+ & Floor, roof ($y/H=2$), side walls ($z/H=\pm12$), cube: no-slip with \texttt{kqR}/\texttt{omega}/\texttt{nutUSpalding} wall functions \\
+Numerics & Kurganov flux~\cite{kurganov2000central}, Minmod reconstruction, Euler time step, $\mathrm{Co}_{\max}=0.4$
+ & Kurganov flux, van Leer ($\rho$, $T$) and van Leer-V ($\mathbf{U}$) reconstruction, Euler, $\mathrm{Co}_{\max}=0.2$
+ & Backward time step, PIMPLE (2 outer, 2 pressure correctors), linear-upwind $\mathbf{U}$, upwind $k,\omega$, $\mathrm{Co}_{\max}=0.8$, $\Delta t\le0.02$ \\
+Horizon & $t=6$\,ms (30,471 steps) & $t=4$ (5,428 steps) & $t^*=80$ \\
+Assessment basis & Quasi-1-D analytical consistency and registered numerical checks
+ & Registered numerical checks and directional compression diagnostics
+ & Registered stationarity/development gate \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Converging--Diverging Nozzle}
+\label{sec:nozzle_setup}
+
+The canonical nozzle is an inviscid, compressible perfect-gas
+calculation using \texttt{shockFluid}. The gas properties are
+$\gamma=1.4$ and $R=287\,\mathrm{J\,kg^{-1}\,K^{-1}}$.
+The inlet stagnation pressure and temperature are
+$p_0=200\,\mathrm{kPa}$ and $T_0=300\,\mathrm{K}$.
+The inlet, throat, and exit radii are respectively
+$0.0500$, $0.0326$, and $0.0354\,\mathrm{m}$, with a total
+domain length of $0.33\,\mathrm{m}$. The area ratio is
+$A_e/A^*=1.179$ and the nominal pressure ratio is $p_0/p_a=6.67$.
+
+A structured $5^\circ$ wedge mesh contains 2,112 cells,
+with 132 axial and 16 radial divisions (Fig.~\ref{fig:case_geometries}a).
+Slip conditions are applied at the nozzle wall, and wedge boundaries represent
+axisymmetry. The inlet uses total-pressure and
+total-temperature conditions with an axially constrained velocity.
+The outlet uses zero-gradient
+conditions for pressure, temperature, and velocity.
+The nominal ambient pressure of $30\,\mathrm{kPa}$ is used
+in the operating-regime assessment; it is not imposed as a
+fixed outlet pressure, and the external jet is not simulated.
+
+Quasi-one-dimensional theory supplies the initial internal
+fields and the analytical comparison. It does not constrain
+the subsequent CFD exit state. The numerical setup uses
+Kurganov fluxes~\cite{kurganov2000central}, Minmod reconstruction,
+Euler time integration, and an adaptive timestep with a target maximum
+Courant number of 0.4. The canonical run advances to
+$t=0.006\,\mathrm{s}$.
+
+Assessment includes mesh validity, solver completion,
+positive and finite thermodynamic fields, conservation,
+stationarity, and consistency with the intended choked,
+supersonic-outlet regime. Registered requirements include
+a maximum steady mass-flow mismatch below $0.1\%$ over the
+final 2\,ms, normalized transient continuity error
+below $0.01\%$, and monitor drift and relative field changes below $0.2\%$
+over the same window.
+The outlet-pressure discrepancy from quasi-one-dimensional
+theory must remain below $5\%$, with the remaining registered
+theory-comparison quantities below $3\%$. These checks are
+combined with inlet-total-condition, sonic-throat
+($0.9<M_t<1.1$), supersonic-outlet (minimum face-normal Mach number above 1.05),
+stagnation-enthalpy, and flux-consistency checks, twenty checks in total.
+The accepted parameterized run is classified as
+\texttt{PASS\_SINGLE\_MESH}; it is not itself a grid-convergence
+study.
+
+\subsection{Mach-2 Forward-Facing Step}
+\label{sec:step_setup}
+
+The step demonstration solves the two-dimensional compressible
+Euler equations using \texttt{shockFluid}. The domain has
+length 3 and height 1, with the step beginning at $x=0.6$
+and rising to a height of 0.2. A structured mesh contains
+16,128 hexahedral cells and one spanwise layer with
+\texttt{empty} front and back boundaries (Fig.~\ref{fig:case_geometries}b).
+
+The normalized inlet and initial states are
+$p=1$, $T=1$, and $\mathbf{U}=(2,0,0)$; the normalized gas has unit
+sound speed, so the inlet Mach number is 2. Inlet values are fixed,
+the step surface is an inviscid slip boundary, and the upper and lower
+channel boundaries are symmetry planes. The outlet
+uses zero-gradient pressure with inlet--outlet treatment
+for velocity and temperature. The scheme uses Kurganov
+fluxes, van Leer reconstruction, and Euler time integration,
+copied unchanged from the Foundation forward-step tutorial recipe and
+hash-checked at run time.
+The target maximum Courant number is 0.2, and the canonical
+simulation advances to normalized time $t=4$, with 40 saved states.
+
+The assessment checks planar mesh topology, the prescribed
+initial state, realized supersonic inflow, field positivity,
+solver health, wall impermeability, and completion of the
+requested time horizon. Conservation is evaluated using
+the transient balance
+\begin{equation}
+    \frac{\mathrm{d}}{\mathrm{d}t}
+    \int_{\Omega}\rho\,\mathrm{d}V
+    +
+    \int_{\partial\Omega}
+    \rho\mathbf{U}\cdot\mathbf{n}\,\mathrm{d}S
+    = 0,
+    \label{eq:transient_mass}
+\end{equation}
+with discrete storage and numerical face-flux terms.
+The registered normalized closure residual must remain
+below $10^{-6}$, with continuity across restart segments
+checked where applicable. Unequal instantaneous inlet
+and outlet fluxes are therefore not interpreted as a
+conservation failure when balanced by changing stored mass.
+
+The compression diagnostic additionally requires measurable
+increases in pressure, density, and temperature across the
+detected front. These are directional physical checks,
+not a quantitative reference-field comparison. The canonical
+Mach-2 result is assessed under this numerical and physical
+contract; an independent reference-field comparison is not
+part of its demonstrated acceptance. The case differs from the classical
+Mach-3 forward-facing-step problem~\cite{woodward1984strong} and is not
+presented as a reproduction of it.
+
+\subsection{Turbulent Cube Diagnostic Study}
+\label{sec:cube_setup}
+
+The cube study uses the Foundation-v14
+\texttt{incompressibleFluid} solver with the unsteady
+Reynolds-averaged Navier--Stokes equations and
+$k$--$\omega$ SST closure~\cite{menter1994sst}. With cube height $H=1$,
+bulk velocity $U_b=1$, and kinematic viscosity
+$\nu=2.5\times10^{-5}$, the Reynolds number is
+$Re_H=U_bH/\nu=40{,}000$, in a channel of height $2H$ comparable to the
+configuration of Martinuzzi and Tropea~\cite{martinuzzi1993cube}.
+
+The computational domain spans
+$x/H\in[-6,16]$, $y/H\in[0,2]$, and $z/H\in[-12,12]$.
+The cube occupies $x/H\in[0,1]$,
+$y/H\in[0,1]$, and $z/H\in[-0.5,0.5]$.
+The mesh contains 567,360 hexahedral cells (Fig.~\ref{fig:case_geometries}c).
+Developed inlet velocity and turbulence profiles are mapped from a
+precursor channel calculation. The floor, roof, side walls, and cube use
+no-slip velocity conditions with the preserved SST wall-function treatment.
+The outlet uses fixed reference pressure and zero-gradient
+velocity and turbulence fields. Pressure is kinematic gauge pressure.
+
+The calculation uses backward time integration,
+linear-upwind velocity convection, upwind turbulence
+convection, and a target maximum Courant number of 0.8.
+The preserved campaign continues a predecessor pilot and extends to
+$t^*=tU_b/H=80$; force histories are analyzed from $t^*=20$.
+Development is assessed using force histories, six wake probes, block-mean
+fields, and fluctuation measures rather than solver residuals alone.
+
+The registered stationarity gate is applied to the pressure-plus-viscous
+force on the cube over the final 20 time units. It requires that the
+least-squares drift of each force component across the window remain below
+$2\%$ of the mean streamwise force, that the mean lateral force remain below
+$5\%$ of the streamwise force, and that the mean of $|F_z|$ over the second
+half of the window not exceed $1.25$ times its first-half value. A
+supplementary, predeclared audit examines complete lateral-force cycles
+between successive upward zero crossings of $F_z$. For cycle $n$, the
+amplitude is
+\begin{equation}
+    A_n =
+    \frac{F_{z,\max,n}-F_{z,\min,n}}{2},
+    \label{eq:cycle_amplitude}
+\end{equation}
+and the audit criterion requires the relative
+change between successive comparable complete-cycle
+amplitudes to remain within $10\%$. Incomplete cycles are
+excluded from this comparison. Mean drag, probe statistics,
+and other development indicators provide complementary
+evidence. The cube is retained as a diagnostic stress test,
+not as an accepted turbulent reference solution.
+
+\subsection{Workflow Evaluation and Execution Provenance}
+\label{sec:evaluation_protocol}
+
+The archived campaign includes nozzle geometry and
+operating-condition variations, together with step Mach-number,
+step-height, and execution-horizon variations. These records
+are examined for the sequence of diagnostic evidence,
+proposed action, permitted execution, and final assessment.
+They provide examples of acceptance, continuation,
+correction, and safe termination.
+
+The nozzle and step runs record their model calls explicitly.
+Request interpretation, mesh-evidence review, diagnosis, and summary
+calls in these runs used \texttt{gemini-3.5-flash-lite}; the step runs
+additionally invoked a Gemini multimodal field-image observer whose model
+identifier was not recorded in the run provenance. The nozzle diagnosis
+step receives a theory-blind evidence packet from which analytical target
+values are excluded. These records are
+distinguished from deterministic-backend execution and
+replay of archived assessments. The cube campaign was executed outside the
+agent loop and contains no model call; its analysis is
+attributed to quantitative diagnostic evidence, and the
+available trace does not establish that an LLM independently
+discovered the growing wake mode.
+
+The present evaluation documents demonstrated workflow
+behavior and scientific decisions. Archived-case replay
+is used to check consistency of recorded outcomes, not
+as evidence of new autonomous CFD execution or
+generalization. Controlled ablations against fixed-rule
+workflows have not yet been performed; consequently,
+the study does not claim a measured improvement in
+success rate, computational cost, or accuracy attributable
+to the LLM.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Converging--Diverging Nozzle}
+\label{sec:nozzle_results}
+
+The canonical nozzle run completed to $t=6$\,ms in 30,471 adaptive steps
+(maximum Courant number 0.400) and passed all twenty registered checks,
+yielding \texttt{PASS\_SINGLE\_MESH} and a deterministic \texttt{ACCEPT}.
+Figure~\ref{fig:nozzle} compares radially volume-weighted axial profiles
+with the isentropic quasi-one-dimensional solution for the same area
+distribution. The flow accelerates from $M=0.253$ in the inlet section,
+reaches $M=1.029$ in the throat, and leaves the nozzle at $M=1.513$, while
+static pressure and temperature fall to $0.266\,p_0$ and $0.686\,T_0$. The
+minimum slab-averaged Mach number downstream of the throat is 1.17 and the
+minimum face-normal outlet Mach number is 1.46, so no internal normal shock
+forms and the entire exit plane is supersonic. The exit static pressure,
+53.1\,kPa, exceeds the 30\,kPa nominal ambient pressure, which is consistent
+with an underexpanded nozzle.
+
+Table~\ref{tab:nozzle} lists the deterministic comparison with theory.
+All differences are below $2\%$; the largest is the exit static pressure
+($-1.83\%$, limit $5\%$), and the mass flow is $1.11\%$ below the ideal
+choked value. These differences are consistent with a two-dimensional
+axisymmetric solution that departs from strictly one-dimensional flow near
+the conical corners. The inlet total conditions are reproduced to a relative
+error of $2.5\times10^{-8}$ in $p_0$ and $7.2\times10^{-9}$ in $T_0$. Over
+the final 2\,ms, the maximum steady mass-flow mismatch is $0.055\%$, the
+largest monitor drift is $0.081\%$, the largest relative field change is
+$0.111\%$, and the maximum transient continuity error is
+$6.4\times10^{-8}\%$.
+
+\begin{table}[t]
+\centering
+\caption{Canonical nozzle: CFD versus isentropic quasi-one-dimensional
+theory at $t=6$\,ms. Exit values are area averages on the outlet patch;
+throat and inlet values are slab averages. Mass flow is scaled from the
+wedge to the full nozzle.}
+\label{tab:nozzle}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Quantity & CFD & Quasi-1-D & Difference & Registered limit \\
+\midrule
+Inlet Mach number$^{a}$ & 0.2528 & 0.2558 & $-1.2\%$ & -- \\
+Throat Mach number & 1.029 & 1 & -- & $0.9<M_t<1.1$ \\
+Exit Mach number & 1.5133 & 1.5044 & $+0.59\%$ & $<3\%$ \\
+Exit static pressure (kPa) & 53.14 & 54.13 & $-1.83\%$ & $<5\%$ \\
+Exit static temperature (K) & 205.76 & 206.52 & $-0.37\%$ & $<3\%$ \\
+Exit velocity (m\,s$^{-1}$) & 435.09 & 433.36 & $+0.40\%$ & $<3\%$ \\
+Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
+\bottomrule
+\multicolumn{5}{@{}l}{\footnotesize $^{a}$Not a registered check; theory value computed from the inlet area ratio.}
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig3_nozzle.pdf}
+    \caption{Nozzle results. (a,b) Axial profiles of the canonical run at
+    $t=6$\,ms (solid) and the isentropic quasi-one-dimensional solution for
+    the registered area distribution (dashed). (c) The three stationarity
+    checks of the separate continuation run, expressed as measured value over
+    registered limit, at the initial 1\,ms endpoint (failed) and after the
+    approved continuation to 6\,ms (passed).}
+    \label{fig:nozzle}
+\end{figure}
+
+A separate archived run of the same specification illustrates the
+corrective loop (Fig.~\ref{fig:nozzle}c). Executed initially only to
+$t=1$\,ms, it passed 17 of 20 checks but failed the steady mass-balance
+($1.35\%$ against $0.1\%$), monitor-stationarity ($2.0\%$ against $0.2\%$),
+and field-stationarity ($1.2\%$ against $0.2\%$) criteria. At this
+endpoint the exit-state differences from quasi-one-dimensional theory were
+already below $0.7\%$. Agreement with the reference therefore did not
+establish that the flow had settled, and the stationarity evidence
+determined the outcome. After an approved continuation to 6\,ms, all three
+metrics fell below their limits (ratios 0.59, 0.41, and 0.66) and the run
+was accepted.
+
+\subsection{Mach-2 Forward-Facing Step}
+\label{sec:step_results}
+
+The canonical step run completed to $t=4$ in 5,428 steps and 102\,s of wall
+time, passing all 17 hard checks and the three compression checks
+(\texttt{PASS\_2D\_FORWARD\_STEP}, deterministic \texttt{ACCEPT}). The
+realized inlet Mach number was 2.000006, and the maximum Courant number was
+0.202 against the 0.2 controller target. Figure~\ref{fig:step} shows the
+flow at the registered horizon. A detached compression front spans the
+channel ahead of the step, an expansion fan forms at the step shoulder, and
+an oblique shock from the shoulder region reflects from the upper symmetry
+plane near $x\approx1.95$. Across the detected front, pressure, density,
+and temperature rise by factors of 5.18, 2.87, and 1.81. These values exceed
+the stationary normal-shock ratios for Mach 2 (4.50, 2.67, and 1.69); the
+difference is qualitatively consistent with a front that is moving
+upstream, but these gradient-based regional measurements are not
+grid-converged and are not used as acceptance bands.
+
+The detected front moves upstream monotonically, from $x=0.525$ at $t=0.1$
+to $x=0.113$ at $t=4$ (Fig.~\ref{fig:step}c). A quasi-one-dimensional
+estimate explains this behavior. Behind a normal shock at Mach 2 the flow
+has $M=0.577$, whose sonic area is $0.822$ of the channel height. This
+exceeds the $0.8$ opening above the step, so the subsonic post-shock flow
+cannot pass the contraction and the front is displaced upstream. At Mach 3
+the corresponding sonic area is $0.719$, which is why a standing detached
+shock is possible in the classical Mach-3 configuration. The canonical
+Mach-2 solution is therefore genuinely transient at $t=4$. The registered
+contract evaluates health, conservation, and compression structure at that
+horizon and applies no stationarity criterion to this family.
+
+Mass conservation closes to round-off in the storage-aware form of
+Eq.~(\ref{eq:transient_mass}). The maximum normalized closure residual is
+$5.7\times10^{-11}$ (99th percentile $3.0\times10^{-11}$), against the
+registered $10^{-6}$ limit (Fig.~\ref{fig:step}d). The cumulative defect is
+$8\times10^{-14}$ of the initial mass, and the largest flux through the
+impermeable boundaries is $1.1\times10^{-17}$. At $t=4$ the instantaneous
+outlet mass flux is $16\%$ below the inlet flux, a difference balanced by
+mass accumulating behind the advancing front. A test based on inlet--outlet
+equality would have rejected a correctly conservative transient solution.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig4_step.pdf}
+    \caption{Mach-2 forward-facing step. (a) Mach number and (b) density
+    contours at $t=4$, reproduced from the archived pipeline renderings of the
+    native fields with new axes. (c) Position of the detected compression
+    front below the step height. (d) Normalized discrete closure residual of
+    Eq.~(\ref{eq:transient_mass}) at every time step, with the registered
+    limit. \textbf{TODO:} re-render (a,b) directly from the native $t=4$
+    fields once they are exported from the WSL case directory.}
+    \label{fig:step}
+\end{figure}
+
+\subsection{Turbulent Cube Diagnostic Study}
+\label{sec:cube_results}
+
+The cube calculation completed its bounded extension to $t^*=80$ without
+numerical failure. In the final two segments the maximum Courant number was
+0.79, the largest reported continuity error was $2\times10^{-12}$, and the
+outlet and inlet volume fluxes balanced to a relative $3\times10^{-11}$.
+Instantaneous fields at $t^*=80$ show a physically plausible horseshoe
+region, separated shear layers from the leading edges, and a recirculating
+wake (Fig.~\ref{fig:cube}a). The streamwise force also appears settled. Over
+the registered window $t^*\in[59.98, 79.98]$, the mean drag coefficient is
+$C_D=2F_x=1.412$ and its drift is $0.075\%$ of the mean, well within the
+$2\%$ limit, and the mean lateral force is $0.063\%$ of the drag (limit
+$5\%$).
+
+The lateral force shows that the flow has not developed
+(Fig.~\ref{fig:cube}c). $F_z$ oscillates with an almost constant period of
+about 10.1 time units ($St\approx0.098$), while its envelope grows: the mean
+of $|F_z|$ rises from $1.83\times10^{-3}$ in the first half of the window
+to $3.85\times10^{-3}$ in the second, a ratio of 2.10 against the registered
+limit of 1.25. The gate therefore returns \texttt{STILL\_DEVELOPING}, and the
+run is rejected. The supplementary complete-cycle audit agrees
+(Fig.~\ref{fig:cube}d). Successive complete-cycle amplitudes grow by
+$209\%$, $137\%$, and $113\%$, and the last comparable pair exceeds the
+$10\%$ audit limit by an order of magnitude. The growth rate is declining
+but the mode has not saturated. The two diagnostics are different
+measurements and are reported separately. Only the half-window ratio is part
+of the registered gate.
+
+The result illustrates why the assessment cannot rely on a single signal.
+Solver completion, small continuity errors, a stable mean drag, and
+plausible instantaneous contours all coexist here with a lateral mode whose
+amplitude more than doubles every cycle. Block-averaged fields are also
+misleading: between the $t^*=60$--70 and 70--80 averages the mean drag
+changes by only $0.04\%$ and wake-probe means by at most $0.002\,U_b$, while
+the root-mean-square lateral force increases by $110\%$. Period averages
+suppress an alternating signal whose amplitude is still growing.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig5_cube.pdf}
+    \caption{Turbulent cube diagnostic study. (a) Velocity magnitude on the
+    plane $y/H=0.5$ at $t^*=80$, from the archived ParaView rendering of the
+    native field with new axes. (b) Drag coefficient history; the shaded band
+    is the registered 20-unit window. (c) Lateral force, with the two
+    half-windows of the registered growth test shaded and the mean $|F_z|$ of
+    each labelled; dotted lines mark the upward zero crossings that bound
+    complete cycles. (d) Complete-cycle amplitudes from
+    Eq.~(\ref{eq:cycle_amplitude}) and their successive changes.}
+    \label{fig:cube}
+\end{figure}
+
+\subsection{Agentic Workflow and Corrective Actions}
+\label{sec:agent_results}
+
+Table~\ref{tab:assessment} summarizes the registered outcomes, and
+Table~\ref{tab:actions} lists recorded decision points in which a model
+proposal met the deterministic action validator. In each case the proposed
+action was consistent with the deterministic evidence and was approved. In
+the nozzle continuation, the model read the stationarity failures and
+proposed \texttt{CONTINUE\_RUN}. In a Mach-3 step run that was healthy but
+had reached only $t=2$ of the registered $t=4$ horizon, the model proposed
+extending the end time, which the validator permitted as a bounded change
+($2\to4$) before reassessment and acceptance. In a Mach-3 run with a taller
+step ($h=0.3$), the deterministic compression diagnostic could no longer
+measure a front; the model attributed this to upstream migration of the
+shock system and proposed \texttt{FAIL\_SAFELY}. This outcome is consistent with the choking estimate
+above, since the post-shock sonic area at Mach 3 (0.719) exceeds the 0.7
+opening. That run was preserved and rejected rather than tuned.
+
+These records demonstrate that the interface between model reasoning and
+deterministic authority functions as designed. In every recorded case the
+terminal verdict was computed by the validators, and continuation or
+extension occurred only through permitted actions. The records do not
+measure whether model reasoning improves on a fixed rule. In these examples
+a rule keyed to the failed check would have selected the same action, and
+the multimodal observer returned no usable observation in some runs without
+affecting the outcome.
+
+\begin{table}[t]
+\centering
+\caption{Registered scientific assessment of the three studies.}
+\label{tab:assessment}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+Evidence & Nozzle & Forward-facing step & Cube \\
+\midrule
+Mesh & checkMesh OK & checkMesh OK; 2 solution directions & checkMesh OK \\
+Solver health & Completed; $p,T,\rho>0$ at all saved times & Completed; positive at every step; no fatal signature & Completed; no warnings in final segments \\
+Conservation & Window mismatch $0.055\%$ ($<0.1\%$) & Closure residual $5.7\times10^{-11}$ ($<10^{-6}$) & Volume-flux imbalance $3\times10^{-11}$ \\
+Physical or reference & Quasi-1-D differences $\le1.83\%$ & $p$, $\rho$, $T$ rise across front & Not assessed (no validated reference) \\
+Stationarity or development & Drift $0.081\%$, field change $0.111\%$ ($<0.2\%$) & Not required (transient family) & Lateral growth ratio 2.10 ($>1.25$) \\
+Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \texttt{ACCEPT} \newline (\texttt{PASS\_2D\_FORWARD\_STEP}) & \texttt{REJECT} \newline (\texttt{STILL\_DEVELOPING}) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Recorded decision points with genuine model calls
+(\texttt{gemini-3.5-flash-lite}). ``Approved'' denotes a ruling of the
+deterministic action validator; the verdict column is computed by the
+scientific validator.}
+\label{tab:actions}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.2cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.55cm}
+  >{\raggedright\arraybackslash}p{1.45cm} >{\raggedright\arraybackslash}p{3.3cm}@{}}
+\toprule
+Run and state & Deterministic evidence & Model proposal & Validator & Verdict \\
+\midrule
+Nozzle, $t=1$\,ms & 17/20 checks; mass mismatch $1.35\%$, drift $2.0\%$, field change $1.2\%$ & \texttt{CONTINUE\_RUN} & Approved & \texttt{FAIL} $\rightarrow$ continue \\
+Nozzle, $t=6$\,ms & 20/20 checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_SINGLE\_MESH} \\
+Step, Mach 2, $t=4$ & 17/17 hard checks; compression rises measured & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
+Step, Mach 3, $t=2$ of 4 & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Healthy, not final $\rightarrow$ extend \\
+Step, Mach 3, $t=4$ & 17/17 hard checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
+Step, Mach 3, $h=0.3$ & Compression front not measurable & \texttt{FAIL\_SAFELY} & Approved & \texttt{FAIL} (preserved) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Limitations}
+\label{sec:limitations}
+
+The demonstration covers three CFD studies. Nozzle and forward-facing-step
+flows are the validated, routable families. The cube is supporting diagnostic
+evidence and is not routable. Each new physics family requires its own
+scientific contract, and acceptance under a family contract is not a general
+statement of CFD correctness. The accepted runs are single-mesh
+verifications. Grid and time-step independence are not re-established per
+case, and the step case has no quantitative reference-field comparison. The
+cube wall treatment is uncertain: at $t^*=80$ the cube-surface $y^+$ has a
+median of 24.7 and a range of 2.8--96.5, with $67\%$ of the area below
+$y^+=30$. A provisional comparison of its evolving mean wake with
+ERCOFTAC centre-line profiles is not satisfactory, so no experimental
+validation is claimed. General CAD/STEP-to-CFD execution is not
+demonstrated. Finally, the evaluation documents workflow behavior rather
+than an ablation. Comparisons with a fixed-rule controller and with
+model-only acceptance remain future work.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+CFD Forge links engineering requests to OpenFOAM case construction,
+execution, diagnosis, correction, and reporting, while keeping scientific
+acceptance in deterministic, family-specific contracts. Language-model
+reasoning interprets requests and evidence and proposes bounded actions;
+validators decide whether those actions are admissible and whether a result
+is accepted. Under this division, a converging--diverging nozzle was accepted
+with sub-$2\%$ agreement with quasi-one-dimensional theory after its
+stationarity evidence, not its reference agreement, determined when the run
+was complete. A transient Mach-2 forward-facing-step flow was accepted with
+storage-aware mass closure at round-off. A three-dimensional turbulent cube
+was rejected because a growing lateral mode showed that solver completion and
+a settled mean drag did not establish a developed flow. Case files, model
+calls, action rulings, and field-evolution records keep each decision
+auditable. These elements provide a basis for high-throughput simulation,
+active learning, and design-optimization loops in which automated
+evaluations must remain scientifically accountable.
+
+\begin{thebibliography}{99}
+
+\bibitem{slotnick2014vision}
+J.~P. Slotnick, A. Khodadoust, J. Alonso, D. Darmofal,
+W. Gropp, E. Lurie, and D.~J. Mavriplis,
+\textit{CFD Vision 2030 Study: A Path to Revolutionary
+Computational Aerosciences}.
+NASA, Technical Report NASA/CR-2014-218178, 2014.
+\url{https://ntrs.nasa.gov/citations/20140003093}.
+
+\bibitem{weller1998tensorial}
+H.~G. Weller, G. Tabor, H. Jasak, and C. Fureby,
+``A tensorial approach to computational continuum mechanics
+using object-oriented techniques,''
+\textit{Computers in Physics}, vol.~12, no.~6,
+pp.~620--631, 1998.
+DOI: \url{https://doi.org/10.1063/1.168744}.
+
+\bibitem{forrester2009surrogate}
+A.~I.~J. Forrester and A.~J. Keane,
+``Recent advances in surrogate-based optimization,''
+\textit{Progress in Aerospace Sciences}, vol.~45, nos.~1--3,
+pp.~50--79, 2009.
+DOI: \url{https://doi.org/10.1016/j.paerosci.2008.11.001}.
+
+\bibitem{chen2026optmeta}
+Y. Chen, L. Zhang, X. Zhu, H. Zhou, and Z. Ren,
+``Large language model-assisted sensitivity analysis and
+parameter optimization in computational fluid dynamics,''
+\textit{Theoretical and Applied Mechanics Letters},
+Article~100660, 2026, advance online publication.
+DOI: \url{https://doi.org/10.1016/j.taml.2026.100660}.
+
+\bibitem{brunton2020mlfluids}
+S.~L. Brunton, B.~R. Noack, and P. Koumoutsakos,
+``Machine learning for fluid mechanics,''
+\textit{Annual Review of Fluid Mechanics}, vol.~52,
+pp.~477--508, 2020.
+DOI: \url{https://doi.org/10.1146/annurev-fluid-010719-060214}.
+
+\bibitem{yao2023react}
+S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran,
+K. Narasimhan, and Y. Cao,
+``ReAct: Synergizing reasoning and acting in language models,''
+in \textit{The Eleventh International Conference on
+Learning Representations (ICLR)}, 2023.
+Available at \url{https://arxiv.org/abs/2210.03629}.
+
+\bibitem{schick2023toolformer}
+T. Schick, J. Dwivedi-Yu, R. Dess{\`i}, R. Raileanu,
+M. Lomeli, E. Hambro, L. Zettlemoyer, N. Cancedda,
+and T. Scialom,
+``Toolformer: Language models can teach themselves to use tools,''
+in \textit{Advances in Neural Information Processing Systems},
+vol.~36, 2023.
+DOI: \url{https://doi.org/10.52202/075280-2997}.
+
+\bibitem{lewis2020rag}
+P. Lewis, E. Perez, A. Piktus, F. Petroni, V. Karpukhin,
+N. Goyal, H. K{\"u}ttler, M. Lewis, W.-t. Yih,
+T. Rockt{\"a}schel, S. Riedel, and D. Kiela,
+``Retrieval-augmented generation for knowledge-intensive NLP tasks,''
+in \textit{Advances in Neural Information Processing Systems},
+vol.~33, 2020.
+Available at \url{https://arxiv.org/abs/2005.11401}.
+
+\bibitem{chen2024metaopenfoam}
+Y. Chen, X. Zhu, H. Zhou, and Z. Ren,
+``MetaOpenFOAM: An LLM-based multi-agent framework for CFD,''
+\textit{arXiv preprint arXiv:2407.21320}, 2024.
+DOI: \url{https://doi.org/10.48550/arXiv.2407.21320}.
+
+\bibitem{chen2025metaopenfoam2}
+Y. Chen, X. Zhu, H. Zhou, and Z. Ren,
+``MetaOpenFOAM 2.0: Large language model driven chain of
+thought for automating CFD simulation and post-processing,''
+\textit{arXiv preprint arXiv:2502.00498}, 2025.
+DOI: \url{https://doi.org/10.48550/arXiv.2502.00498}.
+
+\bibitem{pandey2025openfoamgpt}
+S. Pandey, R. Xu, W. Wang, and X. Chu,
+``OpenFOAMGPT: A retrieval-augmented large language model
+(LLM) agent for OpenFOAM-based computational fluid dynamics,''
+\textit{Physics of Fluids}, vol.~37, no.~3,
+Article~035120, 2025.
+DOI: \url{https://doi.org/10.1063/5.0257555}.
+
+\bibitem{feng2026openfoamgpt2}
+J. Feng, R. Xu, and X. Chu,
+``OpenFOAMGPT 2.0: End-to-end, trustworthy automation
+for computational fluid dynamics,''
+\textit{International Journal of Heat and Fluid Flow},
+vol.~120, Article~110399, 2026.
+DOI: \url{https://doi.org/10.1016/j.ijheatfluidflow.2026.110399}.
+
+\bibitem{dong2025autocfd}
+Z. Dong, Z. Lu, and Y. Yang,
+``Fine-tuning a large language model for automating
+computational fluid dynamics simulations,''
+\textit{Theoretical and Applied Mechanics Letters},
+vol.~15, Article~100594, 2025.
+DOI: \url{https://doi.org/10.1016/j.taml.2025.100594}.
+
+\bibitem{yue2026foamagent}
+L. Yue, N. Somasekharan, T. Zhang, Y. Cao,
+Z. Chen, S. Di, and S. Pan,
+``Foam-Agent: A large language model-based multi-agent
+framework for automating computational fluid dynamics workflows,''
+\textit{Computer Methods in Applied Mechanics and Engineering},
+vol.~461, Article~119271, 2026.
+DOI: \url{https://doi.org/10.1016/j.cma.2026.119271}.
+
+\bibitem{fan2026chatcfd}
+E. Fan, K. Hu, Z. Wu, J. Ge, J. Miao,
+Y. Zhang, H. Sun, W. Wang, and T. Zhang,
+``ChatCFD: A large language model-driven agent for end-to-end
+computational fluid dynamics automation with structured
+knowledge and reasoning,''
+\textit{Advanced Intelligent Discovery}, vol.~2, no.~3,
+Article~e202500174, 2026.
+DOI: \url{https://doi.org/10.1002/aidi.202500174}.
+
+\bibitem{oberkampf2002vv}
+W.~L. Oberkampf and T.~G. Trucano,
+``Verification and validation in computational fluid dynamics,''
+\textit{Progress in Aerospace Sciences}, vol.~38, no.~3,
+pp.~209--272, 2002.
+DOI: \url{https://doi.org/10.1016/S0376-0421(02)00005-2}.
+
+\bibitem{celik2008discretization}
+I.~B. Celik, U. Ghia, P.~J. Roache, C.~J. Freitas,
+H. Coleman, and P.~E. Raad,
+``Procedure for estimation and reporting of uncertainty
+due to discretization in CFD applications,''
+\textit{Journal of Fluids Engineering}, vol.~130, no.~7,
+Article~078001, 2008.
+DOI: \url{https://doi.org/10.1115/1.2960953}.
+
+\bibitem{somasekharan2026aicfd}
+N. Somasekharan, R. Pathak, M. Dhanakoti,
+T. Zhang, L. Yue, A. Zhu, and S. Pan,
+``AI CFD Scientist: Toward open-ended computational fluid
+dynamics discovery with physics-aware AI agents,''
+\textit{arXiv preprint arXiv:2605.06607}, 2026.
+DOI: \url{https://doi.org/10.48550/arXiv.2605.06607}.
+
+\bibitem{fan2026phynikce}
+E. Fan, L. Shi, Z. Li, and C.-y. Wen,
+``PhyNiKCE: A neurosymbolic agentic framework for
+autonomous computational fluid dynamics,''
+\textit{arXiv preprint arXiv:2602.11666}, 2026.
+DOI: \url{https://doi.org/10.48550/arXiv.2602.11666}.
+
+\bibitem{kurganov2000central}
+A. Kurganov and E. Tadmor,
+``New high-resolution central schemes for nonlinear conservation
+laws and convection--diffusion equations,''
+\textit{Journal of Computational Physics}, vol.~160, no.~1,
+pp.~241--282, 2000.
+DOI: \url{https://doi.org/10.1006/jcph.2000.6459}.
+
+\bibitem{woodward1984strong}
+P. Woodward and P. Colella,
+``The numerical simulation of two-dimensional fluid flow with
+strong shocks,''
+\textit{Journal of Computational Physics}, vol.~54, no.~1,
+pp.~115--173, 1984.
+DOI: \url{https://doi.org/10.1016/0021-9991(84)90142-6}.
+
+\bibitem{menter1994sst}
+F.~R. Menter,
+``Two-equation eddy-viscosity turbulence models for engineering
+applications,''
+\textit{AIAA Journal}, vol.~32, no.~8, pp.~1598--1605, 1994.
+DOI: \url{https://doi.org/10.2514/3.12149}.
+
+\bibitem{martinuzzi1993cube}
+R. Martinuzzi and C. Tropea,
+``The flow around surface-mounted, prismatic obstacles placed in a
+fully developed channel flow,''
+\textit{Journal of Fluids Engineering}, vol.~115, no.~1,
+pp.~85--92, 1993.
+DOI: \url{https://doi.org/10.1115/1.2910118}.
+
+\end{thebibliography}
+
+\end{document}

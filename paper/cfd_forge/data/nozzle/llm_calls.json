@@ -1,0 +1,50 @@
+[
+  {
+    "stage": "case_spec_interpretation",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 4.888,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  },
+  {
+    "stage": "mesh_evidence_review",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 2.573,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  },
+  {
+    "stage": "theory_blind_diagnosis",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 3.221,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  },
+  {
+    "stage": "engineering_summary",
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "ok": true,
+    "error": null,
+    "latency_s": 3.294,
+    "attempts": 1,
+    "notes": [],
+    "is_llm": true,
+    "label": "LLM:gemini-3.5-flash-lite"
+  }
+]

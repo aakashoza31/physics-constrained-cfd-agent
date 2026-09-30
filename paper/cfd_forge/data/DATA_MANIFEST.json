@@ -1,0 +1,180 @@
+{
+ "note": "Verbatim copies of archived CFD Forge evidence used by scripts/make_figures.py. Paths: Research/ = C:/Backup from one drive/Desktop/Research/, Codex/ = C:/Users/Aakash/Documents/Codex/. Native OpenFOAM cases remain in WSL (see paper/PAPER_GAPS.md).",
+ "files": {
+  "nozzle/validation.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference/validation.json",
+   "sha256": "cdeafe48ad4d5de57e3a67d4f5712e7a9bafda3c29cba070c97ebf7e980be704",
+   "bytes": 31598
+  },
+  "nozzle/axial_profile.csv": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference/axial_profile.csv",
+   "sha256": "0958c9784b1bc456658ab8e92e4e7d8d96891fddf9abff304dfcf64819d38941",
+   "bytes": 16657
+  },
+  "nozzle/llm_calls.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference/llm_calls.json",
+   "sha256": "223f56cfd8328cd305650823331e0c6b041ec4cf50baebc21507d224b750670c",
+   "bytes": 1112
+  },
+  "nozzle/blockMeshDict": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_e2e/case_A_reference/generated_case/system/blockMeshDict",
+   "sha256": "d4a9376e271e68b1c035688d6bfd4df69cd07f19d300cc0ab2073480544de335",
+   "bytes": 1482
+  },
+  "nozzle/mach_t0006_paraview.png": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/field-evolution-video/outputs/field_videos/nozzle_final/contours/mach.png",
+   "sha256": "46fa6a065cc2598b7a2a2f6ed7841c1c6c7b5556a3cf21d4b3e3cc2f8a48b076",
+   "bytes": 17194
+  },
+  "nozzle_continuation/iter01_validation.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/iterations/iteration_01/validation.json",
+   "sha256": "a464bb86d182d29301da8b3b10cf1f983e7f3fd2a47220186d6bd2a3faf492b4",
+   "bytes": 9658
+  },
+  "nozzle_continuation/iter02_validation.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/iterations/iteration_02/validation.json",
+   "sha256": "a535b0a9a6d0c580bee2982dce1368ab62fc960d843f9f5597257843355df4eb",
+   "bytes": 31699
+  },
+  "nozzle_continuation/iter01_agent_decision.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/iterations/iteration_01/agent_decision.json",
+   "sha256": "bccbfffc10e77cc91eb93711109475617189605c1c38b0bd6a609f0758e2d206",
+   "bytes": 1976
+  },
+  "nozzle_continuation/iter02_agent_decision.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/iterations/iteration_02/agent_decision.json",
+   "sha256": "84dfa64dcbfa0ea2955d6bcd28be369f8787598572c5f20f17844c4e110f28a4",
+   "bytes": 2037
+  },
+  "nozzle_continuation/llm_calls.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/llm_calls.json",
+   "sha256": "6bc9764ca44b1caf6c8f4809290f553910adf57566a51e8176dfd5bee399b923",
+   "bytes": 1112
+  },
+  "nozzle_continuation/events.log": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/nozzle_feedback_v2_hotfix/case_A_reference/events.log",
+   "sha256": "e25497fa60919cee7dd321aba1aee938d3511d67ad6be193e8ddde810628751f",
+   "bytes": 3501
+  },
+  "step/validation.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/validation.json",
+   "sha256": "90a4edd3b58031d9f0ef144dc9fdb2f13c082f86f69b901f79352dd5d4e23a75",
+   "bytes": 6331
+  },
+  "step/diagnostics.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/diagnostics.json",
+   "sha256": "94db93735f93c67bfc0d449f2e7ebd407e7729d790c8d0917b64f06ed80ff18b",
+   "bytes": 5549
+  },
+  "step/shock_front_history.csv": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/shock_front_history.csv",
+   "sha256": "213b3caef64d5fab777138169355c794dc9c87c7c51d196f5393b6938bd7cac5",
+   "bytes": 3073
+  },
+  "step/transient_mass.csv": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/transient_mass.csv",
+   "sha256": "bad32c33c2e59f84bce79e5ee1153cd3037f25ec0ae3ad097b21c0d16cbd2f8c",
+   "bytes": 830583
+  },
+  "step/stored_totals.csv": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/stored_totals.csv",
+   "sha256": "0d4de3887b8632d1dc897602580a9be2fbf7a66f223251cd6b0d0a0979577a7b",
+   "bytes": 6097
+  },
+  "step/provenance.json": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/provenance.json",
+   "sha256": "9281e6b3ff9d55d15e717160b3765c21fc106c4d0c73ad5a8e101e0c2ea2c9fd",
+   "bytes": 6489
+  },
+  "step/events.log": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/events.log",
+   "sha256": "f587e16cfa574a6ca106bcd5c925a0413648346888f2f70a3f3f27081c9db2a1",
+   "bytes": 2725
+  },
+  "step/Mach_field.png": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/figures/Mach_field.png",
+   "sha256": "35dd71a94996ca2e442421520a43002a6fdf768a87f69111feed93100e0b7710",
+   "bytes": 54208
+  },
+  "step/shock_density_contours.png": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_B_mach20/iteration_01/figures/shock_density_contours.png",
+   "sha256": "cf8ee11c21ba9a4fbcc0b69c8a62546ad85799a9e17fe1571831cc67e28bab70",
+   "bytes": 374591
+  },
+  "step/case_H_events.log": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_H_iterative_short_run/events.log",
+   "sha256": "110d54937e0e0c5ede5910182803c54028e54846c185d419c20b6d04c38e4b2e",
+   "bytes": 3360
+  },
+  "step/case_F_events.log": {
+   "source": "Research/physics-constrained-cfd-agent-e2e/demo/forward_step_2d/case_F_step030/events.log",
+   "sha256": "09c027e37883fb2defc7ed2a6d415be61bd42cd30def9bd1b063dde77d0c04c6",
+   "bytes": 2762
+  },
+  "cube/cycle_gates.json": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/outputs/family3_cube_reference/audit_t80/cycle_gates.json",
+   "sha256": "238e5327bece733e1658e75b9fd336f4af8ce23153a18041361668c23a674e49",
+   "bytes": 2029
+  },
+  "cube/forces_merged.csv": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/outputs/family3_cube_reference/audit_t80/forces_merged.csv",
+   "sha256": "2108894266437010d4fe75c120002cb43a4d5533785e9b77e3dddb5c24ea89d4",
+   "bytes": 201261
+  },
+  "cube/cube_wall_t80.csv": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/outputs/family3_cube_reference/audit_t80/cube_wall_t80.csv",
+   "sha256": "4e599b61f9ad3c5979b4ec1f69fce567fcda6fcc2fd3383783124394165022db",
+   "bytes": 403882
+  },
+  "cube/registered_stationarity.json": {
+   "source": "Research/physics-constrained-cfd-agent/cases/cube/drifting_wake/expected_result.json",
+   "sha256": "df64d4882cb562ee64fd332183268af0d14fdc7e5fca9b51aa20be8f0a967317",
+   "bytes": 2084
+  },
+  "cube/force_history.json": {
+   "source": "Research/physics-constrained-cfd-agent/cases/cube/drifting_wake/reference/force_history.json",
+   "sha256": "dcf993436e2931bc77a4ac27c0382d2c3da4a179b3fe2a92bb1136414d7c829e",
+   "bytes": 579517
+  },
+  "cube/blockMeshDict": {
+   "source": "Research/CFD_Verification_Package_20260929/03_cube/system/blockMeshDict",
+   "sha256": "1463d58cb92de5237353d652b9a488599aa41226ff198f979484f90f0feb8ed5",
+   "bytes": 7756
+  },
+  "cube/log.checkMesh": {
+   "source": "Research/CFD_Verification_Package_20260929/03_cube/logs/log.checkMesh.retry2",
+   "sha256": "fa7b9d8419a9c82c35a63d85a254e92d7295a433e73a1c0fd53dab862f9a0e4b",
+   "bytes": 4305
+  },
+  "cube/initial_BC_audit.json": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/outputs/family3_cube_reference/recovery_evidence/sst/cube_pilot/initial_BC_audit.json",
+   "sha256": "05cfb4aac5e7b9a7cac5a21a3830584bda68e9338169cde52a8df9c7ba97d4ee",
+   "bytes": 3183
+  },
+  "cube/mapping.json": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/outputs/family3_cube_reference/recovery_evidence/sst/cube_pilot/mapping.json",
+   "sha256": "02f4d661066ec03287733cf4da5b379d4bf25c7f25c504320712cfc63e99009f",
+   "bytes": 811
+  },
+  "cube/velocity_t80_paraview.png": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/field-evolution-video/outputs/field_videos/cube_final/contours/velocity.png",
+   "sha256": "7a6bd4afdaae33c1950ea7d7a0bad0ec9832760df8f849e0e94c50de76834220",
+   "bytes": 42199
+  },
+  "cube/video_manifest.json": {
+   "source": "Codex/2026-09-20/i-am-attaching-a-full-project/field-evolution-video/outputs/field_videos/cube_final/video/video_manifest.json",
+   "sha256": "b7ed9064484281028e0548746c7f040b758a400343bc6582aa92f1e7a313ad76",
+   "bytes": 52825
+  },
+  "cube/video_manifest_ranges.json": {
+   "source": "DERIVED: fixed_color_ranges extracted from cube/video_manifest.json",
+   "sha256": "5b583f6b15afcdf22c729cf0f1c5ccb10a2683051d0f0ba6134e8d12b3c0b2c8",
+   "bytes": 334
+  },
+  "cube/grid_lines.npz": {
+   "source": "DERIVED: unique x,y,z coordinates of Research/CFD_Verification_Package_20260929/03_cube/constant/polyMesh/points (sha256 ff38d437... matches field-video manifest after CR stripping)",
+   "sha256": "886121a5e56d6a6a38d3ea4d185e5b6506aba8ae28829f66a4443d9f39f931fc",
+   "bytes": 2988
+  }
+ }
+}

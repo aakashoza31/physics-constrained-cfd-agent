@@ -1,0 +1,219 @@
+{
+  "family": "forward_step_2d",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family\nwith inlet Mach number 2.0, step height 0.20 channel heights, and step location\nx = 0.6. Run the CFD, inspect the transient shock/compression structure, and\ndetermine whether the final result passes deterministic scientific validation.\n",
+  "started": "2026-09-22T15:36:33",
+  "iterations": [
+    {
+      "iteration": 1,
+      "spec": {
+        "length": 3.0,
+        "height": 1.0,
+        "step_x": 0.6,
+        "step_height": 0.2,
+        "span": 0.1,
+        "nx": 240,
+        "ny": 80,
+        "mach": 2.0,
+        "pressure": 1.0,
+        "temperature": 1.0,
+        "end_time": 4.0,
+        "max_co": 0.2,
+        "write_interval": 0.1,
+        "family": "forward_step_2d",
+        "physics": "inviscid_euler"
+      },
+      "execution": {
+        "status": "COMPLETED",
+        "returncode": 0,
+        "wall_seconds": 102.18043928,
+        "last_observed_time": 4.0,
+        "requested_end_time": 4.0,
+        "wall_limit_seconds": 7200.0,
+        "stall_limit_seconds": 300.0,
+        "serial": true,
+        "continuation": false,
+        "command": "foamRun -case /home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case"
+      },
+      "validation_status": "PASS_2D_FORWARD_STEP",
+      "failed_checks": [],
+      "images": [
+        "Mach_field",
+        "T_field",
+        "mesh_cells",
+        "p_field",
+        "rho_field",
+        "shock_density_contours",
+        "shock_front_history",
+        "speed_field"
+      ],
+      "visual_status": "visual_observation_complete",
+      "llm_diagnosis": "HEALTHY_COMPLETE",
+      "llm_action": "ACCEPT",
+      "action_approved": true,
+      "action_reasons": [
+        "ACCEPT is consistent with the deterministic forward-step checks."
+      ]
+    }
+  ],
+  "llm_interpretation": {
+    "case_name": "mach2p0_step0p20",
+    "summary": "Simulate the forward-facing step with inlet Mach 2.0, step height 0.20, and step at x = 0.6.",
+    "mach": 2.0,
+    "step_height": 0.2,
+    "step_x": 0.6,
+    "length": null,
+    "height": null,
+    "pressure": null,
+    "temperature": null,
+    "end_time": null,
+    "max_co": null,
+    "nx": null,
+    "ny": null,
+    "requests_unsupported_physics": false,
+    "unsupported_notes": [],
+    "reporting_objectives": [
+      "inspect the transient shock/compression structure",
+      "determine whether the final result passes deterministic scientific validation"
+    ],
+    "notes": []
+  },
+  "field_provenance": {
+    "stated_by_user": [
+      "mach",
+      "step_height",
+      "step_x"
+    ],
+    "inferred_from_family_defaults": [
+      "end_time",
+      "height",
+      "length",
+      "max_co",
+      "nx",
+      "ny",
+      "pressure",
+      "temperature",
+      "write_interval"
+    ],
+    "defaults_source": "canonical OpenFOAM v14 shockFluid/forwardStep tutorial"
+  },
+  "reporting_objectives": [
+    "inspect the transient shock/compression structure",
+    "determine whether the final result passes deterministic scientific validation"
+  ],
+  "scope_gate": {
+    "approved": true,
+    "decision": "IN_SCOPE",
+    "family": "forward_step_2d",
+    "reasons": [],
+    "checks": {
+      "specification_valid": true,
+      "registered_family": true,
+      "step_inside_channel": true,
+      "mach_in_range": true,
+      "step_height_fraction_in_range": true,
+      "step_x_fraction_in_range": true,
+      "aspect_ratio_in_range": true,
+      "pressure_in_range": true,
+      "temperature_in_range": true,
+      "end_time_in_range": true,
+      "max_co_in_range": true,
+      "cells_in_range": true,
+      "cell_aspect_ratio_in_range": true,
+      "request_text_in_family": true
+    },
+    "measurements": {
+      "cells": 16128.0,
+      "canonical_cells": 16128.0,
+      "step_height_fraction": 0.2,
+      "step_x_fraction": 0.19999999999999998,
+      "channel_aspect_ratio": 3.0,
+      "dx": 0.012499999999999999,
+      "dy": 0.0125,
+      "cell_aspect_ratio": 0.9999999999999999,
+      "realized_inlet_Mach": 2.000006294393939,
+      "inlet_velocity": 2.0
+    },
+    "clarification_needed": [
+      "The request mentions turbulence (rans). This family solves inviscid Euler with slip walls; confirm that is acceptable."
+    ],
+    "authority": "deterministic"
+  },
+  "spec": {
+    "length": 3.0,
+    "height": 1.0,
+    "step_x": 0.6,
+    "step_height": 0.2,
+    "span": 0.1,
+    "nx": 240,
+    "ny": 80,
+    "mach": 2.0,
+    "pressure": 1.0,
+    "temperature": 1.0,
+    "end_time": 4.0,
+    "max_co": 0.2,
+    "write_interval": 0.1,
+    "family": "forward_step_2d",
+    "physics": "inviscid_euler"
+  },
+  "runtime": {
+    "mode": "wsl",
+    "distro": "Ubuntu-24.04",
+    "bashrc": "/opt/openfoam14/etc/bashrc",
+    "returncode": 0,
+    "raw": "VERSION=14\nTOOL=blockMesh\nTOOL=checkMesh\nTOOL=foamPostProcess\nTOOL=foamRun\nNUMPY=1.26.4\nHOME=/home/aakash",
+    "openfoam_version": "14",
+    "numpy": "1.26.4",
+    "home": "/home/aakash",
+    "missing_tools": [],
+    "ok": true
+  },
+  "runtime_case": "/home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case",
+  "llm_calls": [
+    {
+      "stage": "forward_step_case_spec_interpretation",
+      "source": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "ok": true,
+      "error": null,
+      "latency_s": 5.872,
+      "attempts": 1,
+      "notes": [],
+      "is_llm": true,
+      "label": "LLM:gemini-3.5-flash-lite"
+    },
+    {
+      "stage": "forward_step_reference_blind_diagnosis",
+      "source": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "ok": true,
+      "error": null,
+      "latency_s": 2.87,
+      "attempts": 1,
+      "notes": [],
+      "is_llm": true,
+      "label": "LLM:gemini-3.5-flash-lite"
+    },
+    {
+      "stage": "engineering_summary",
+      "source": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "ok": true,
+      "error": null,
+      "latency_s": 3.656,
+      "attempts": 1,
+      "notes": [],
+      "is_llm": true,
+      "label": "LLM:gemini-3.5-flash-lite"
+    }
+  ],
+  "final_status": "ACCEPTED",
+  "event_summary": {
+    "case_id": "forward_step_2d",
+    "event_count": 24,
+    "failures": [],
+    "llm_sources": [
+      "LLM:gemini-3.5-flash-lite",
+      "LLM:multimodal-visual-observer"
+    ]
+  }
+}

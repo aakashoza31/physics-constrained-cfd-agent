@@ -1,0 +1,24 @@
+    0.00s  [ORCHESTRATOR]           ....  Resuming an existing case at /home/aakash/.cache/nozzle-e2e/20260922T203850Z-forward-step-2d/case. The solver will not be restarted from t = 0 and no existing field is rewritten.
+    0.00s  [ORCHESTRATOR]           PASS  Previous run documents archived to pre_resume_20260922T212609Z; 5 recorded iteration(s) preserved.
+    5.71s  [PREFLIGHT]              PASS  OpenFOAM Foundation v14 ready (wsl, numpy 1.26.4).
+    6.04s  [ORCHESTRATOR]           PASS  Recovered specification: Mach 3, 16128 cells, initial execution horizon t = 0.5, current horizon t = 2, final target t = 4.
+    6.40s  [ORCHESTRATOR]           PASS  Corrected pipeline staged for the resumed loop.
+    6.40s  [EXECUTOR]               ....  Iteration 6: no solver execution. The case is already solved to its current horizon; its existing fields are re-read as evidence.
+    6.72s  [EXECUTOR]               PASS  Solver status COMPLETED at t = 2.0 after 14 s.
+    6.72s  [DIAGNOSTICS]            ....  Collecting transient diagnostics and field images.
+   13.20s  [DIAGNOSTICS]            PASS  17/17 hard checks passed; hard checks PASS_HARD_CHECKS; disposition CURRENT_STATE_HEALTHY_TARGET_NOT_REACHED; 8 field images.
+   13.20s  [SCIENTIFIC VALIDATOR]   ....  Current state is healthy but not finally acceptable: t = 2.0 of the required t = 4.0.
+   20.56s  [LLM]                    ....  Multimodal observation: visual_observation_failed   <LLM:multimodal-visual-observer>
+   37.26s  [LLM]                    ....  Diagnosis HEALTHY_INCOMPLETE -> EXTEND_END_TIME (high). All deterministic hard checks pass and the solver completed the requested end time of 2.0 successfully. However, the final target horizon of 4.0 has not yet been reached, requiring   <LLM:gemini-3.5-flash-lite>
+   37.26s  [ACTION VALIDATOR]       PASS  EXTEND_END_TIME APPROVED: EXTEND_END_TIME permitted: 2 -> 4 on a healthy run that reached its current horizon; final target t = 4.
+   37.26s  [SCIENTIFIC VALIDATOR]   FAIL  Deterministic verdict: CURRENT_STATE_HEALTHY_TARGET_NOT_REACHED
+   37.26s  [ORCHESTRATOR]           ....  Approved EXTEND_END_TIME: {'end_time': 4.0}.
+   39.22s  [EXECUTOR]               ....  Iteration 7: foamRun -case (shockFluid) to t = 4 (continuation)
+   70.20s  [EXECUTOR]               PASS  Solver status COMPLETED at t = 4.0 after 28 s.
+   70.20s  [DIAGNOSTICS]            ....  Collecting transient diagnostics and field images.
+   76.98s  [DIAGNOSTICS]            PASS  17/17 hard checks passed; hard checks PASS_HARD_CHECKS; disposition PASS_2D_FORWARD_STEP; 8 field images.
+   89.19s  [LLM]                    ....  Multimodal observation: visual_observation_complete   <LLM:multimodal-visual-observer>
+   91.39s  [LLM]                    ....  Diagnosis HEALTHY_COMPLETE -> ACCEPT (high). All deterministic checks pass, conservation is maintained, and the solver successfully reached both the current requested end time and the final target end time of 4.0. The physica   <LLM:gemini-3.5-flash-lite>
+   91.39s  [ACTION VALIDATOR]       PASS  ACCEPT APPROVED: ACCEPT is consistent with the deterministic forward-step checks.
+   91.39s  [SCIENTIFIC VALIDATOR]   PASS  Deterministic verdict: PASS_2D_FORWARD_STEP
+   94.06s  [REPORTER]               PASS  Scientific summary written.   <LLM:gemini-3.5-flash-lite>

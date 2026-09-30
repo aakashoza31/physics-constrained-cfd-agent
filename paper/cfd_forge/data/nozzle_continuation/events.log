@@ -1,0 +1,25 @@
+    0.00s  [ORCHESTRATOR]           ....  Engineering request received (866 characters).
+    3.82s  [LLM]                    ....  Case interpreted: exit radius 0.0354 m, p0 200000 Pa, T0 300 K, ambient 30000 Pa.   <LLM:gemini-3.5-flash-lite>
+    3.83s  [SCOPE GATE]             PASS  Case is inside the declared validated envelope (area ratio 1.1792, NPR 6.667, 2112 cells).
+    9.68s  [PREFLIGHT]              PASS  OpenFOAM Foundation v14 runtime ready (wsl, numpy 1.26.4).
+   10.02s  [MESH TOOL]              ....  Generating parameterized wedge mesh in /home/aakash/.cache/nozzle-e2e/20260921T052758Z-case_A_reference/conical_nozzle_200kpa_30kpa.
+   13.50s  [MESH TOOL]              PASS  openfoam_v14_environment: returncode 0
+   13.50s  [MESH TOOL]              PASS  blockMesh: returncode 0
+   13.50s  [MESH TOOL]              PASS  checkMesh: returncode 0
+   13.50s  [MESH TOOL]              PASS  checkMesh_reports_Mesh_OK: returncode 0
+   13.50s  [MESH TOOL]              PASS  writeCellCentres: returncode 0
+   13.50s  [MESH TOOL]              PASS  writeCellVolumes: returncode 0
+   13.50s  [MESH TOOL]              PASS  checkMesh -allTopology -allGeometry: Mesh OK (2112 cells, max non-orthogonality 9.562293062831).
+   15.18s  [LLM]                    ....  Mesh evidence reviewed -> PROCEED_TO_CFD_SETUP. The deterministic mesh checks report that checkMesh passed with no failed checks, and the mesh is reported as OK.   <LLM:gemini-3.5-flash-lite>
+   15.28s  [CFD SETUP]              PASS  Validated recipe written: shockFluid via foamRun, Kurganov fluxes, Minmod reconstruction, Euler time integration, maxCo 0.4, endTime 0.001 s, totalPressure/totalTemperature/directionMixed inlet, pressure-free zeroGradient outlet, adiabatic slip walls.
+   15.28s  [INITIALIZER]            ....  Writing explicit per-cell quasi-1D initial state.
+   16.76s  [INITIALIZER]            PASS  Read-back verified over 2112 cells; p in [54134.1, 191103.1] Pa spans the quasi-1D range required for this specification.
+   16.76s  [EXECUTOR]               ....  Running foamRun/shockFluid to 0.001 s (bounded, serial).
+   34.09s  [EXECUTOR]               PASS  Solver completed to 0.001 s in 16 s wall clock.
+   34.09s  [DIAGNOSTICS]            ....  Recomputing all deterministic checks from native fields, logs and monitors.
+   36.00s  [DIAGNOSTICS]            FAIL  17/20 deterministic checks passed. Failed: steady_mass_balance, monitors_stationary, fields_stationary.
+   38.94s  [LLM]                    ....  Theory-blind diagnosis: UNCONVERGED -> CONTINUE_RUN. The simulation is numerically healthy, physically admissible, and satisfies all mesh and boundary sanity checks. However, stationarity and mass conservation cri   <LLM:gemini-3.5-flash-lite>
+   38.94s  [ACTION VALIDATOR]       PASS  Proposed action CONTINUE_RUN APPROVED: CONTINUE_RUN is permitted for a healthy evolving solution.
+   38.94s  [SCIENTIFIC VALIDATOR]   FAIL  Deterministic verdict: FAIL (failed: steady_mass_balance, monitors_stationary, fields_stationary)
+   41.49s  [REPORTER]               PASS  Engineering summary written to C:\Backup from one drive\Desktop\Research\physics-constrained-cfd-agent-e2e\demo\nozzle_feedback_v2_hotfix\case_A_reference\ENGINEERING_SUMMARY.md.   <LLM:gemini-3.5-flash-lite>
+   41.49s  [ORCHESTRATOR]           ....  Runtime case preserved at /home/aakash/.cache/nozzle-e2e/20260921T052758Z-case_A_reference/conical_nozzle_200kpa_30kpa (delete manually when done).

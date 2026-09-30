@@ -1,0 +1,192 @@
+{
+  "spec": {
+    "length": 3.0,
+    "height": 1.0,
+    "step_x": 0.6,
+    "step_height": 0.2,
+    "span": 0.1,
+    "nx": 240,
+    "ny": 80,
+    "mach": 2.0,
+    "pressure": 1.0,
+    "temperature": 1.0,
+    "end_time": 4.0,
+    "max_co": 0.2,
+    "write_interval": 0.1,
+    "family": "forward_step_2d",
+    "physics": "inviscid_euler"
+  },
+  "cells": 16128,
+  "final_time": 4.0,
+  "saved_times": 40,
+  "requested_end_time": 4.0,
+  "reached_requested_end_time": true,
+  "solver_completed": true,
+  "solver_runs": 1,
+  "continuation_used": false,
+  "mesh_ok": true,
+  "two_solution_directions": true,
+  "mesh_failed_step": null,
+  "fatal_error": false,
+  "fatal_error_evidence": [],
+  "fatal_scan": {
+    "solver_log": "log.foamRun",
+    "solver_log_bytes": 2760677,
+    "solver_log_complete": true,
+    "signatures_checked": [
+      "foam_fatal_io_error",
+      "foam_fatal_error",
+      "foam_error_stack",
+      "sigfpe_trapped",
+      "sigsegv_trapped",
+      "floating_point_exception",
+      "segmentation_fault",
+      "core_dumped",
+      "abnormal_termination",
+      "non_finite_value"
+    ],
+    "benign_excluded": "FOAM_SIGFPE / sigSegv / sigInt / sigQuit startup banner"
+  },
+  "finite_all_saved": true,
+  "positive_all_saved": true,
+  "ranges_all_saved": {
+    "p": [
+      0.006021869766903488,
+      8.756989500518186
+    ],
+    "rho": [
+      0.02817053613164771,
+      5.424634485926574
+    ],
+    "T": [
+      0.2992719235448107,
+      2.509517475547845
+    ],
+    "speed": [
+      0.003714414482350894,
+      2.723303539183236
+    ],
+    "Mach": [
+      0.002344789007453934,
+      3.4839833303972836
+    ]
+  },
+  "final_ranges": {
+    "p": [
+      0.02885820568455248,
+      6.142677670353234
+    ],
+    "rho": [
+      0.06786791862286244,
+      4.624241009697755
+    ],
+    "T": [
+      0.5945130254966065,
+      1.859717571263714
+    ],
+    "speed": [
+      0.026100815840530516,
+      2.339493022345061
+    ],
+    "Mach": [
+      0.019139560107959076,
+      2.913577126853986
+    ]
+  },
+  "runtime_seconds": 102.18043928,
+  "steps": 5428,
+  "nominal_inlet_Mach": 2.0,
+  "realized_inlet_Mach": 2.000006294393939,
+  "gas": {
+    "R": 0.7142825028696203,
+    "gamma": 1.3999974822543102,
+    "Cp": 2.5
+  },
+  "warnings": [
+    "--> FOAM Warning:\n    From function virtual Foam::Time& Foam::Time::operator++()\n    in file db/Time/Time.C at line 1323\n    Increased the timePrecision from 14 to 15 to distinguish between timeNames at time 1.00071942446043"
+  ],
+  "energy_momentum_scope": "Stored domain totals only. Boundary momentum and energy flux closure is not computed and is not claimed.",
+  "boundary": {
+    "empty_patch_present": true,
+    "cyclic_patch_count": 0,
+    "expected_patches_present": true
+  },
+  "fixed_recipe_unchanged": true,
+  "cell_count_matches_spec": true,
+  "initial_state_errors": {
+    "p": 0.0,
+    "T": 0.0,
+    "U": 0.0
+  },
+  "Co": {
+    "target": 0.2,
+    "time_loop_max": 0.2020580711633621,
+    "last": 0.178824364627709,
+    "samples": 5428
+  },
+  "courant_finite_positive": true,
+  "max_nonorthogonality": 0.0,
+  "max_skewness": 2.110450105528887e-13,
+  "max_aspect_ratio": 1.000000000000124,
+  "mass": {
+    "final_inlet": 0.28000109141323865,
+    "final_outlet": 0.2348459591234296,
+    "instantaneous_mismatch_fraction": -0.16126770100037577,
+    "relative_residual_max": 5.674922520888197e-11,
+    "relative_residual_p99": 2.9741990167955357e-11,
+    "cumulative_defect_fraction_initial_mass": 8.292024565917043e-14,
+    "cumulative_defect_max_abs_fraction": 1.0014940486159768e-13,
+    "impermeable_flux_max_abs": 1.1384122811097797e-17,
+    "note": "Mass closure only. shockFluid's momentum/energy boundary fluxes are local predictor temporaries, so no momentum or energy closure is claimed."
+  },
+  "minima_every_step": {
+    "rho": 0.02590184989356427,
+    "p": 0.006021869766903488,
+    "T": 0.29725332629658746
+  },
+  "transient_evolution": {
+    "p": {
+      "relative_L2": 0.0734274763957849,
+      "relative_Linf": 0.5034227752268207
+    },
+    "rho": {
+      "relative_L2": 0.053691906922462604,
+      "relative_Linf": 0.43040358556603325
+    },
+    "T": {
+      "relative_L2": 0.028428496117737307,
+      "relative_Linf": 0.3330487558517634
+    },
+    "U": {
+      "relative_L2": 0.04960836670029641,
+      "relative_Linf": 0.5039096429228659
+    }
+  },
+  "shock": {
+    "available": true,
+    "upper_stem_x": 0.17500000000000002,
+    "regional_angle_deg": 83.69808928844273,
+    "qualification": "Gradient-based regional measurements on a moving, curved shock system. Not an exact stationary-shock interpretation and not a grid-converged measurement.",
+    "lower_front_x": 0.1125,
+    "sample_counts": [
+      12,
+      24
+    ],
+    "jumps": {
+      "p": 5.184097221136844,
+      "rho": 2.8705803663020273,
+      "T": 1.8059342466322001
+    },
+    "sample_upstream_Mach": 2.000006294394051,
+    "stationary_normal_shock_sanity": {
+      "p": 4.500026751208605,
+      "rho": 2.6666806542309294,
+      "T": 1.6875011801915263,
+      "note": "Sanity reference for a stationary normal shock; not an acceptance band."
+    }
+  },
+  "reference_comparison": {
+    "status": "PENDING_NO_REFERENCE_PACKAGE",
+    "note": "The trusted 2D reference evidence package is not present in this repository. No reference numbers are invented. Supply a reference .npz to enable this comparison."
+  }
+}

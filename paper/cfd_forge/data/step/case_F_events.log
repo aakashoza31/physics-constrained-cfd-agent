@@ -1,0 +1,24 @@
+    0.00s  [ORCHESTRATOR]           ....  Engineering request received (727 characters).
+    6.36s  [ORCHESTRATOR]           ....  3 reporting objective(s) recorded for the final summary; these do not affect case setup or the scope gate.
+    6.36s  [LLM]                    ....  Interpreted: Mach 3, step height 0.3, step at x = 0.6, 14592 cells, end time 4.   <LLM:gemini-3.5-flash-lite>
+    6.37s  [SCOPE GATE]             PASS  In scope: Mach 3, step/height 0.300, 14592 cells, dx/dy 1.000.
+    6.37s  [SCOPE GATE]             ....  Clarification noted: The request mentions turbulence (rans). This family solves inviscid Euler with slip walls; confirm that is acceptable.
+   18.89s  [PREFLIGHT]              PASS  OpenFOAM Foundation v14 ready (wsl, numpy 1.26.4).
+   23.43s  [CFD SETUP]              PASS  Case generated: 14592 cells, blocks [1152, 2688, 10752], dx 0.0125, dy 0.0125. Trusted recipe copied unchanged (Kurganov, vanLeer/vanLeerV, Euler, shockFluid).
+   29.73s  [MESH TOOL]              PASS  openfoam_v14_environment: returncode 0
+   29.74s  [MESH TOOL]              PASS  blockMesh: returncode 0
+   29.74s  [MESH TOOL]              PASS  checkMesh: returncode 0
+   29.74s  [MESH TOOL]              PASS  checkMesh_reports_Mesh_OK: returncode 0
+   29.75s  [MESH TOOL]              PASS  two_solution_directions: returncode 0
+   29.75s  [MESH TOOL]              PASS  writeCellCentres: returncode 0
+   29.75s  [MESH TOOL]              PASS  writeCellVolumes: returncode 0
+   29.76s  [MESH TOOL]              PASS  checkMesh: Mesh OK, 2 solution directions.
+   29.76s  [EXECUTOR]               ....  Iteration 1: foamRun -case (shockFluid) to t = 4
+  150.76s  [EXECUTOR]               PASS  Solver status COMPLETED at t = 4.0 after 116 s.
+  150.76s  [DIAGNOSTICS]            ....  Collecting transient diagnostics and field images.
+  166.83s  [DIAGNOSTICS]            FAIL  16/17 hard checks passed; status FAIL; 8 field images. Failed: compression_front_measurable.
+  189.04s  [LLM]                    ....  Multimodal observation: visual_observation_complete   <LLM:multimodal-visual-observer>
+  193.69s  [LLM]                    ....  Diagnosis NO_COMPRESSION_STRUCTURE -> FAIL_SAFELY (high). Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upst   <LLM:gemini-3.5-flash-lite>
+  193.69s  [ACTION VALIDATOR]       PASS  FAIL_SAFELY APPROVED: FAIL_SAFELY permitted: evidence is preserved and no further CFD is executed.
+  193.70s  [SCIENTIFIC VALIDATOR]   FAIL  Deterministic verdict: FAIL
+  199.33s  [REPORTER]               PASS  Scientific summary written.   <LLM:gemini-3.5-flash-lite>
