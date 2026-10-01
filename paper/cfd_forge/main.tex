@@ -1451,13 +1451,13 @@ schema passed as the structured-output schema. The field observer reads the
 same model variable but does not record it (Sec.~\ref{sec:model}). The
 nozzle sessions ran on 21 September 2026 and the step sessions on 22
 September 2026; the cube calculation ran on 23--24 September 2026, and its
-LLM diagnosis (Sec.~\ref{sec:cube_results}) on 1 October 2026. The system
+LLM diagnosis (Sec.~\ref{sec:cube_results}) and the controller comparison (Sec.~\ref{sec:controller}) on 1 October 2026. The system
 instructions and schemas are defined in the repository in
 \texttt{src/agents/} (request interpretation, mesh review, theory- and
 reference-blind diagnosis, field observation, and reporting) and, for the
 cube diagnosis, in \nolinkurl{paper/cfd_forge/scripts/cube_llm_diagnosis.py}.
 Each run allowed at most four iterations of solve, diagnosis, and action. Token counts were recorded only for the cube
-diagnosis.
+diagnosis and the controller comparison.
 
 {\sloppy\paragraph{Action vocabularies.} The nozzle family
 admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
