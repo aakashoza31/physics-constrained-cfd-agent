@@ -1,0 +1,1032 @@
+{
+  "family": "nozzle",
+  "case": "canonical_reference",
+  "verdict": "ACCEPT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields",
+  "status": "RENDERED",
+  "output_files": [
+    "pressure_evolution.mp4",
+    "velocity_evolution.mp4",
+    "temperature_evolution.mp4",
+    "mach_evolution.mp4",
+    "summary_evolution.mp4",
+    "simulation.mp4"
+  ],
+  "source_config_and_mesh_sha256": {
+    "constant/momentumTransport": "1e30ed3650d4c5a03bd4c6d8489a6e8bcd5d8baf0931b2b116734a2ce5c2c793",
+    "constant/physicalProperties": "1b18c19b8b907ed20381f5b25f901cbb752432827c86f92d4e036fd8b6953ef8",
+    "constant/polyMesh/boundary": "c2cb9f37f7f4058c58a923d58d92cf6290fa6e7ccb26b836b924e84dba265eb8",
+    "constant/polyMesh/faces": "5a94575a05dcb1bc85eb2713c0b02f9bd99016323f356821486ebe902710fd75",
+    "constant/polyMesh/neighbour": "e3a2954cadbce82da33d54909df3b2b299b4ce9423b420881c41784c190e58d0",
+    "constant/polyMesh/owner": "b22f39f065ecf8764450f0412ad87b7bc990452d85b2f9fc60322498ba699249",
+    "constant/polyMesh/points": "dd7a0e708d0d3b479e7c423fc5901bb79d21f18ce26b8ffdc581f5b150bc321c",
+    "system/blockMeshDict": "9c3e1489289f49649c77c616dc7028fa00dab2fbe3aaf6f3337a6a767e09ca6f",
+    "system/controlDict": "e349a1eef2244f5b9c9332b5163a9525f96a86db8a11292d9c01f4b1c87243e4",
+    "system/fvSchemes": "31a8984c63336fd02a82d79e5244dccde4230c872cd7c1d198c30beb9975922f",
+    "system/fvSolution": "7f9afe3a3b3d77af1a4791f381d4114d23e859fbda16a63e48f43ac79bf6dd61"
+  },
+  "source_case_directory": "external-case://conical_nozzle_200kpa_30kpa",
+  "source_case_id": "3dbc880057b46b24cf47ca285024e9bc3087ba4c96ef93ea24c25a2be42c5d12",
+  "physical_solver_time": true,
+  "solver": "shockFluid",
+  "rendered_solver_times": [
+    0.0,
+    0.00025,
+    0.0005,
+    0.00075,
+    0.001,
+    0.00125,
+    0.0015,
+    0.00175,
+    0.002,
+    0.00225,
+    0.0025,
+    0.00275,
+    0.003,
+    0.00325,
+    0.0035,
+    0.00375,
+    0.004,
+    0.00425,
+    0.0045,
+    0.00475,
+    0.005,
+    0.00525,
+    0.0055,
+    0.00575,
+    0.006
+  ],
+  "time_directory_names": [
+    "0",
+    "0.00025",
+    "0.0005",
+    "0.00075",
+    "0.001",
+    "0.00125",
+    "0.0015",
+    "0.00175",
+    "0.002",
+    "0.00225",
+    "0.0025",
+    "0.00275",
+    "0.003",
+    "0.00325",
+    "0.0035",
+    "0.00375",
+    "0.004",
+    "0.00425",
+    "0.0045",
+    "0.00475",
+    "0.005",
+    "0.00525",
+    "0.0055",
+    "0.00575",
+    "0.006"
+  ],
+  "frame_count": 25,
+  "sampling": "uniform index selection of actual available times; no temporal interpolation",
+  "data_layout": "reconstructed",
+  "output_cadence": {
+    "writeControl": "adjustableRunTime",
+    "writeInterval": "0.00025",
+    "purgeWrite": "0"
+  },
+  "paraview_version": "(5, 11)",
+  "ffmpeg_version": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "reader_only_dimension_translations": [
+    {
+      "file": "0/T",
+      "from": "temperature",
+      "to": "0 0 0 1 0 0 0",
+      "source_sha256": "a096133b5e5f76a21bb18ff06e39186b66ea88fa6628ceda4edb7a4c33c82fd9"
+    },
+    {
+      "file": "0/U",
+      "from": "velocity",
+      "to": "0 1 -1 0 0 0 0",
+      "source_sha256": "7ede4c5c9c91c06f2e7f16072fc4d42df1460cac3537ff1a559e30e8cc71ab73"
+    },
+    {
+      "file": "0/p",
+      "from": "pressure",
+      "to": "1 -1 -2 0 0 0 0",
+      "source_sha256": "5dd90cbffe21d41470dda18bd6b72f66df27ba5f8eeca6cd83f97a228f64c440"
+    }
+  ],
+  "reader_time_values": [
+    0.0,
+    0.00025,
+    0.0005,
+    0.00075,
+    0.001,
+    0.00125,
+    0.0015,
+    0.00175,
+    0.002,
+    0.00225,
+    0.0025,
+    0.00275,
+    0.003,
+    0.00325,
+    0.0035,
+    0.00375,
+    0.004,
+    0.00425,
+    0.0045,
+    0.00475,
+    0.005,
+    0.00525,
+    0.0055,
+    0.00575,
+    0.006
+  ],
+  "mach_derivation": {
+    "formula": "mag(U)/sqrt(gamma*R*T)",
+    "gamma_R": 401.7999789651776
+  },
+  "slice": null,
+  "camera": {
+    "position": [
+      0.16500000655651093,
+      0.024976205080747604,
+      1.0
+    ],
+    "focal_point": [
+      0.16500000655651093,
+      0.024976205080747604,
+      0.0
+    ],
+    "view_up": [
+      0,
+      1,
+      0
+    ],
+    "parallel_scale": 0.11880000472068786
+  },
+  "rendering_method": "ParaView OpenFOAMReader; cell coloring; offscreen rendering; two-pass fixed temporal ranges",
+  "fields_rendered": [
+    "pressure",
+    "velocity",
+    "temperature",
+    "mach"
+  ],
+  "fixed_color_ranges": {
+    "pressure": [
+      49460.453125,
+      195247.953125
+    ],
+    "velocity": [
+      79.62639756128047,
+      445.3412269710627
+    ],
+    "temperature": [
+      201.33201599121094,
+      298.0133972167969
+    ],
+    "mach": [
+      0.23011909314556525,
+      1.5657352420165316
+    ]
+  },
+  "range_scope": "cell values on rendered dataset (slice for cube), across every selected time",
+  "field_data_ranges": {
+    "pressure": [
+      49460.453125,
+      195247.953125
+    ],
+    "velocity": [
+      79.62639756128047,
+      445.3412269710627
+    ],
+    "temperature": [
+      201.33201599121094,
+      298.0133972167969
+    ],
+    "mach": [
+      0.23011909314556525,
+      1.5657352420165316
+    ]
+  },
+  "per_frame_color_ranges": [
+    {
+      "time": 0.0,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00025,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00025,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00025,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00025,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0005,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0005,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0005,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0005,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00075,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00075,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00075,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00075,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.001,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.001,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.001,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.001,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00125,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00125,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00125,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00125,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0015,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0015,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0015,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0015,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00175,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00175,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00175,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00175,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.002,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.002,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.002,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.002,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00225,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00225,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00225,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00225,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0025,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0025,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0025,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0025,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00275,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00275,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00275,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00275,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.003,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.003,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.003,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.003,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00325,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00325,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00325,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00325,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0035,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0035,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0035,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0035,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00375,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00375,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00375,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00375,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.004,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.004,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.004,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.004,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00425,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00425,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00425,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00425,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0045,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0045,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0045,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0045,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00475,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00475,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00475,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00475,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.005,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.005,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.005,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.005,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00525,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00525,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00525,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00525,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.0055,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.0055,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.0055,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.0055,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.00575,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.00575,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.00575,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.00575,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    },
+    {
+      "time": 0.006,
+      "field": "pressure",
+      "range": [
+        49460.453125,
+        195247.953125
+      ]
+    },
+    {
+      "time": 0.006,
+      "field": "velocity",
+      "range": [
+        79.62639756128047,
+        445.3412269710627
+      ]
+    },
+    {
+      "time": 0.006,
+      "field": "temperature",
+      "range": [
+        201.33201599121094,
+        298.0133972167969
+      ]
+    },
+    {
+      "time": 0.006,
+      "field": "mach",
+      "range": [
+        0.23011909314556525,
+        1.5657352420165316
+      ]
+    }
+  ],
+  "contact_sheet": "contact_sheet.png",
+  "output_sha256": {
+    "pressure_evolution.mp4": "6171a323b3f609c43a583dd752cc844a734a75cee00eddaddb95f97242d8a6e0",
+    "velocity_evolution.mp4": "4ffa3d32ff3e7e18e16949d4b8be542d990d3e9113d64a3b59fe6fa459f0e109",
+    "temperature_evolution.mp4": "b47a8e66bc689359270468569fd8bf3b59510149e73d6b80df91faedeeace643",
+    "mach_evolution.mp4": "bedaf720db2bc584ebec766093c81e65a454a88f21746af864f3a9a629717ad0",
+    "summary_evolution.mp4": "bbcd8a06ccfbc2c64af7f2bf01cbbdd540cc038dd308edade35084616f3766c9",
+    "simulation.mp4": "bbcd8a06ccfbc2c64af7f2bf01cbbdd540cc038dd308edade35084616f3766c9"
+  },
+  "source_config_and_mesh_unchanged": true,
+  "summary_fields": [
+    "mach",
+    "pressure",
+    "velocity",
+    "temperature"
+  ],
+  "is_flow_field_animation": true,
+  "fps": 8,
+  "playback": "one selected solver time per frame; frame spacing does not imply uniform physical time"
+}

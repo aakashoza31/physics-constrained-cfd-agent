@@ -1,0 +1,115 @@
+{
+  "status": "success",
+  "stage": "single_initial_mesh_measurement",
+  "mesh_file": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\mesh\\trial_01\\initial_mesh.msh",
+  "nodes": 12517,
+  "elements_3d": 63747,
+  "element_types_3d": [
+    4
+  ],
+  "quality_metric": "minSICN",
+  "minimum_quality_minSICN": 0.34939536633362894,
+  "average_quality_minSICN": 0.881772269684192,
+  "throat_nodes": 6113,
+  "throat_node_metric_definition": {
+    "x_min_m": 0.14500000000000002,
+    "x_max_m": 0.16500000000000004,
+    "radial_limit_m": 0.03586
+  },
+  "constraints": {
+    "max_elements": 150000,
+    "min_quality": 0.1,
+    "min_throat_nodes": null
+  },
+  "feasible_initial_mesh": true,
+  "violations": [],
+  "boundary_tags": {
+    "inlet": [
+      3
+    ],
+    "outlet": [
+      7
+    ],
+    "walls": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "fluid": [
+      1
+    ]
+  },
+  "physical_group_tags": {
+    "inlet": 1,
+    "outlet": 2,
+    "walls": 3,
+    "fluid": 4
+  },
+  "mesh_strategy": {
+    "global_size_m": 0.01,
+    "throat_size_m": 0.002,
+    "wall_size_m": 0.005,
+    "diverging_size_m": 0.008,
+    "throat_padding_m": 0.01,
+    "wall_refinement_distance_m": 0.005,
+    "refine_throat": true,
+    "refine_walls": false,
+    "refine_diverging_section": false,
+    "refine_high_curvature": true,
+    "boundary_layer_requested": false,
+    "rationale": "An initial mesh strategy is proposed with local refinement focused on the throat and high-curvature geometric stations. Slip wall conditions are specified without boundary layers, respecting the user budget."
+  },
+  "mesh_field_execution": {
+    "background_field_tag": 6,
+    "field_tags": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "field_descriptions": [
+      {
+        "type": "throat_box",
+        "field_tag": 1,
+        "size_m": 0.002,
+        "x_min_m": 0.14,
+        "x_max_m": 0.17000000000000004
+      },
+      {
+        "type": "high_curvature_box",
+        "field_tag": 2,
+        "center_x_m": 0.15000000000000002,
+        "half_width_m": 0.01,
+        "size_m": 0.005
+      },
+      {
+        "type": "high_curvature_box",
+        "field_tag": 3,
+        "center_x_m": 0.05,
+        "half_width_m": 0.01,
+        "size_m": 0.005
+      },
+      {
+        "type": "high_curvature_box",
+        "field_tag": 4,
+        "center_x_m": 0.16000000000000003,
+        "half_width_m": 0.01,
+        "size_m": 0.005
+      },
+      {
+        "type": "high_curvature_box",
+        "field_tag": 5,
+        "center_x_m": 0.28,
+        "half_width_m": 0.01,
+        "size_m": 0.005
+      }
+    ],
+    "global_size_m": 0.01,
+    "effective_mesh_size_min_m": 0.001
+  },
+  "mesh_optimization": "netgen_success",
+  "boundary_layer_status": "not_requested"
+}

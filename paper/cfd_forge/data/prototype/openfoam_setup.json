@@ -1,0 +1,40 @@
+{
+  "source": "gemini",
+  "plan": {
+    "solver": "fluid",
+    "simulation_mode": "transient",
+    "turbulence_treatment": "laminar",
+    "turbulence_model": null,
+    "inlet_turbulence_intensity": 0.05,
+    "inlet_turbulence_mixing_length_m": 0.005,
+    "thermophysical_package": "hePsiThermo",
+    "equation_of_state": "perfectGas",
+    "transport_model": "sutherland",
+    "energy_formulation": "sensibleInternalEnergy",
+    "convective_flux_scheme": "Kurganov",
+    "gradient_scheme": "Gauss linear",
+    "laplacian_scheme": "Gauss linear corrected",
+    "time_scheme": "Euler",
+    "initial_delta_t_s": 1e-07,
+    "max_courant_number": 0.5,
+    "minimum_run_steps": 1000,
+    "maximum_run_steps": 20000,
+    "write_interval_steps": 500,
+    "residual_target": 0.0001,
+    "mass_flow_relative_imbalance_target": 0.001,
+    "convergence_window_steps": 500,
+    "output_fields": [
+      "p",
+      "T",
+      "U",
+      "rho",
+      "Mach",
+      "mass_flow"
+    ],
+    "rationale": "For high pressure ratio compressible nozzle flow using the modern OpenFOAM fluid solver backend, a transient density-based formulation using Kurganov fluxes and kOmegaSST turbulence provides robust shock capture and boundary layer representation. Conservative initial time step and Euler time integration ensure stable startup before steady flow establishment.",
+    "assumptions": [
+      "Inlet turbulence intensity of 5 percent is standard for internal pipe/nozzle flows.",
+      "Mixing length is estimated from 10 percent of the inlet radius."
+    ]
+  }
+}

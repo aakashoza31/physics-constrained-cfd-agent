@@ -1,14 +1,14 @@
-# CFD Forge paper: outstanding gaps (state 2026-09-30)
+# CFD Forge paper: outstanding gaps (state 2026-10-01)
 
 Scope freeze applies: none of these items requires a new CFD case. Only item 1
 needs any data movement at all, and none needs a new solver run.
 
 | # | Gap | Affects | Why it matters | Likely source | Existing evidence enough? | New CFD? | Priority |
 |---|-----|---------|----------------|---------------|---------------------------|----------|----------|
-| 1 | Field panels are re-axed copies of archived renderings, not renders made directly from native fields | Fig. 4a,b (step Mach, density at t=4); Fig. 5a (cube \|U\| at t*=80) | The pixels are real native-field renders (Mach colour limits confirmed from the colourbar ticks), but a reviewer-grade figure should be rendered straight from the fields | WSL: `/home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case/4/`; `/home/aakash/family3_cube_sst_literature_audit_t4_retry2/80/` | Yes, once copied to Windows (the copy command was sent in chat) | No | High |
-| 2 | No nozzle contour panel | Fig. 3 (optional) | Profiles already carry the validation; a Mach contour would make it easier to read | Same WSL nozzle case, `0.006/` | Yes | No | Low |
+| 1 | Field panels are re-axed copies of archived renderings, not renders made directly from native fields | Fig. 4a,b (step Mach, density at t=4); Fig. 5a (cube \|U\| at t*=80) | The pixels are real native-field renders (Mach colour limits confirmed from the colourbar ticks), but a reviewer-grade figure should be rendered straight from the fields | WSL: `/home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case/4/`; `/home/aakash/family3_cube_sst_literature_audit_t4_retry2/80/` | Yes, once copied to Windows (the copy command was sent in chat) | No | Medium (2026-10-01: accepted for the arXiv draft; captions state renders are archived ParaView images of native fields, re-axed from the recorded camera; TODO removed. Optional native re-render via scripts/extract_native_fields.py) |
+| 2 | No nozzle contour panel | Fig. 3 (optional) | Profiles already carry the validation; a Mach contour would make it easier to read | Same WSL nozzle case, `0.006/` | Yes | No | RESOLVED 2026-10-01: Fig. nozzle_fields (Mach, p, T at 6 ms) |
 | 3 | Page count: 16 pages including ~2.5 pages of references, in generic `article` 11 pt | Whole paper | The target conference's page limit and template are not recorded anywhere I could find | Prof. Amir / venue call | n/a | No | High |
-| 4 | Four new references added (Kurganov–Tadmor 2000, Woodward–Colella 1984, Menter 1994, Martinuzzi–Tropea 1993); bibliographic details were written from knowledge, not retrieved | References [20–23] | Volume, page and DOI details should be checked before submission | Publisher pages | Needs a quick check | No | Medium |
+| 4 | Four new references added (Kurganov–Tadmor 2000, Woodward–Colella 1984, Menter 1994, Martinuzzi–Tropea 1993); bibliographic details were written from knowledge, not retrieved | References [20–23] | RESOLVED 2026-10-01: all 23 references checked against Crossref/arXiv/NTRS; every DOI/arXiv ID resolves to the cited paper. Corrected chen2026optmeta (vol. 16, no. 5), added dong2025 issue 3 and Toolformer pages. Celik 2008 author list could not be confirmed from Crossref (no author metadata) | Publisher pages | Done | No | Low |
 | 5 | Registered cube gate and paper criterion were inconsistent in the Overleaf draft | Sec. 3.3 (corrected) | The draft called the 10% complete-cycle test "the registered criterion". The registered gate (`src/families/cube/stationarity.py`, `cube-stationarity/1.0.0`) is the half-window mean \|Fz\| ratio ≤ 1.25 (measured 2.10). The 10% cycle test (measured +112.96%) comes from the separate read-only audit `outputs/family3_cube_reference/audit_t80/`. The text now states both and labels them separately. **Please have Prof. Amir confirm this framing.** | Code + audit | Yes | No | High |
 | 6 | Docstring of `src/families/cube/stationarity.py` is wrong | Code only (not the paper) | It says the run "misses the drift bound by more than an order of magnitude" and misses the growth bound "by a factor of about six". Measured values: drift 0.075% vs 2% (**passes**); growth 2.10 vs 1.25 (factor 1.68). The gate logic and verdict are correct; only the comment is wrong. Left unchanged here (code is outside the paper-only scope). | Repo | n/a | No | Medium |
 | 7 | Nozzle runs: canonical vs continuation | Secs. 2.3, 3.1, 4.1, Table 4 | The handoff described one run with a continuation. The archives show two real runs: canonical `20260921T041731Z` (single execution to 6 ms, accepted first time; the field-video source) and continuation run `20260921T052758Z` (1 ms FAIL → Gemini CONTINUE_RUN → 6 ms PASS). The paper now attributes each result to the correct run. | `demo/nozzle_e2e/`, `demo/nozzle_feedback_v2_hotfix/` in the e2e worktree | Yes | No | Done (please confirm) |
@@ -30,9 +30,15 @@ needs any data movement at all, and none needs a new solver run.
 | 19 | Repo docs call the nozzle "compressible Euler, 2-D"; it is an axisymmetric 5° wedge | Paper says axisymmetric; align the docs |
 
 ## TODO markers in `main.tex`
-- Fig. 4 caption: `\textbf{TODO:}` re-render (a,b) from native t = 4 fields (item 1).
+- Sec. 5.4: cube Gemini diagnosis pending (`scripts/cube_llm_diagnosis.py --repeats 3`, run on the laptop with the key).
+- (Fig. 4 TODO removed 2026-10-01; see item 1.)
 - (Fig. 5a has the same limitation; its caption states the source honestly but carries no TODO. Add one if preferred.)
 
 ## Things deliberately NOT changed
 - Abstract, Introduction, Sections 2.1–2.4, Figure 1, title, authors.
 - All historical verdicts: nozzle ACCEPT, step ACCEPT, cube REJECT (STILL_DEVELOPING).
+
+## Added 2026-10-01 (figures for the arXiv draft)
+- New figures, all from archived data: fig_agent_loop (architecture; counts from agent_stats.json), fig_agent_stats, fig_mesh_nozzle (exact blockMesh wedge + prototype Gmsh surface), fig_mesh_step_cube (native polyMesh), fig_nozzle_fields, fig_step_evolution, fig_cube_wake. fig2_configurations is no longer used in main.tex.
+- New paragraph on the prototype CAD->Gmsh run (Sec. 5.2) from data/prototype and data/gmsh records. It states only what those records show; the Gmsh path is not claimed as validated.
+- Cube "wake" field = `U_Z` (ParaView Calculator in src/reporting/paraview_field_video.py, lines 195-201); labelled U_z/U_b with U_b = 1. Verified 2026-10-01.

@@ -1,0 +1,43 @@
+{
+  "source": "gemini",
+  "plan": {
+    "case_name": "20260914_020146_conical_nozzle",
+    "geometry": {
+      "family": "conical",
+      "selection_reason": "User explicitly selected the conical family.",
+      "inlet_radius": 0.05,
+      "throat_radius": 0.0326,
+      "outlet_radius": 0.0354,
+      "inlet_length": 0.05,
+      "converging_length": 0.1,
+      "throat_length": 0.01,
+      "diverging_length": 0.12,
+      "outlet_length": 0.05,
+      "bell_exponent": 1.0,
+      "profile_points": []
+    },
+    "physics": {
+      "fluid": "air",
+      "compressible": true,
+      "inlet_total_pressure_pa": 200000.0,
+      "inlet_total_temperature_k": 300.0,
+      "outlet_static_pressure_pa": 30000.0,
+      "walls": "slip",
+      "turbulence_model": "Euler",
+      "solver": "shockFluid"
+    },
+    "mesh_constraints": {
+      "max_elements": 5000,
+      "min_quality": 0.28,
+      "min_throat_nodes": 180,
+      "important_regions": [
+        "throat",
+        "diverging"
+      ]
+    },
+    "assumptions": [
+      "Dimensions converted from mm to SI meters.",
+      "Calorically perfect gas assumption with gamma=1.4 and R=287."
+    ]
+  }
+}

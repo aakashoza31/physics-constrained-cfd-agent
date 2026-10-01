@@ -1,0 +1,73 @@
+{
+  "sessions": {
+    "step": 11,
+    "nozzle": 8
+  },
+  "n_sessions": 19,
+  "model_calls_by_stage": {
+    "interpretation": 17,
+    "field observation": 15,
+    "diagnosis": 23,
+    "summary": 19,
+    "field observation (failed)": 5,
+    "mesh review": 8
+  },
+  "proposals_by_action": {
+    "ACCEPT": 11,
+    "FAIL_SAFELY": 3,
+    "EXTEND_END_TIME": 4,
+    "CONTINUE_RUN": 4,
+    "REFINE_MESH": 1
+  },
+  "rulings": {
+    "ACCEPT|APPROVED": 10,
+    "FAIL_SAFELY|APPROVED": 3,
+    "EXTEND_END_TIME|APPROVED": 3,
+    "CONTINUE_RUN|REJECTED": 1,
+    "EXTEND_END_TIME|REJECTED": 1,
+    "REFINE_MESH|APPROVED": 1,
+    "ACCEPT|REJECTED": 1,
+    "CONTINUE_RUN|APPROVED": 3
+  },
+  "refusals": [
+    {
+      "file": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T210551Z/events.jsonl",
+      "message": "CONTINUE_RUN REJECTED: CONTINUE_RUN refused: the requested horizon t = 1 was already reached."
+    },
+    {
+      "file": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z/events.jsonl",
+      "message": "EXTEND_END_TIME REJECTED: Iteration budget exhausted (5/4); no further CFD actions may be executed."
+    },
+    {
+      "file": "forward_step_2d/case_I_mesh_sensitivity/events.jsonl",
+      "message": "ACCEPT REJECTED: ACCEPT refused: this request asked for a numerical-sensitivity assessment, and the registered cross-grid requirement is not met (SENSITIVITY_CRITERION_NOT_REGISTERED). NOT REGISTERED. No cross-grid tolerance exists in this "
+    }
+  ],
+  "latency_median_s_by_stage": {
+    "case_spec_interpretation": 4.279,
+    "mesh_evidence_review": 1.9380000000000002,
+    "theory_blind_diagnosis": 2.9444999999999997,
+    "engineering_summary": 2.539
+  },
+  "source_files": [
+    "forward_step_2d/case_B_mach20/events.jsonl",
+    "forward_step_2d/case_C_mach35/events.jsonl",
+    "forward_step_2d/case_E_step010/events.jsonl",
+    "forward_step_2d/case_F_step030/events.jsonl",
+    "forward_step_2d/case_G_step030_x100/events.jsonl",
+    "forward_step_2d/case_H_iterative_short_run/events.jsonl",
+    "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T210551Z/events.jsonl",
+    "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212431Z/events.jsonl",
+    "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z/events.jsonl",
+    "forward_step_2d/case_I_mesh_sensitivity/events.jsonl",
+    "forward_step_2d/live_run_01/events.jsonl",
+    "nozzle_e2e/case_A_reference/events.jsonl",
+    "nozzle_e2e/case_B_geometry/events.jsonl",
+    "nozzle_e2e/case_C_conditions/events.jsonl",
+    "nozzle_feedback/case_A_reference/events.jsonl",
+    "nozzle_feedback_final/case_B_geometry/events.jsonl",
+    "nozzle_feedback_final/case_C_conditions/events.jsonl",
+    "nozzle_feedback_v2/case_A_reference/events.jsonl",
+    "nozzle_feedback_v2_hotfix/case_A_reference/events.jsonl"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "run_name": "20260914_020146_conical_nozzle",
+  "prompt": "Simulate compressible inviscid air flow through an axisymmetric conical converging-diverging nozzle.\n\nGeometry:\ninlet radius = 50 mm\nthroat radius = 32.6 mm\noutlet radius = 35.4 mm\ninlet straight length = 50 mm\nconverging length = 100 mm\nthroat length = 10 mm\ndiverging length = 120 mm\noutlet straight length = 50 mm\n\nOperating conditions:\ninlet stagnation pressure = 200 kPa\ninlet stagnation temperature = 300 K\ndownstream back pressure = 30 kPa\n\nUse calorically perfect air with gamma = 1.4 and R = 287 J/(kg K).\n\nUse inviscid Euler physics with adiabatic slip walls.\n\nAutonomously determine the flow regime, choose regime-consistent boundary conditions and initialization, generate and validate the mesh, execute OpenFOAM, diagnose the CFD using numerical and visual evidence, and take only scientifically validated corrective actions.\n\nDo not expose analytical solution target values to the CFD reasoning agent.\n\nPrioritize physical reliability, conservation, numerical stability, and traceable scientific decision-making.",
+  "family": "conical",
+  "iterations": [
+    {
+      "iteration": 1,
+      "diagnosis": "UNCONVERGED",
+      "action": "CONTINUE_RUN",
+      "guardrail_approved": true,
+      "physical_time_s": 0.000100004930555
+    },
+    {
+      "iteration": 2,
+      "diagnosis": "UNCONVERGED",
+      "action": "CONTINUE_RUN",
+      "guardrail_approved": true,
+      "physical_time_s": 0.000200004930555
+    }
+  ],
+  "terminal_reason": null,
+  "final_package": {
+    "run_name": "20260914_020146_conical_nozzle",
+    "results_directory": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final",
+    "report_markdown": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\CFD_REPORT.md",
+    "report_html": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\CFD_REPORT.html",
+    "primary_vtk": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\final_field.vtk",
+    "final_mesh": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\final_mesh.msh",
+    "images": {
+      "p": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\images\\pressure.png",
+      "Mach": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\images\\mach.png",
+      "VelocityMagnitude": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\images\\velocity_magnitude.png",
+      "mesh": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent\\runs\\20260914_020146_conical_nozzle\\final\\images\\mesh.png"
+    },
+    "visualization_error": null
+  },
+  "theory_used_by_agent": false,
+  "initialization_theory_assisted": true
+}
