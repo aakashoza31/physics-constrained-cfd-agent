@@ -152,14 +152,14 @@ def fig_meshes():
     ax.add_patch(plt.Rectangle((0.45, 0.1), 0.3, 0.2, fc="none", ec=C2, lw=1.0))
     ax.set_xlim(0, 3); ax.set_ylim(0, 1); ax.set_aspect("equal")
     ax.set_xlabel("x", labelpad=1); ax.set_ylabel("y", labelpad=1)
-    ax.set_title(f"(c) Step: {len(P):,} cells (every 4th line)")
+    ax.set_title(f"(a) Step: {len(P):,} cells (every 4th line)")
     ax = fig.add_subplot(gs[0, 1])
     ax.add_collection(PolyCollection(P, facecolor="none", edgecolor=INK2, linewidths=0.35))
     ax.add_patch(plt.Rectangle((0.6, 0), 2.4, 0.2, fc="#efeeea", ec=INK, lw=0.8))
     ax.set_xlim(0.45, 0.75); ax.set_ylim(0.1, 0.3); ax.set_aspect("equal")
     ax.set_xlabel("x", labelpad=1)
     dx = float(np.median(np.diff(xv)))
-    ax.set_title(f"(d) Step corner, every cell (Δx = Δy = {dx:.4g})")
+    ax.set_title(f"(b) Step corner, every cell (Δx = Δy = {dx:.4g})")
     for sp in ax.spines.values():
         sp.set_edgecolor(C2)
 
@@ -175,7 +175,7 @@ def fig_meshes():
     ax.set_box_aspect((7, 5, 1.2), zoom=1.35)
     ax.view_init(elev=32, azim=-55)
     ax.set_axis_off()
-    ax.set_title("(e) Cube and floor surface mesh, −2 ≤ x/H ≤ 5", pad=0)
+    ax.set_title("(c) Cube and floor surface mesh, −2 ≤ x/H ≤ 5", pad=0)
 
     ax = fig.add_subplot(gs[1, 1])
     lo, hi = d["lo"], d["hi"]
@@ -185,7 +185,7 @@ def fig_meshes():
     ax.add_patch(plt.Rectangle((0, -0.5), 1, 1, fc=C2, ec=INK, lw=0.5))
     ax.set_xlim(-2, 6); ax.set_ylim(-2.5, 2.5); ax.set_aspect("equal")
     ax.set_xlabel("x/H", labelpad=1); ax.set_ylabel("z/H", labelpad=1)
-    ax.set_title(f"(f) Cube: cell layer at y/H = 0.5 ({int(m.sum()):,} cells)")
+    ax.set_title(f"(d) Cube: cell layer at y/H = 0.5 ({int(m.sum()):,} cells)")
     fig.savefig(OUT / "fig_mesh_step_cube.pdf", bbox_inches="tight")
     fig.savefig(OUT / "fig_mesh_step_cube.png", bbox_inches="tight", dpi=200)
     plt.close(fig)

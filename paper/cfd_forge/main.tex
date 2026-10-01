@@ -994,10 +994,10 @@ Assessment basis & Quasi-1-D analytical consistency and registered numerical che
     \centering
     \includegraphics[width=0.88\linewidth]{Figures/fig_mesh_step_cube.pdf}
     \caption{Step and cube meshes, plotted from the native OpenFOAM
-    \texttt{polyMesh} files. (c) Forward-facing-step domain (every fourth grid
-    line) with the step in grey and (d) every cell near the step corner; the
+    \texttt{polyMesh} files. (a) Forward-facing-step domain (every fourth grid
+    line) with the step in grey and (b) every cell near the step corner; the
     mesh topology files are identical to those of the agent's Mach-2 case.
-    (e) Cube and floor boundary faces near the cube and (f) the cell layer
+    (c) Cube and floor boundary faces near the cube and (d) the cell layer
     starting at $y/H=0.5$, showing the clustering around the cube and in the
     near wake.}
     \label{fig:meshes_step_cube}
@@ -1067,7 +1067,7 @@ Euler equations using \texttt{shockFluid}. The domain has
 length 3 and height 1, with the step beginning at $x=0.6$
 and rising to a height of 0.2. A structured mesh contains
 16,128 hexahedral cells and one spanwise layer with
-\texttt{empty} front and back boundaries (Fig.~\ref{fig:meshes_step_cube}c,d).
+\texttt{empty} front and back boundaries (Fig.~\ref{fig:meshes_step_cube}a,b).
 
 The normalized inlet and initial states are
 $p=1$, $T=1$, and $\mathbf{U}=(2,0,0)$; the normalized gas has unit
@@ -1146,7 +1146,7 @@ The computational domain spans
 $x/H\in[-6,16]$, $y/H\in[0,2]$, and $z/H\in[-12,12]$.
 The cube occupies $x/H\in[0,1]$,
 $y/H\in[0,1]$, and $z/H\in[-0.5,0.5]$.
-The mesh contains 567,360 hexahedral cells (Fig.~\ref{fig:meshes_step_cube}e,f).
+The mesh contains 567,360 hexahedral cells (Fig.~\ref{fig:meshes_step_cube}c,d).
 Developed inlet velocity and turbulence profiles are mapped from a
 precursor channel calculation. The floor, roof, side walls, and cube use
 no-slip velocity conditions with the preserved SST wall-function treatment.
