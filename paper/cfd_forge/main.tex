@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations include a converging-diverging nozzle and a two-dimensional Mach-2 forward-facing step that satisfy their registered criteria. A three-dimensional turbulent cube, run outside the agent loop, serves as a retrospective diagnostic stress test: a stationarity gate, defined after the run, withholds acceptance because the lateral force is still growing although the mean drag is stable. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
+Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations cover a converging-diverging nozzle and a two-dimensional forward-facing step. Within these families, the agent built and ran new cases from text requests that varied the geometry and operating conditions, and the canonical runs satisfy their registered criteria. A three-dimensional turbulent cube, run outside the agent loop, serves as a retrospective diagnostic stress test: a stationarity gate, defined after the run, withholds acceptance because the lateral force is still growing although the mean drag is stable. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
 \end{abstract}
 
 \section{Introduction}
@@ -76,7 +76,7 @@ Integrating execution with scientific assessment requires attention to what coun
 
 CFD Forge connects engineering intent and geometry parameters to case construction, meshing, boundary and initial conditions, OpenFOAM execution, diagnostics, corrective actions, and reporting. The LLM reasons across solver logs, field diagnostics, conservation measures, and flow histories to interpret behavior, identify likely causes of problems, and propose what should be tried next. Deterministic scientific checks measure explicit criteria, enforce thresholds, and retain final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. This division gives reasoning a substantive role while keeping acceptance reproducible. Modular scientific contracts organize physical assumptions, numerical requirements, and allowed actions so that additional simulation families can be incorporated. The current evaluation uses registered families and parameterized geometries.
 
-We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a Mach-2 forward-facing step assessed for transient numerical health and conservation. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. Applied retrospectively, the stationarity gate withholds acceptance on this evidence, illustrating why several physical signals must be examined together. The contribution is the realization of model-proposes, code-decides for CFD acceptance: family-specific numerical contracts, a bounded vocabulary of actions that the validator can refuse, transient and development diagnostics that resist premature acceptance, and an auditable record of model calls, proposals, and refusals. This architecture provides a basis for larger simulation campaigns and future integration with active-learning and design-optimization loops.
+We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a forward-facing step assessed for transient numerical health and conservation, including new cases that the agent built from text requests with different geometry and operating conditions. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. Applied retrospectively, the stationarity gate withholds acceptance on this evidence, illustrating why several physical signals must be examined together. The contribution is the realization of model-proposes, code-decides for CFD acceptance: family-specific numerical contracts, a bounded vocabulary of actions that the validator can refuse, transient and development diagnostics that resist premature acceptance, and an auditable record of model calls, proposals, and refusals. This architecture provides a basis for larger simulation campaigns and future integration with active-learning and design-optimization loops.
 
 \section{The CFD Forge Agent}
 \label{sec:framework}
@@ -542,6 +542,80 @@ Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \tex
 \end{table}
 
 
+\subsection{New Cases Within the Registered Families}
+\label{sec:variants}
+
+Within each registered family, the agent constructed, ran, and assessed new
+cases from natural-language requests that changed the geometry and the
+operating conditions (Table~\ref{tab:variants}). For the nozzle, the
+requests changed the exit radius from 35.4 to 37.0\,mm and, separately, the
+inlet total pressure from 200 to 220\,kPa. For the forward-facing step, they
+changed the inlet Mach number from 2 to 3.5, the step height from 0.1 to 0.3,
+and the step position from $x=0.6$ to $x=1.0$. In each case the model
+extracted the stated quantities, the family builder produced a new mesh and
+case, and the same contract assessed the result. Boundary-condition types are
+fixed by the contract, so the requests changed boundary-condition values
+($p_0$, the inlet Mach number), not their formulation; a request outside the
+registered envelope would have been refused by the scope gate. These were
+development runs, not a held-out evaluation (Appendix~\ref{app:repro}).
+
+The results behave as the physics requires. Raising $p_0$ by $10\%$ at fixed
+geometry left the exit Mach number unchanged (1.513) and scaled the exit
+pressure and the mass flow by 1.100, as expected for a choked perfect-gas
+nozzle; enlarging the exit raised the exit Mach number to 1.652, within
+$0.39\%$ of quasi-one-dimensional theory. All three nozzle variants passed
+the twenty registered checks with differences from theory below $2\%$. In the
+step family, the pressure rise across the detected front exceeded the
+stationary normal-shock ratio at every Mach number by 4--15\%, which is
+consistent with fronts that are still moving upstream, and the storage-aware
+mass closure stayed between $3\times10^{-11}$ and $6\times10^{-11}$ in every
+run. The quasi-one-dimensional choking estimate of Sec.~\ref{sec:step_results}
+separates the configurations. Where the post-shock sonic area exceeds the
+opening above the step (Mach 2 with $h=0.2$, and Mach 3 with $h=0.3$), the
+front was displaced towards the inlet; with the step at $x=0.6$ and $h=0.3$
+it reached $x=0.025$, no front could be measured, and the model proposed
+\texttt{FAIL\_SAFELY}. With the same step moved to $x=1.0$, the front had not
+yet reached the inlet at $t=4$ and the run passed its contract, which for
+this transient family includes no stationarity criterion. The Mach-2.5 run
+was first stopped by the false-positive fatal-error check of
+Sec.~\ref{sec:agent_results} and passes after the corrected reanalysis.
+
+\begin{table}[!htbp]
+\centering
+\caption{New cases built and run by the agent from text requests. Nozzle
+values are at $t=6$\,ms on the 2,112-cell wedge, with differences from
+quasi-one-dimensional theory in parentheses. Step values are at $t=4$ on the
+16,128-cell mesh: the detected front position below the step height, the
+pressure rise across it with the stationary normal-shock ratio in
+parentheses, and the post-shock sonic area $A^*/A$ compared with the opening
+$1-h$ above the step (choked when $A^*/A>1-h$).}
+\label{tab:variants}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\multicolumn{4}{@{}l}{\emph{Converging--diverging nozzle}} \\
+Request & Exit $M$ & Exit $p$ (kPa) & $\dot m$ (kg\,s$^{-1}$) \\
+\midrule
+Reference: $r_e=35.4$\,mm, $p_0=200$\,kPa & 1.513 ($+0.59\%$) & 53.14 ($-1.83\%$) & 1.541 ($-1.11\%$) \\
+Exit radius $r_e=37.0$\,mm & 1.652 ($+0.39\%$) & 43.29 ($-1.57\%$) & 1.541 ($-1.10\%$) \\
+Inlet total pressure $p_0=220$\,kPa & 1.513 ($+0.58\%$) & 58.46 ($-1.83\%$) & 1.695 ($-1.11\%$) \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Forward-facing step}} \\
+Request ($M$, $h$, $x_s$) $\rightarrow$ decision & Front $x$ & $p$ rise (normal shock) & $A^*/A$ vs.\ $1-h$ \\
+\midrule
+2.0, 0.20, 0.6 $\rightarrow$ \texttt{ACCEPT} & 0.113 & 5.18 (4.50) & 0.822 $>$ 0.80, choked \\
+2.5, 0.15, 0.6 $\rightarrow$ \texttt{REJECT}$^{a}$ & 0.341 & 7.49 (7.12) & 0.760 $<$ 0.85 \\
+3.0, 0.10, 0.6 $\rightarrow$ \texttt{ACCEPT} & 0.450 & 11.11 (10.33) & 0.719 $<$ 0.90 \\
+3.0, 0.20, 0.6 $\rightarrow$ \texttt{ACCEPT}$^{b}$ & 0.313 & 10.82 (10.33) & 0.719 $<$ 0.80 \\
+3.0, 0.30, 0.6 $\rightarrow$ \texttt{REJECT} & 0.025 & not measurable & 0.719 $>$ 0.70, choked \\
+3.0, 0.30, 1.0 $\rightarrow$ \texttt{ACCEPT} & 0.425 & 11.00 (10.33) & 0.719 $>$ 0.70, choked \\
+3.5, 0.20, 0.6 $\rightarrow$ \texttt{ACCEPT} & 0.338 & 14.76 (14.12) & 0.692 $<$ 0.80 \\
+\bottomrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize $^{a}$False-positive fatal-error check; \texttt{PASS\_2D\_FORWARD\_STEP} on deterministic reanalysis after the fix. $^{b}$Reached after resumed sessions (Table~\ref{tab:ledger}); the mesh-sensitivity request with the same parameters ended \texttt{INCONCLUSIVE}.} \\
+\end{tabular}
+\end{table}
+
 \subsection{Converging--Diverging Nozzle}
 \label{sec:nozzle_results}
 
@@ -850,7 +924,10 @@ is accepted. Under this division, a converging--diverging nozzle was accepted
 with sub-$2\%$ agreement with quasi-one-dimensional theory after its
 stationarity evidence, not its reference agreement, determined when the run
 was complete. A transient Mach-2 forward-facing-step flow was accepted with
-storage-aware mass closure at round-off. For a three-dimensional turbulent cube run outside the agent loop, a
+storage-aware mass closure at round-off. Within both families, the agent also built and
+assessed new cases from text requests that changed the geometry and the
+operating conditions, and their results followed the expected physical
+trends. For a three-dimensional turbulent cube run outside the agent loop, a
 retrospectively registered stationarity gate withheld acceptance because a
 growing lateral mode showed that solver completion and a settled mean drag
 did not establish a developed flow. Case files, model
