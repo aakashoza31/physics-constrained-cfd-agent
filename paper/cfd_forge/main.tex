@@ -2,6 +2,12 @@
 \usepackage{graphicx}
 \graphicspath{{./}{Figures/}{Figures/figures/}}
 \usepackage[section]{placeins}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
@@ -178,7 +184,7 @@ budgets are listed in Appendix~\ref{app:repro}.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{Figures/fig_agent_loop.pdf}
+    \includegraphics[width=0.95\linewidth]{Figures/fig_agent_loop.pdf}
     \caption{The agent loop as implemented. Blue: model calls, each a single
     schema-constrained request; orange: deterministic gates and validators;
     green: registered tools. A proposed correction is executed only after the
@@ -309,7 +315,7 @@ determine whether the final result passes deterministic scientific validation.
 \end{quote}
 
 \paragraph{Interpretation.} The model converts the request into a structured
-specification (Fig.~\ref{fig:walk_spec}). It extracts the three quantities
+specification (Fig.~\ref{fig:walk_spec} in Appendix~\ref{app:records}). It extracts the three quantities
 the user stated---Mach number 2.0, step height 0.2, and step location
 0.6---and leaves every quantity the user did not state empty rather than
 guessing it. It also records the two reporting objectives separately from
@@ -317,34 +323,6 @@ the case parameters. The framework then fills each empty field from the
 family defaults (the Foundation v14 \texttt{shockFluid/forwardStep} recipe)
 and labels every field as \emph{stated by the user} or \emph{inferred from
 family defaults}, so the origin of each simulation parameter is explicit.
-
-\begin{figure}[!htbp]
-\centering
-\begin{minipage}{0.96\linewidth}
-\footnotesize
-\begin{verbatim}
-model output (LLM, schema-constrained, temperature 0)
-  case_name: mach2p0_step0p20     mach: 2.0   step_height: 0.2   step_x: 0.6
-  length, height, pressure, temperature, end_time, max_co, nx, ny: null
-  requests_unsupported_physics: false
-  reporting_objectives:
-    - inspect the transient shock/compression structure
-    - determine whether the final result passes deterministic scientific validation
-resolved specification
-  length 3.0  height 1.0  nx 240  ny 80  pressure 1.0  temperature 1.0
-  end_time 4.0  max_co 0.2  write_interval 0.1  physics: inviscid_euler
-field provenance
-  stated_by_user:                mach, step_height, step_x
-  inferred_from_family_defaults: end_time, height, length, max_co, nx, ny,
-                                 pressure, temperature, write_interval
-\end{verbatim}
-\end{minipage}
-\caption{Request interpretation in the walkthrough session (abridged from the
-archived \texttt{llm\_interpretation.json}). The model returns only what the
-request states; family defaults complete the specification, and the origin of
-every field is recorded.}
-\label{fig:walk_spec}
-\end{figure}
 
 \paragraph{Admissibility and case construction.} A deterministic scope gate
 checks the resolved specification against the family envelope: Mach number,
@@ -433,7 +411,7 @@ and compression diagnostics. The three-dimensional turbulent cube tests
 whether the acceptance layer can distinguish numerical completion from a
 developed flow. All three use OpenFOAM Foundation v14.
 Figures~\ref{fig:case_geometries} and~\ref{fig:meshes_step_cube} and
-Table~\ref{tab:setup} summarize their
+Table~\ref{tab:setup} (Appendix~\ref{app:setup}) summarize their
 geometry, meshes, boundary conditions, and numerics; the complete setup and
 acceptance criteria are given in Appendix~\ref{app:setup}.
 
@@ -446,7 +424,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{Figures/fig_mesh_nozzle.pdf}
+    \includegraphics[width=0.92\linewidth]{Figures/fig_mesh_nozzle.pdf}
     \caption{Nozzle meshes. (a) The agent-built wedge mesh in the $x$--$r$
     plane, every cell shown: five blocks with 20, 40, 4, 48, and 20 axial
     divisions and 16 radial divisions, reconstructed exactly from the archived
@@ -461,7 +439,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{Figures/fig_mesh_step_cube.pdf}
+    \includegraphics[width=0.88\linewidth]{Figures/fig_mesh_step_cube.pdf}
     \caption{Step and cube meshes, plotted from the native OpenFOAM
     \texttt{polyMesh} files. (c) Forward-facing-step domain (every fourth grid
     line) with the step in grey and (d) every cell near the step corner; the
@@ -471,48 +449,6 @@ that recorded verdicts are reproduced, never as evidence of new execution.
     near wake.}
     \label{fig:meshes_step_cube}
 \end{figure}
-
-\begin{table}[!htbp]
-\centering
-\caption{Simulation setup. All cases use OpenFOAM Foundation v14 through
-\texttt{foamRun}. The scheme, solution, thermophysical and mesh files quoted
-here match the SHA-256 digests recorded for the native cases in the
-field-evolution manifests; cube boundary types are taken from the preserved
-initial-condition audit of its predecessor pilot.}
-\label{tab:setup}
-\small
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.05cm}
-  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
-  >{\raggedright\arraybackslash}X@{}}
-\toprule
- & Nozzle & Forward-facing step & Surface-mounted cube \\
-\midrule
-Model & Inviscid compressible Euler, perfect gas ($\gamma=1.4$, $R=287$\,J\,kg$^{-1}$\,K$^{-1}$); \texttt{shockFluid}
- & Inviscid compressible Euler, normalized perfect gas ($\gamma=1.4$, sound speed 1); \texttt{shockFluid}
- & Incompressible URANS, $k$--$\omega$ SST~\cite{menter1994sst}, $\nu=2.5\times10^{-5}$, $Re_H=40{,}000$; \texttt{incompressibleFluid} \\
-Mesh & 5$^\circ$ wedge, $132\times16=2{,}112$ hexahedra; max.\ aspect ratio 2.46, non-orthogonality $9.6^\circ$, skewness 0.33
- & Three blocks, uniform $\Delta x=\Delta y=0.0125$, 16,128 hexahedra, one \texttt{empty} spanwise layer
- & Rectilinear, $116\times40\times124$ minus the $20^3$ cube cells $=567{,}360$ hexahedra; max.\ aspect ratio 18.4, six partitions \\
-Inlet & \texttt{totalPressure} $p_0=200$\,kPa, \texttt{totalTemperature} $T_0=300$\,K, axial-direction velocity
- & Fixed $p=1$, $T=1$, $\mathbf{U}=(2,0,0)$
- & Developed $\mathbf{U}$, $k$, $\omega$ mapped from a precursor channel; $\partial p/\partial n=0$ \\
-Outlet & Zero gradient for $p$, $T$, $\mathbf{U}$ (30\,kPa ambient not imposed)
- & Zero-gradient $p$; \texttt{inletOutlet} $\mathbf{U}$, $T$
- & Fixed gauge $p$; zero gradient for $\mathbf{U}$, $k$, $\omega$ \\
-Other boundaries & Slip wall; \texttt{wedge} front/back; axis
- & Step: slip; top/bottom: \texttt{symmetryPlane}
- & Floor, roof ($y/H=2$), side walls ($z/H=\pm12$), cube: no-slip with \texttt{kqR}/\texttt{omega}/\texttt{nutUSpalding} wall functions \\
-Numerics & Kurganov flux~\cite{kurganov2000central}, Minmod reconstruction, Euler time step, $\mathrm{Co}_{\max}=0.4$
- & Kurganov flux, van Leer ($\rho$, $T$) and van Leer-V ($\mathbf{U}$) reconstruction, Euler, $\mathrm{Co}_{\max}=0.2$
- & Backward time step, PIMPLE (2 outer, 2 pressure correctors), linear-upwind $\mathbf{U}$, upwind $k,\omega$, $\mathrm{Co}_{\max}=0.8$, $\Delta t\le0.02$ \\
-Horizon & $t=6$\,ms (30,471 steps) & $t=4$ (5,428 steps) & $t^*=80$ \\
-Assessment basis & Quasi-1-D analytical consistency and registered numerical checks
- & Registered numerical checks and directional compression diagnostics
- & Registered stationarity/development gate \\
-\bottomrule
-\end{tabularx}
-\end{table}
 
 \section{Results}
 \label{sec:results}
@@ -535,8 +471,8 @@ per stage; 5 of the 23 field-observation calls failed with a provider error
 \texttt{FAIL\_SAFELY}, 1 \texttt{REFINE\_MESH}, and 1
 \texttt{REQUEST\_DIAGNOSTIC}. The validator approved 25 and refused 3
 (Fig.~\ref{fig:agent_stats}). Table~\ref{tab:actions}
-lists representative decision points, and Fig.~\ref{fig:trace} shows one
-complete diagnosis record.
+lists representative decision points, and Fig.~\ref{fig:trace} in
+Appendix~\ref{app:records} shows one complete diagnosis record.
 
 \begin{figure}[!htbp]
     \centering
@@ -547,39 +483,6 @@ complete diagnosis record.
     field-observation calls failed with a provider-side HTTP 503 error.
     (b) Action proposals by type and the action validator's ruling.}
     \label{fig:agent_stats}
-\end{figure}
-
-\begin{figure}[!htbp]
-\centering
-\begin{minipage}{0.96\linewidth}
-\footnotesize
-\begin{verbatim}
-diagnosis: UNCONVERGED            confidence: high
-evidence_used:
-  - mass imbalance is 1.35 percent, exceeding the steady balance criterion
-  - passes_stationarity is false
-  - mass flow range and drift indicate ongoing evolution
-  - no local mesh underresolution flagged by baseline metrics
-competing_hypotheses:
-  - insufficient_run_time
-      for:     monitors and fields are not yet stationary;
-               mass imbalance and drift are slowly decreasing
-  - local_mesh_underresolution
-      for:     strong gradients present near throat
-      against: checkMesh passed cleanly; no candidate underresolved
-               regions flagged by feedback profile diagnostics
-action: CONTINUE_RUN
-action validator: APPROVED ("permitted for a healthy evolving solution")
-scientific validator: FAIL (steady_mass_balance, monitors_stationary,
-                            fields_stationary)
-\end{verbatim}
-\end{minipage}
-\caption{Archived LLM diagnosis record for the
-nozzle continuation run at $t=1$\,ms (abridged from
-\texttt{agent\_decision.json}; wording verbatim). The model separates
-insufficient run time from local under-resolution using the evidence packet,
-and its proposal is executed only after the action validator approves it.}
-\label{fig:trace}
 \end{figure}
 
 In
@@ -786,7 +689,7 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{Figures/fig_nozzle_fields.pdf}
+    \includegraphics[width=0.78\linewidth]{Figures/fig_nozzle_fields.pdf}
     \caption{Canonical agent nozzle run at $t=6$\,ms: Mach number, static
     pressure, and static temperature from the archived ParaView renderings of
     the native fields (fixed colour ranges recorded in the field-evolution
@@ -889,7 +792,7 @@ for, not that the solution is accurate.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{Figures/fig_step_evolution.pdf}
+    \includegraphics[width=0.92\linewidth]{Figures/fig_step_evolution.pdf}
     \caption{Evolution of the agent's Mach-2 step solution: Mach number at
     $t=0.5$, 1, 2, and 4 from the archived ParaView renderings of the native
     fields, on one fixed colour range. The detached front moves upstream
@@ -935,22 +838,11 @@ amplitude more than doubles every cycle. Block-averaged fields are also
 misleading: between the $t^*=60$--70 and 70--80 averages the mean drag
 changes by only $0.04\%$ and wake-probe means by at most $0.002\,U_b$, while
 the root-mean-square lateral force increases by $110\%$. Period averages
-suppress an alternating signal whose amplitude is still growing. The
-instantaneous lateral-velocity fields make the same point visually
-(Fig.~\ref{fig:cube_wake}): at $t^*=20$, 40, 60, and 80 the near-wake
-structure looks almost the same, so inspection of contours alone would not
-reveal the growing mode that the force history exposes.
-
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=\linewidth]{Figures/fig_cube_wake.pdf}
-    \caption{Lateral velocity $U_z/U_b$ on the plane $y/H=0.5$ at four
-    times, from the archived ParaView renderings of the native cube fields on
-    one fixed colour range. The snapshots differ little, although the
-    lateral force amplitude more than doubles over the registered window
-    (Fig.~\ref{fig:cube}c).}
-    \label{fig:cube_wake}
-\end{figure}
+suppress an alternating signal whose amplitude is still growing. Instantaneous
+lateral-velocity fields on the plane $y/H=0.5$ at $t^*=20$, 40, 60, and 80
+are almost indistinguishable on a common colour range (not shown), so
+inspection of contours alone would not reveal the growing mode that the
+force history exposes.
 
 \begin{figure}[!htbp]
     \centering
@@ -1068,6 +960,48 @@ evaluations must remain scientifically accountable.
 \appendix
 \section{Detailed Simulation Setup and Acceptance Criteria}
 \label{app:setup}
+
+\begin{table}[!htbp]
+\centering
+\caption{Simulation setup. All cases use OpenFOAM Foundation v14 through
+\texttt{foamRun}. The scheme, solution, thermophysical and mesh files quoted
+here match the SHA-256 digests recorded for the native cases in the
+field-evolution manifests; cube boundary types are taken from the preserved
+initial-condition audit of its predecessor pilot.}
+\label{tab:setup}
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.05cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+ & Nozzle & Forward-facing step & Surface-mounted cube \\
+\midrule
+Model & Inviscid compressible Euler, perfect gas ($\gamma=1.4$, $R=287$\,J\,kg$^{-1}$\,K$^{-1}$); \texttt{shockFluid}
+ & Inviscid compressible Euler, normalized perfect gas ($\gamma=1.4$, sound speed 1); \texttt{shockFluid}
+ & Incompressible URANS, $k$--$\omega$ SST~\cite{menter1994sst}, $\nu=2.5\times10^{-5}$, $Re_H=40{,}000$; \texttt{incompressibleFluid} \\
+Mesh & 5$^\circ$ wedge, $132\times16=2{,}112$ hexahedra; max.\ aspect ratio 2.46, non-orthogonality $9.6^\circ$, skewness 0.33
+ & Three blocks, uniform $\Delta x=\Delta y=0.0125$, 16,128 hexahedra, one \texttt{empty} spanwise layer
+ & Rectilinear, $116\times40\times124$ minus the $20^3$ cube cells $=567{,}360$ hexahedra; max.\ aspect ratio 18.4, six partitions \\
+Inlet & \texttt{totalPressure} $p_0=200$\,kPa, \texttt{totalTemperature} $T_0=300$\,K, axial-direction velocity
+ & Fixed $p=1$, $T=1$, $\mathbf{U}=(2,0,0)$
+ & Developed $\mathbf{U}$, $k$, $\omega$ mapped from a precursor channel; $\partial p/\partial n=0$ \\
+Outlet & Zero gradient for $p$, $T$, $\mathbf{U}$ (30\,kPa ambient not imposed)
+ & Zero-gradient $p$; \texttt{inletOutlet} $\mathbf{U}$, $T$
+ & Fixed gauge $p$; zero gradient for $\mathbf{U}$, $k$, $\omega$ \\
+Other boundaries & Slip wall; \texttt{wedge} front/back; axis
+ & Step: slip; top/bottom: \texttt{symmetryPlane}
+ & Floor, roof ($y/H=2$), side walls ($z/H=\pm12$), cube: no-slip with \texttt{kqR}/\texttt{omega}/\texttt{nutUSpalding} wall functions \\
+Numerics & Kurganov flux~\cite{kurganov2000central}, Minmod reconstruction, Euler time step, $\mathrm{Co}_{\max}=0.4$
+ & Kurganov flux, van Leer ($\rho$, $T$) and van Leer-V ($\mathbf{U}$) reconstruction, Euler, $\mathrm{Co}_{\max}=0.2$
+ & Backward time step, PIMPLE (2 outer, 2 pressure correctors), linear-upwind $\mathbf{U}$, upwind $k,\omega$, $\mathrm{Co}_{\max}=0.8$, $\Delta t\le0.02$ \\
+Horizon & $t=6$\,ms (30,471 steps) & $t=4$ (5,428 steps) & $t^*=80$ \\
+Assessment basis & Quasi-1-D analytical consistency and registered numerical checks
+ & Registered numerical checks and directional compression diagnostics
+ & Registered stationarity/development gate \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Converging--Diverging Nozzle}
 \label{sec:nozzle_setup}
@@ -1248,6 +1182,73 @@ excluded from this comparison. Mean drag, probe statistics,
 and other development indicators provide complementary
 evidence. The cube is retained as a diagnostic stress test,
 not as an accepted turbulent reference solution.
+
+\section{Model Records}
+\label{app:records}
+
+Figures~\ref{fig:walk_spec} and~\ref{fig:trace} reproduce two archived model
+outputs referred to in the main text.
+
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}{0.96\linewidth}
+\footnotesize
+\begin{verbatim}
+model output (LLM, schema-constrained, temperature 0)
+  case_name: mach2p0_step0p20     mach: 2.0   step_height: 0.2   step_x: 0.6
+  length, height, pressure, temperature, end_time, max_co, nx, ny: null
+  requests_unsupported_physics: false
+  reporting_objectives:
+    - inspect the transient shock/compression structure
+    - determine whether the final result passes deterministic scientific validation
+resolved specification
+  length 3.0  height 1.0  nx 240  ny 80  pressure 1.0  temperature 1.0
+  end_time 4.0  max_co 0.2  write_interval 0.1  physics: inviscid_euler
+field provenance
+  stated_by_user:                mach, step_height, step_x
+  inferred_from_family_defaults: end_time, height, length, max_co, nx, ny,
+                                 pressure, temperature, write_interval
+\end{verbatim}
+\end{minipage}
+\caption{Request interpretation in the walkthrough session (abridged from the
+archived \texttt{llm\_interpretation.json}). The model returns only what the
+request states; family defaults complete the specification, and the origin of
+every field is recorded.}
+\label{fig:walk_spec}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}{0.96\linewidth}
+\footnotesize
+\begin{verbatim}
+diagnosis: UNCONVERGED            confidence: high
+evidence_used:
+  - mass imbalance is 1.35 percent, exceeding the steady balance criterion
+  - passes_stationarity is false
+  - mass flow range and drift indicate ongoing evolution
+  - no local mesh underresolution flagged by baseline metrics
+competing_hypotheses:
+  - insufficient_run_time
+      for:     monitors and fields are not yet stationary;
+               mass imbalance and drift are slowly decreasing
+  - local_mesh_underresolution
+      for:     strong gradients present near throat
+      against: checkMesh passed cleanly; no candidate underresolved
+               regions flagged by feedback profile diagnostics
+action: CONTINUE_RUN
+action validator: APPROVED ("permitted for a healthy evolving solution")
+scientific validator: FAIL (steady_mass_balance, monitors_stationary,
+                            fields_stationary)
+\end{verbatim}
+\end{minipage}
+\caption{Archived LLM diagnosis record for the
+nozzle continuation run at $t=1$\,ms (abridged from
+\texttt{agent\_decision.json}; wording verbatim). The model separates
+insufficient run time from local under-resolution using the evidence packet,
+and its proposal is executed only after the action validator approves it.}
+\label{fig:trace}
+\end{figure}
 
 \section{Reproducibility, Session Ledger, and Development History}
 \label{app:repro}
