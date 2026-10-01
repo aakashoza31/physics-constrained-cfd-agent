@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use CFD Forge, please cite the accompanying preprint."
+title: "CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD"
+type: software
+authors:
+  - family-names: Oza
+    given-names: Aakash Shailesh
+    affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+  - family-names: Johnson
+    given-names: Ryan F.
+    affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+  - family-names: Barati Farimani
+    given-names: Amir
+    affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+repository-code: "https://github.com/aakashoza31/physics-constrained-cfd-agent"
+keywords:
+  - computational fluid dynamics
+  - OpenFOAM
+  - large language models
+  - scientific agents
+  - verification
