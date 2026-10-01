@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{graphicx}
+\usepackage[section]{placeins}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
@@ -51,7 +52,7 @@ For an admissible request, a family-specific runner constructs the case, generat
 
 The present implementation uses parameterized geometries and registered CFD families. This provides a concrete interface between engineering intent and executable simulation operations, while allowing additional families to be incorporated through their own scientific contracts and runners.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{cfd-forge-figure-1.png}\caption{Functional organization of CFD Forge. Language-model
     outputs are proposals; deterministic checks retain authority
@@ -67,6 +68,18 @@ The present implementation uses parameterized geometries and registered CFD fami
 The LLM provides a flexible interface for interpreting engineering requests and reasoning over simulation evidence. Its responsibilities include explaining observed behavior, identifying likely causes of problems, proposing a next action, and supporting the engineering narrative. The evidence supplied to this reasoning process can include solver-health indicators, field extrema, conservation measures, convergence histories, and family-specific diagnostics.
 
 Scientific acceptance is evaluated separately. Deterministic routines calculate the relevant quantities and compare them with the registered criteria. The LLM can propose that a run appears complete or requires further work, but its statement does not override a failed or unresolved check. Similarly, a proposed correction must be permitted by the family contract before it can be applied.
+
+Within these bounds, the language model is the decision-making component that
+automates the workflow. It translates a natural-language engineering request
+into a structured case specification that drives geometry, mesh, and
+boundary-condition construction; reviews mesh evidence before setup proceeds;
+diagnoses each completed run from solver, conservation, and field evidence;
+and selects the next action---accept, continue, extend the horizon, refine the
+mesh, or stop safely---which the orchestrator executes by invoking the
+corresponding meshing, solver, and post-processing tools. It also interprets
+rendered field images and writes the engineering summary. The decision of
+what to do next therefore rests with the model, while the admissibility of
+that action and the acceptance of the result rest with deterministic checks.
 
 This separation yields three terminal outcomes:
 \begin{itemize}
@@ -130,6 +143,71 @@ actions were taken, and why the result received its final decision.
 The following sections examine this workflow through the nozzle,
 forward-facing-step, and turbulent-cube studies.
 
+\subsection{Model Integration}
+\label{sec:model}
+
+Table~\ref{tab:llm_stages} lists the points at which the model is called.
+Each call is a single request to a Gemini model through the
+\texttt{google-genai} interface. The request has a fixed system
+instruction, a JSON evidence payload, and a Pydantic response schema; it uses
+temperature 0, and the structured response is parsed into a typed record
+before any code acts on it. The archived campaigns used
+\texttt{gemini-3.5-flash-lite} for interpretation, mesh review, diagnosis,
+and reporting. If the model is unavailable or its response fails the schema, the stage
+stops, unless a deterministic fallback has been explicitly enabled; any such
+fallback is recorded as non-LLM in the call log. Each call is logged with its
+stage, model identifier, latency, number of attempts, and parsed output.
+
+\begin{table}[!htbp]
+\centering
+\caption{Model calls in the CFD Forge workflow. ``Consumer'' is the
+deterministic component that receives the structured output.}
+\label{tab:llm_stages}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{3.1cm}@{}}
+\toprule
+Stage & Model input & Structured output & Consumer \\
+\midrule
+Request interpretation & Engineering request text & Case parameters, with each field marked as stated or defaulted; unsupported-physics flags & Scope gate (family envelope) \\
+Mesh-evidence review (nozzle) & checkMesh and mesh-generation records & Proceed or stop, with cited evidence & Mesh gate \\
+Diagnosis and action & Theory- or reference-blind evidence packet: solver health, conservation, stationarity, admissibility, boundaries, mesh, flow features & Diagnosis label, cited evidence, competing hypotheses with evidence for and against, one action from the family vocabulary, confidence & Action validator, then scientific validator \\
+Field observation & Rendered field images & Qualitative observations and suspected regions & Advisory only; no gate \\
+Reporting & Final evidence and verdict & Engineering summary & Report \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The diagnosis stage is the one that drives the workflow. Its system
+instruction states that OpenFOAM solves the equations, that deterministic
+code measures the evidence, and that the model interprets the evidence and
+chooses one permitted action. It also directs the model not to invent
+measurements, to distinguish insufficient run time from local
+under-resolution and from numerical failure, not to treat solver completion
+as evidence of stationarity, and to request a diagnostic when the evidence
+cannot separate competing hypotheses. Analytical and reference targets are
+removed from the evidence packet before the call, and the packet builder
+refuses to emit one that contains them. The model therefore diagnoses from
+the simulation's own evidence, and agreement with theory is checked
+afterwards, by code.
+
+{\sloppy Actions come from closed, family-specific vocabularies. The nozzle family
+admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
+\texttt{REQUEST\_DIAGNOSTIC}, \texttt{REFINE\_THROAT},
+\texttt{REFINE\_GRADIENT\_REGION}, \texttt{REPAIR\_MESH},
+\texttt{RESTART\_CLEAN}, and \texttt{REJECT\_OUTSIDE\_DOMAIN}. The step
+family admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
+\texttt{EXTEND\_END\_TIME}, \texttt{REDUCE\_MAX\_CO},
+\texttt{REFINE\_MESH}, \texttt{REBUILD\_FROM\_VALIDATED\_SPEC},
+\texttt{REQUEST\_CLARIFICATION}, \texttt{REJECT\_UNSUPPORTED}, and
+\texttt{FAIL\_SAFELY}. The action validator checks each proposal against the
+evidence and a fixed iteration budget. For example, \texttt{CONTINUE\_RUN}
+is refused once the requested horizon has been reached, \texttt{REFINE\_MESH}
+is refused unless the current solution is healthy, and \texttt{ACCEPT} is
+refused unless the registered scientific status is final.\par}
+
 \section{Experimental Setup and Assessment Protocol}
 \label{sec:experiments}
 
@@ -149,7 +227,7 @@ the role of agent reasoning. Reference agreement, numerical
 acceptance, and physical development are treated as distinct
 questions.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{figures/fig2_configurations.pdf}
     \caption{Computational configurations, drawn from the preserved case
@@ -163,7 +241,7 @@ questions.
     \label{fig:case_geometries}
 \end{figure}
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Simulation setup. All cases use OpenFOAM Foundation v14 through
 \texttt{foamRun}. The scheme, solution, thermophysical and mesh files quoted
@@ -438,7 +516,7 @@ mesh, which is still within the $5\%$ limit. This trend is consistent with
 resolving multidimensional corner effects that the one-dimensional model
 omits. No formal grid-convergence index is reported.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Frozen LLM-free nozzle reference campaign: mesh refinement at
 $t=6$\,ms. Mesh 1 is identical to the agent's canonical run. Coarse-mesh
@@ -472,7 +550,7 @@ largest monitor drift is $0.081\%$, the largest relative field change is
 $0.111\%$, and the maximum transient continuity error is
 $6.4\times10^{-8}\%$.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Canonical nozzle: CFD versus isentropic quasi-one-dimensional
 theory at $t=6$\,ms. Exit values are area averages on the outlet patch;
@@ -496,7 +574,7 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{figures/fig3_nozzle.pdf}
     \caption{Nozzle results. (a,b) Axial profiles of the canonical run at
@@ -560,7 +638,7 @@ outlet mass flux is $16\%$ below the inlet flux, a difference balanced by
 mass accumulating behind the advancing front. A test based on inlet--outlet
 equality would have rejected a correctly conservative transient solution.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{figures/fig4_step.pdf}
     \caption{Mach-2 forward-facing step. (a) Mach number and (b) density
@@ -611,7 +689,7 @@ changes by only $0.04\%$ and wake-probe means by at most $0.002\,U_b$, while
 the root-mean-square lateral force increases by $110\%$. Period averages
 suppress an alternating signal whose amplitude is still growing.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{figures/fig5_cube.pdf}
     \caption{Turbulent cube diagnostic study. (a) Velocity magnitude on the
@@ -628,9 +706,52 @@ suppress an alternating signal whose amplitude is still growing.
 \subsection{Agentic Workflow and Corrective Actions}
 \label{sec:agent_results}
 
-Table~\ref{tab:assessment} summarizes the registered outcomes, and
-Table~\ref{tab:actions} lists recorded decision points in which a model
-proposal met the deterministic action validator. In
+Table~\ref{tab:assessment} summarizes the registered outcomes. Across the
+19 archived agent sessions (8 nozzle, 11 step), the model was called 82 times:
+17 request interpretations, 8 mesh reviews, 23 diagnoses, 15 field
+observations, and 19 summaries. All 66 calls with a recorded attempt count succeeded on the first
+attempt, with median latencies between 1.9 and 5.7\,s per stage; the
+field observer returned no usable observation in 5 of its 15 calls. Token counts
+were not logged. The 23 diagnoses produced 23 action proposals: 11
+\texttt{ACCEPT}, 4 \texttt{CONTINUE\_RUN}, 4 \texttt{EXTEND\_END\_TIME}, 3
+\texttt{FAIL\_SAFELY}, and 1 \texttt{REFINE\_MESH}. The validator approved
+20 and refused 3. Table~\ref{tab:actions} lists representative decision
+points, and Fig.~\ref{fig:trace} shows one complete diagnosis record.
+
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}{0.96\linewidth}
+\footnotesize
+\begin{verbatim}
+diagnosis: UNCONVERGED            confidence: high
+evidence_used:
+  - mass imbalance is 1.35 percent, exceeding the steady balance criterion
+  - passes_stationarity is false
+  - mass flow range and drift indicate ongoing evolution
+  - no local mesh underresolution flagged by baseline metrics
+competing_hypotheses:
+  - insufficient_run_time
+      for:     monitors and fields are not yet stationary;
+               mass imbalance and drift are slowly decreasing
+  - local_mesh_underresolution
+      for:     strong gradients present near throat
+      against: checkMesh passed cleanly; no candidate underresolved
+               regions flagged by feedback profile diagnostics
+action: CONTINUE_RUN
+action validator: APPROVED ("permitted for a healthy evolving solution")
+scientific validator: FAIL (steady_mass_balance, monitors_stationary,
+                            fields_stationary)
+\end{verbatim}
+\end{minipage}
+\caption{Archived \texttt{gemini-3.5-flash-lite} diagnosis record for the
+nozzle continuation run at $t=1$\,ms (abridged from
+\texttt{agent\_decision.json}; wording verbatim). The model separates
+insufficient run time from local under-resolution using the evidence packet,
+and its proposal is executed only after the action validator approves it.}
+\label{fig:trace}
+\end{figure}
+
+In
 the nozzle continuation, the model read the stationarity failures and
 proposed \texttt{CONTINUE\_RUN}. In a Mach-3 step run that was healthy but
 had reached only $t=2$ of the registered $t=4$ horizon, the model proposed
@@ -642,7 +763,15 @@ shock system and proposed \texttt{FAIL\_SAFELY}. This outcome is consistent with
 above, since the post-shock sonic area at Mach 3 (0.719) exceeds the 0.7
 opening. That run was preserved and rejected rather than tuned.
 
-One recorded run shows the validator overruling the model. A Mach-3 request
+The three refused proposals show the validator correcting the model. In
+the iterative Mach-3 run, the model proposed \texttt{CONTINUE\_RUN} after the
+requested horizon had already been reached; the validator refused it, because
+more physical time requires \texttt{EXTEND\_END\_TIME}. Later in the same
+campaign, a further \texttt{EXTEND\_END\_TIME} was refused because the
+iteration budget was exhausted. That campaign was completed in supervised
+resumed sessions, after the treatment of restart seams in the mass-balance
+diagnostic had been corrected, so its final acceptance is not an unattended result.
+The third refusal is the clearest case of the validator overruling the model. A Mach-3 request
 asked for a numerical-sensitivity assessment. The model first proposed
 \texttt{REFINE\_MESH}, which was approved under the registered bounded policy
 (linear refinement by a factor of 2, from 4,032 to 16,128 cells, as a fresh
@@ -663,7 +792,7 @@ a rule keyed to the failed check would have selected the same action, and
 the multimodal observer returned no usable observation in some runs without
 affecting the outcome.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Registered scientific assessment of the three studies.}
 \label{tab:assessment}
@@ -685,7 +814,7 @@ Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \t
 \end{tabularx}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Recorded decision points with genuine model calls
 (\texttt{gemini-3.5-flash-lite}). ``Approved'' and ``Refused'' denote rulings of the
@@ -703,7 +832,7 @@ Run and state & Deterministic evidence & Model proposal & Validator & Verdict \\
 Nozzle, $t=1$\,ms & 17/20 checks; mass mismatch $1.35\%$, drift $2.0\%$, field change $1.2\%$ & \texttt{CONTINUE\_RUN} & Approved & \texttt{FAIL} $\rightarrow$ continue \\
 Nozzle, $t=6$\,ms & 20/20 checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_SINGLE\_MESH} \\
 Step, Mach 2, $t=4$ & 17/17 hard checks; compression rises measured & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
-Step, Mach 3, $t=2$ of 4 & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Healthy, not final $\rightarrow$ extend \\
+Step, Mach 3, $t=2$ of 4 (resumed) & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Healthy, not final $\rightarrow$ extend \\
 Step, Mach 3, $t=4$ & 17/17 hard checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
 Step, Mach 3, $h=0.3$ & Compression front not measurable & \texttt{FAIL\_SAFELY} & Approved & \texttt{FAIL} (preserved) \\
 Step, Mach 3, sensitivity request, 4,032 cells & Hard checks pass; one grid cannot establish sensitivity & \texttt{REFINE\_MESH} ($\times2$) & Approved & Healthy $\rightarrow$ refine \\
