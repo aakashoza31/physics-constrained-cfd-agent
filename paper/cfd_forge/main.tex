@@ -375,9 +375,9 @@ acceptance criteria are given in Appendix~\ref{app:setup}.
 
 The nozzle and step runs were executed by the agent from natural-language
 requests, and every model call is recorded. The cube campaign was executed
-outside the agent loop; we apply the agent's diagnosis stage to its archived
-evidence and rule on the model's proposal with the registered gate
-(Sec.~\ref{sec:cube_results}). Archived-case replay is used only to check
+outside the agent loop; afterwards we applied the agent's diagnosis stage to
+its archived evidence three times and ruled on each proposal with the
+registered gate (Sec.~\ref{sec:cube_results}). Archived-case replay is used only to check
 that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
@@ -882,11 +882,56 @@ reveal the growing mode that the force history exposes.
     \label{fig:cube}
 \end{figure}
 
-\textbf{TODO (pending \texttt{scripts/cube\_llm\_diagnosis.py}):} report the
-agent's LLM diagnosis of the archived cube evidence. The packet contains
-solver health and force statistics but no gate verdict or thresholds. Report
-all repeats, the proposed action, the validator ruling against the registered
-gate, latency, and token usage.
+\paragraph{Agent diagnosis of the cube evidence.} Because the cube campaign
+ran outside the agent loop, we applied the agent's diagnosis stage to its
+archived evidence afterwards (1 October 2026; no CFD was run). The evidence
+packet contained solver health from the seven run segments (all ended
+normally; maximum Courant number 0.80; maximum global continuity error
+$5.4\times10^{-11}$), force statistics in six 10-unit blocks, and the
+half-cycle extrema of $F_z$. It contained no gate verdict and no threshold.
+The model was called three times with the same packet, system instruction,
+and response schema at temperature 0, and the deterministic validator ruled
+on each proposal against the registered gate, which returns
+\texttt{STILL\_DEVELOPING}.
+
+Table~\ref{tab:cube_llm} lists all three calls. In two, the model diagnosed
+\texttt{STILL\_DEVELOPING} and proposed \texttt{CONTINUE\_RUN}. It noted that
+$F_x$ and $F_y$ had settled while the $F_z$ extrema grew in every half-cycle.
+That agrees with the registered gate, and the model reached it without seeing
+the gate. In the third call, the model read the same growth as a numerical
+instability, diagnosed \texttt{NUMERICALLY\_UNHEALTHY}, and proposed
+\texttt{FAIL\_SAFELY}, although the solver-health evidence was clean. The six
+warning messages counted in the packet are routine OpenFOAM time-precision
+notices, but the packet reported only their number. None of the three calls
+proposed \texttt{ACCEPT}, so the validator's refusal of an unjustified
+acceptance was not exercised here. The validator approved all three
+proposals, because it restricts \texttt{ACCEPT} but permits stopping or
+continuing a run. Each call took about 2\,s and used about 4,800 tokens.
+
+Two conclusions follow. Temperature 0 did not make the model's output
+repeatable: identical inputs produced two different diagnoses. And the
+model's diagnosis is useful but not reliable on its own. Here the
+consequence of the inconsistent call was a conservative stop, not a false
+acceptance, because acceptance is decided by the registered gate.
+
+\begin{table}[!htbp]
+\centering
+\caption{LLM diagnosis of the archived cube evidence: all three calls with
+an identical packet (temperature 0). The registered gate returns
+\texttt{STILL\_DEVELOPING} (lateral-force growth ratio 2.10 against 1.25).
+No action was executed.}
+\label{tab:cube_llm}
+\footnotesize
+\begin{tabular}{@{}clllrr@{}}
+\toprule
+Call & Diagnosis & Proposed action & Validator & Latency (s) & Tokens \\
+\midrule
+1 & \texttt{STILL\_DEVELOPING} & \texttt{CONTINUE\_RUN} & Approved & 2.5 & 4,805 \\
+2 & \texttt{NUMERICALLY\_UNHEALTHY} & \texttt{FAIL\_SAFELY} & Approved & 2.2 & 4,709 \\
+3 & \texttt{STILL\_DEVELOPING} & \texttt{CONTINUE\_RUN} & Approved & 1.7 & 4,764 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Limitations}
 \label{sec:limitations}
@@ -904,7 +949,10 @@ cube wall treatment is uncertain: at $t^*=80$ the cube-surface $y^+$ has a
 median of 24.7 and a range of 2.8--96.5, with $67\%$ of the area below
 $y^+=30$. A provisional comparison of its evolving mean wake with
 ERCOFTAC centre-line profiles is not satisfactory, so no experimental
-validation is claimed. General CAD/STEP-to-CFD execution is not
+validation is claimed. The model's diagnoses are not repeatable: one of
+three identical calls on the cube evidence gave a different diagnosis, and
+repeat-call consistency was not measured in the archived nozzle and step
+campaigns. General CAD/STEP-to-CFD execution is not
 demonstrated. Finally, the evaluation documents workflow behavior rather
 than an ablation. Comparisons with a fixed-rule controller and with
 model-only acceptance remain future work.

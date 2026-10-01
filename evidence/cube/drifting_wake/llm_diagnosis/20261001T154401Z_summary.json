@@ -1,0 +1,22 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "repeats": 3,
+  "decisions": [
+    [
+      "STILL_DEVELOPING",
+      "CONTINUE_RUN",
+      true
+    ],
+    [
+      "NUMERICALLY_UNHEALTHY",
+      "FAIL_SAFELY",
+      true
+    ],
+    [
+      "STILL_DEVELOPING",
+      "CONTINUE_RUN",
+      true
+    ]
+  ],
+  "gate_status": "STILL_DEVELOPING"
+}

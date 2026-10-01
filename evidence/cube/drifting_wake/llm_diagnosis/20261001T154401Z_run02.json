@@ -1,0 +1,92 @@
+{
+  "stage": "cube_evidence_diagnosis",
+  "source": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "is_llm": true,
+  "repeat": 2,
+  "latency_s": 2.162,
+  "usage": {
+    "prompt_token_count": 4378,
+    "candidates_token_count": 331,
+    "total_token_count": 4709
+  },
+  "system_instruction_sha256": "fa3eef7d1a4ff49ecc6c0e658863f1f7ad8b8a6cae89f9896d4dcd846456e371",
+  "packet_sha256": "83d0eb59c387fb138c78083ed179ebd29a34dfd6c0860e71a805c1f9c5b1697d",
+  "raw_response": "{\n  \"diagnosis\": \"NUMERICALLY_UNHEALTHY\",\n  \"evidence_used\": [\n    \"lateral_force_half_cycle_extrema\",\n    \"force_block_statistics\"\n  ],\n  \"competing_hypotheses\": [\n    {\n      \"hypothesis\": \"The flow is developing or statistically stationary.\",\n      \"evidence_for\": [\n        \"fx and fy mean values stabilize across later time windows.\"\n      ],\n      \"evidence_against\": [\n        \"fz shows a growing amplitude over time, increasing from ~1e-4 to nearly 7e-3, indicating an unstable or unphysical divergence in the lateral force.\"\n      ]\n    },\n    {\n      \"hypothesis\": \"The simulation is numerically unstable or unphysical in the lateral direction.\",\n      \"evidence_for\": [\n        \"fz extrema systematically grow in magnitude every half cycle without bound (from -0.00012 to -0.0052).\"\n      ],\n      \"evidence_against\": []\n    }\n  ],\n  \"reasoning_summary\": \"Although the streamwise force fx and vertical force fy appear to reach a steady mean, the lateral force fz exhibits an unbounded, escalating oscillation amplitude over time. This systematic growth in lateral force fluctuations indicates a numerical instability or unphysical feedback loop in the spanwise direction, requiring a safe stop.\",\n  \"action\": \"FAIL_SAFELY\",\n  \"requested_diagnostic\": null,\n  \"confidence\": \"high\"\n}",
+  "decision": {
+    "diagnosis": "NUMERICALLY_UNHEALTHY",
+    "evidence_used": [
+      "lateral_force_half_cycle_extrema",
+      "force_block_statistics"
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "The flow is developing or statistically stationary.",
+        "evidence_for": [
+          "fx and fy mean values stabilize across later time windows."
+        ],
+        "evidence_against": [
+          "fz shows a growing amplitude over time, increasing from ~1e-4 to nearly 7e-3, indicating an unstable or unphysical divergence in the lateral force."
+        ]
+      },
+      {
+        "hypothesis": "The simulation is numerically unstable or unphysical in the lateral direction.",
+        "evidence_for": [
+          "fz extrema systematically grow in magnitude every half cycle without bound (from -0.00012 to -0.0052)."
+        ],
+        "evidence_against": []
+      }
+    ],
+    "reasoning_summary": "Although the streamwise force fx and vertical force fy appear to reach a steady mean, the lateral force fz exhibits an unbounded, escalating oscillation amplitude over time. This systematic growth in lateral force fluctuations indicates a numerical instability or unphysical feedback loop in the spanwise direction, requiring a safe stop.",
+    "action": "FAIL_SAFELY",
+    "requested_diagnostic": null,
+    "confidence": "high"
+  },
+  "action_validation": {
+    "approved": true,
+    "executed": false,
+    "reason": "FAIL_SAFELY permitted."
+  },
+  "registered_gate": {
+    "gate_version": "cube-stationarity/1.0.0",
+    "status": "STILL_DEVELOPING",
+    "passed": false,
+    "window": {
+      "start": 59.980000000000004,
+      "end": 79.98,
+      "samples": 500
+    },
+    "measured": {
+      "mean_fx": 0.7062092986544467,
+      "mean_fy": 0.24507820181705012,
+      "mean_fz": 0.00044205078685453556,
+      "drift_fraction": {
+        "fx": 0.0007529082884745508,
+        "fy": 0.000529098309643609,
+        "fz": 0.004620392788751229
+      },
+      "lateral_growth_ratio": 2.098378164488467,
+      "lateral_relative_magnitude": 0.0006259486921183038,
+      "mean_abs_fz_first_half": 0.0018326531209671012,
+      "mean_abs_fz_second_half": 0.003845599292119007,
+      "samples": 500
+    },
+    "thresholds": {
+      "force_drift_fraction_max": 0.02,
+      "lateral_growth_ratio_max": 1.25,
+      "lateral_relative_max": 0.05,
+      "assessment_window": 20.0
+    },
+    "failures": [
+      "lateral_force_growth"
+    ],
+    "margins_relative_to_threshold": {
+      "lateral_growth_ratio": 1.6787025315907738,
+      "max_drift_fraction": 0.23101963943756146,
+      "lateral_relative": 0.012518973842366075
+    },
+    "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
+  },
+  "solver_invoked": false,
+  "note": "Diagnosis of archived evidence; the cube was executed manually."
+}
