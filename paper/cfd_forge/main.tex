@@ -59,12 +59,12 @@ included as the closest architectural precedent.}
 \toprule
 System & Acceptance decided by & Registered numerical criteria & Bounded actions with deterministic veto & Development or stationarity test & Transient mass balance & Evaluation reported \\
 \midrule
-MetaOpenFOAM 2.0~\cite{chen2025metaopenfoam2} & LLM reviewer, then human judgement & -- & -- & -- & -- & 13 requests, 10 runs each \\
-OpenFOAMGPT 2.0~\cite{feng2026openfoamgpt2} & Error-free completion & -- & -- & -- & -- & 5 case studies, repeated runs \\
-Foam-Agent~\cite{yue2026foamagent} & Error-free execution & -- & -- & -- & -- & Benchmark of 110 tasks \\
+MetaOpenFOAM 2.0~\cite{chen2025metaopenfoam2} & Execution checks, then LLM reviewer, then human judgement & -- & -- & -- & -- & 13 requests, 10 runs each, ablation \\
+OpenFOAMGPT 2.0~\cite{feng2026openfoamgpt2} & Error-free completion & -- & -- & -- & -- & Case studies, over 450 simulations \\
+Foam-Agent~\cite{yue2026foamagent} & Error-free execution & -- & -- & -- & -- & 110 basic tasks plus an advanced tier \\
 ChatCFD~\cite{fan2026chatcfd} & Error-free, converged execution; fidelity scored afterwards & -- & -- & -- & -- & 315 cases with fidelity scoring \\
 PhyNiKCE~\cite{fan2026phynikce} & Execution without failure; accuracy scored afterwards & -- & -- & -- & -- & 13 setups, repeated runs, ablation \\
-AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (open-ended reruns) & -- & -- & 5 tasks; planted failures \\
+AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (rerun controller revises the request) & -- & -- & 5 tasks; 16 planted failures \\
 PolyJarvis~\cite{zhao2026polyjarvis} (MD) & Deterministic gates & Yes & Yes (recovery set, fixed budget) & Yes (drift, block error) & n/a & 7 polymers, 3 replicates, vs.\ experiment \\
 \midrule
 CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; controller comparison, repeated calls \\
