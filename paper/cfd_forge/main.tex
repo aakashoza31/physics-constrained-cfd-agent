@@ -72,7 +72,7 @@ CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & 
 \end{tabularx}
 \end{table}
 
-That integration requires attention to the meaning of a successful simulation. Solver completion, small residuals, or plausible contours can coexist with incorrect boundary conditions, unresolved numerical errors, or a flow that is still developing. Verification and validation therefore require multiple sources of evidence \cite{oberkampf2002vv,celik2008discretization}. An agent must interpret these signals together and distinguish a useful next action from evidence sufficient to accept the result.
+Integrating execution with scientific assessment requires attention to what counts as a successful simulation. Solver completion, small residuals, or plausible contours can coexist with incorrect boundary conditions, unresolved numerical errors, or a flow that is still developing. Verification and validation therefore require multiple sources of evidence \cite{oberkampf2002vv,celik2008discretization}. An agent must interpret these signals together and distinguish a useful next action from evidence sufficient to accept the result.
 
 CFD Forge connects engineering intent and geometry parameters to case construction, meshing, boundary and initial conditions, OpenFOAM execution, diagnostics, corrective actions, and reporting. The LLM reasons across solver logs, field diagnostics, conservation measures, and flow histories to interpret behavior, identify likely causes of problems, and propose what should be tried next. Deterministic scientific checks measure explicit criteria, enforce thresholds, and retain final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. This division gives reasoning a substantive role while keeping acceptance reproducible. Modular scientific contracts organize physical assumptions, numerical requirements, and allowed actions so that additional simulation families can be incorporated. The current evaluation uses registered families and parameterized geometries.
 
@@ -410,8 +410,8 @@ shock-containing flow whose acceptance rests on storage-aware conservation
 and compression diagnostics. The three-dimensional turbulent cube tests
 whether the acceptance layer can distinguish numerical completion from a
 developed flow. All three use OpenFOAM Foundation v14.
-Figures~\ref{fig:case_geometries} and~\ref{fig:meshes_step_cube} and
-Table~\ref{tab:setup} (Appendix~\ref{app:setup}) summarize their
+Figure~\ref{fig:case_geometries}, Fig.~\ref{fig:meshes_step_cube} and
+Table~\ref{tab:setup} (both in Appendix~\ref{app:setup}) summarize their
 geometry, meshes, boundary conditions, and numerics; the complete setup and
 acceptance criteria are given in Appendix~\ref{app:setup}.
 
@@ -437,19 +437,6 @@ that recorded verdicts are reproduced, never as evidence of new execution.
     \label{fig:case_geometries}
 \end{figure}
 
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=0.88\linewidth]{Figures/fig_mesh_step_cube.pdf}
-    \caption{Step and cube meshes, plotted from the native OpenFOAM
-    \texttt{polyMesh} files. (c) Forward-facing-step domain (every fourth grid
-    line) with the step in grey and (d) every cell near the step corner; the
-    mesh topology files are identical to those of the agent's Mach-2 case.
-    (e) Cube and floor boundary faces near the cube and (f) the cell layer
-    starting at $y/H=0.5$, showing the clustering around the cube and in the
-    near wake.}
-    \label{fig:meshes_step_cube}
-\end{figure}
-
 \section{Results}
 \label{sec:results}
 
@@ -457,7 +444,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
 \label{sec:agent_results}
 
 Table~\ref{tab:assessment} summarizes the registered outcomes. The archived
-campaigns comprise 19 agent sessions (8 nozzle, 11 step). These are 15 runs,
+campaigns comprise 19 agent sessions (8 nozzle, 11 step). These are 16 runs,
 because one step run was resumed across four sessions, and 11 distinct
 requests, because the nozzle requests were repeated while the nozzle
 pipeline was being developed (Appendix~\ref{app:repro}). Across them the
@@ -582,7 +569,7 @@ Step, Mach 3, $t=2$ of 4 (resumed) & Hard checks pass; registered horizon not re
 Step, Mach 3, $t=4$ & 17/17 hard checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
 Step, Mach 3, $h=0.3$ & Compression front not measurable & \texttt{FAIL\_SAFELY} & Approved & \texttt{FAIL} (preserved) \\
 Step, Mach 3, sensitivity request, 4,032 cells & Hard checks pass; one grid cannot establish sensitivity & \texttt{REFINE\_MESH} ($\times2$) & Approved & Healthy $\rightarrow$ refine \\
-Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \texttt{ACCEPT} & \textbf{Refused} & \texttt{STOPPED\_ACTION\_\allowbreak REFUSED} \\
+Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \texttt{ACCEPT} & \textbf{Refused} & \texttt{STOPPED\_ACTION\_\allowbreak REFUSED} (\texttt{INCONCLUSIVE}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1003,6 +990,19 @@ Assessment basis & Quasi-1-D analytical consistency and registered numerical che
 \end{tabularx}
 \end{table}
 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.88\linewidth]{Figures/fig_mesh_step_cube.pdf}
+    \caption{Step and cube meshes, plotted from the native OpenFOAM
+    \texttt{polyMesh} files. (c) Forward-facing-step domain (every fourth grid
+    line) with the step in grey and (d) every cell near the step corner; the
+    mesh topology files are identical to those of the agent's Mach-2 case.
+    (e) Cube and floor boundary faces near the cube and (f) the cell layer
+    starting at $y/H=0.5$, showing the clustering around the cube and in the
+    near wake.}
+    \label{fig:meshes_step_cube}
+\end{figure}
+
 \subsection{Converging--Diverging Nozzle}
 \label{sec:nozzle_setup}
 
@@ -1189,12 +1189,12 @@ not as an accepted turbulent reference solution.
 Figures~\ref{fig:walk_spec} and~\ref{fig:trace} reproduce two archived model
 outputs referred to in the main text.
 
-\begin{figure}[!htbp]
+\begin{figure}[!h]
 \centering
 \begin{minipage}{0.96\linewidth}
 \footnotesize
 \begin{verbatim}
-model output (LLM, schema-constrained, temperature 0)
+model output (gemini-3.5-flash-lite, schema-constrained, temperature 0)
   case_name: mach2p0_step0p20     mach: 2.0   step_height: 0.2   step_x: 0.6
   length, height, pressure, temperature, end_time, max_co, nx, ny: null
   requests_unsupported_physics: false
@@ -1217,7 +1217,7 @@ every field is recorded.}
 \label{fig:walk_spec}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!h]
 \centering
 \begin{minipage}{0.96\linewidth}
 \footnotesize
@@ -1242,7 +1242,7 @@ scientific validator: FAIL (steady_mass_balance, monitors_stationary,
                             fields_stationary)
 \end{verbatim}
 \end{minipage}
-\caption{Archived LLM diagnosis record for the
+\caption{Archived \texttt{gemini-3.5-flash-lite} diagnosis record for the
 nozzle continuation run at $t=1$\,ms (abridged from
 \texttt{agent\_decision.json}; wording verbatim). The model separates
 insufficient run time from local under-resolution using the evidence packet,

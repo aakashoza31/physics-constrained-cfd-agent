@@ -56,3 +56,8 @@ needs any data movement at all, and none needs a new solver run.
   * New finding reported: live_run_01 FAIL_SAFELY was caused by a validator false positive (sigFpe banner); the LLM followed the wrong check; deterministic reanalysis later PASS.
 - Point 6 (length/figures): MOSTLY DONE. Fig. 1 caption says schematic + cube offline. Cube wake figure removed (frames visually identical). Verbatim spec and diagnosis-trace figures moved to Appendix B (Model Records); setup table moved to Appendix A. Float placement relaxed and large figures shrunk: 29 pages total, main text ends p.20. Open: abstract numbers (after point 2), further prose cuts if Amir wants.
 - Note: stationarity.py docstring says the cube "misses the drift bound by more than an order of magnitude" - false (drift 0.075%, passes). Fix the docstring in the repo; the paper is correct.
+
+## Full read of Overleaf PDF v2, 2026-10-01
+- Overleaf still had the OLD fig_agent_loop.pdf and fig_agent_stats.pdf (82 calls / 23 proposals), contradicting the text (97 / 28). Re-upload both.
+- Fixed: "15 runs" -> 16 runs (8 nozzle + 8 step; ledger N1-N8, S1-S8); dangling "That integration..." sentence after the related-work rewrite; model name in Fig. 11/12 now matches the text; Table 5 last verdict marked INCONCLUSIVE; step/cube mesh figure moved to Appendix A (removed a half-empty page); Appendix B figures placed in-line.
+- Before release: cube_llm_diagnosis.py and the paper scripts live on paper/results-draft-20260930, not on main. Merge them before making the repo public, because the paper cites that path.
