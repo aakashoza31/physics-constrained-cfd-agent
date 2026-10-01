@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations cover a converging-diverging nozzle and a two-dimensional forward-facing step. Within these families, the agent built and ran new cases from text requests that varied the geometry and operating conditions, and the canonical runs satisfy their registered criteria. A three-dimensional turbulent cube, run outside the agent loop, serves as a retrospective diagnostic stress test: a stationarity gate, defined after the run, withholds acceptance because the lateral force is still growing although the mean drag is stable. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
+Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations cover a converging-diverging nozzle and a two-dimensional forward-facing step. Within these families, the agent built and ran new cases from text requests that varied the geometry and operating conditions, and the canonical runs satisfy their registered criteria. A three-dimensional turbulent cube, run outside the agent loop, serves as a retrospective diagnostic stress test: a stationarity gate, defined after the run, withholds acceptance because the lateral force is still growing although the mean drag is stable. In a controller comparison over 36 archived, defect and planted-fault states, the same model accepted 57 of 93 states that should not have been accepted when the deterministic results were withheld, and none when they were supplied. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
 \end{abstract}
 
 \section{Introduction}
@@ -67,7 +67,7 @@ PhyNiKCE~\cite{fan2026phynikce} & Execution without failure; accuracy scored aft
 AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (open-ended reruns) & -- & -- & 5 tasks; planted failures \\
 PolyJarvis~\cite{zhao2026polyjarvis} (MD) & Deterministic gates & Yes & Yes (recovery set, fixed budget) & Yes (drift, block error) & n/a & 7 polymers, 3 replicates, vs.\ experiment \\
 \midrule
-CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; no ablation \\
+CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; controller comparison, repeated calls \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -263,7 +263,7 @@ stationarity and mass-balance criteria led to a continuation, followed
 by reassessment and acceptance. Such records show how evidence
 informs execution decisions. They do not, by themselves, establish
 that model-assisted diagnosis outperforms a fixed-rule controller;
-that comparison requires a separate evaluation.
+Section~\ref{sec:controller} reports a separate comparison.
 
 \subsection{Evidence, Reporting, and Reproducibility}
 \label{sec:provenance}
@@ -490,6 +490,7 @@ extension occurred only through permitted actions. The records do not
 measure whether model reasoning improves on a fixed rule. In these examples
 a rule keyed to the failed check would have selected the same action, and
 the five failed observer calls did not affect any outcome.
+Section~\ref{sec:controller} compares controllers directly.
 
 \begin{table}[!htbp]
 \centering
@@ -541,6 +542,115 @@ Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \tex
 \end{tabularx}
 \end{table}
 
+
+\subsection{Controller Comparison}
+\label{sec:controller}
+
+The session records above show that the interface behaves as designed; they
+do not show what the deterministic layer contributes. We therefore replayed
+archived decision points through four controllers using the same model
+(\texttt{gemini-3.5-flash-lite}, temperature 0) and the current validators.
+(A)~A fixed rule maps the failed checks to an action, with no model call.
+(B)~CFD Forge: the model diagnoses the full evidence packet, including the
+deterministic check results, and proposes an action; the action gate screens
+the proposal and the validator decides. (B$'$)~Gates off: the same model
+proposal is taken directly as the verdict, without the action gate or the
+validator. (C)~Model only: the model returns a verdict
+(\texttt{ACCEPT}, \texttt{NEEDS\_MORE\_RUNTIME}, \texttt{REJECT} or
+\texttt{INCONCLUSIVE}) from a packet from which every deterministic
+verdict, failed-check list and pass/fail summary has been removed, leaving
+the measured quantities and a one-sentence family description. Arm~C
+therefore tests whether the model, given the raw evidence, reaches the
+verdict the contract would reach. Each archived and defect point was
+queried five times and each fault three times; arms B and B$'$ share one
+model call per repeat.
+
+The decision points are of three kinds. Sixteen archived points cover nine
+forward-step states, six nozzle states and the cube
+(Table~\ref{tab:controller}). The reference answer for each is the
+registered decision: \texttt{ACCEPT} when every check passes,
+\texttt{CORRECT\_AND\_RERUN} when only the target time or settling checks
+are unmet, and not-acceptable otherwise. Eighteen planted faults each alter
+one diagnostic of an accepted Mach-2 step run, for example marking the solver
+as not completed, setting a field minimum negative or adding a wall flux; none
+should be accepted. Two defect points reproduce historical diagnostic-extraction
+errors, a false-positive fatal-error flag and a pre-fix restart-seam closure,
+under which healthy runs appear to fail.
+
+\begin{table}[!htbp]
+\centering
+\caption{Controller comparison with \texttt{gemini-3.5-flash-lite}. Entries
+are correct decisions / decisions, with false accepts (a not-acceptable state
+accepted) in parentheses. Arms A and B terminate at the same validator and so
+reach the same verdicts by construction; they differ in the actions proposed.
+Four of 284 model calls failed and are excluded.}
+\label{tab:controller}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Controller & Archived (16 points) & Planted faults (18) & Defects (2) \\
+\midrule
+A: fixed rule & 16/16 (0) & 18/18 (0) & 0/2 (0) \\
+B: CFD Forge & 79/79 (0) & 53/53 (0) & 0/10 (0) \\
+B$'$: gates off & 74/79 (0) & 53/53 (0) & 0/10 (0) \\
+C: model only, blind packet & 72/79 (7) & 3/53 (50) & 5/10 (0) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Without the deterministic results, the model accepted states that the
+contract rejects. On the archived points, arm~C accepted the Mach-3,
+$h=0.3$ step case whose front never became measurable in all five repeats,
+and accepted the nozzle continuation with time-accounting and
+flux-consistency failures in two of five, giving different verdicts to
+identical inputs. It accepted 17 of the 18 planted faults in every repeat;
+only the explicit fatal-error flag was caught. Thirteen of the faults are
+visible in the blind packet as a changed field, such as
+\texttt{solver\_completed: false} or \texttt{positive\_all\_saved: false}, and
+the model accepted 12 of them; its reasoning typically restated that the run
+had reached $t=4$. The other five (an edited recipe, a subsonic inlet, initial-state
+drift, a missing boundary patch and a cyclic patch) change only fields
+outside the packet, so arm~C could not have detected them; they show what
+is lost without the contract rather than a reasoning error. The model-only
+arm was not over-cautious: it never asked for an unneeded rerun on an
+archived point.
+
+When the same model received the deterministic results (arm~B$'$), it
+proposed acceptance only when the checks passed: no false accept occurred in
+the 93 decisions on states that should not be accepted. Its five errors on archived points are all on the
+no-front step case, where it proposed \texttt{FAIL\_SAFELY}, which maps to
+\texttt{INCONCLUSIVE} rather than \texttt{REJECT}. In this test the model
+never proposed an action that contradicted a failed check, so the action gate
+and validator (arm~B) did not change a verdict relative to arm~B$'$. They
+refused two proposals, both \texttt{REFINE\_MESH} on faults whose failed
+checks (\texttt{mesh\_ok}, \texttt{two\_solution\_directions}) are not
+resolution problems. The comparison therefore separates two effects. Most of
+the protection against false acceptance came from supplying deterministic
+measurements to the model. Enforcement is a guarantee that held in every case
+but was not exercised against a model that disagreed with its checks.
+
+The defect points show the limit of every evidence-dependent controller.
+With the false fatal-error flag, all arms withheld acceptance of a healthy
+run. With the pre-fix seam closure, arms A, B and B$'$ stopped a run that
+needed only more time; arm~C, which did not see the faulty closure verdict,
+correctly asked for more runtime. A contract protects against model error,
+not against an error in its own diagnostics, and its failures are
+conservative here. Neither defect produced a false accept.
+
+{\sloppy
+Repeat consistency was also measured. Arm~B gave the same diagnosis and
+action in all repeats at 16 of 16 archived points, including five of five on
+the cube evidence, and at 13 of 18 faults; at the other five faults the
+proposed corrective action varied (\texttt{FAIL\_SAFELY},
+\texttt{REBUILD\_FROM\_VALIDATED\_SPEC}, \texttt{REFINE\_MESH}) but the
+verdict did not. The run used 280 successful calls, $1.10\times10^6$ tokens,
+and a median latency of 1.27\,s per call. The script
+(\texttt{controller\_comparison.py} in \texttt{paper/cfd\_forge/scripts/}), prompts,
+blinded keys and per-call records are in the repository under
+\texttt{evidence/controller\_comparison/}. The comparison uses one model,
+archived rather than new runs, and faults planted in one family; it is not a
+held-out benchmark.
+\par}
 
 \subsection{New Cases Within the Registered Families}
 \label{sec:variants}
@@ -901,16 +1011,20 @@ $y^+=30$. Its 20-unit gate window contains only about two periods of the lateral
 oscillation, enough to show continued growth but too short for a statistical
 stationarity claim. A provisional comparison of its evolving mean wake with
 ERCOFTAC centre-line profiles is not satisfactory, so no experimental
-validation is claimed. The model's diagnoses are not repeatable: one of
-three identical calls on the cube evidence gave a different diagnosis, and
-repeat-call consistency was not measured in the archived nozzle and step
-campaigns. General CAD/STEP-to-CFD execution is not
+validation is claimed. The model's diagnoses are not guaranteed to be repeatable: in the first cube
+study one of three identical calls gave a different diagnosis, whereas five
+repeats agreed in the controller comparison, and the proposed corrective
+action varied across repeats at five of 18 planted faults
+(Section~\ref{sec:controller}). General CAD/STEP-to-CFD execution is not
 demonstrated. All archived agent sessions are development cases, run while
 the corresponding pipeline was being built, and the cube gate was registered
 after the cube data existed (Appendix~\ref{app:repro}); no request was held
-out. Finally, the evaluation documents workflow behavior rather
-than an ablation. Comparisons with a fixed-rule controller and with
-model-only acceptance remain future work.
+out. Finally, the controller comparison (Section~\ref{sec:controller}) uses one
+model, replays archived states rather than new runs, and plants faults in one
+family. In it the model never contradicted a failed check, so the
+enforcement layer was not tested against a model that disagrees with its
+checks; comparisons across models and on held-out requests remain future
+work.
 
 \section{Conclusion}
 \label{sec:conclusion}

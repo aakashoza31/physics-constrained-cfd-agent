@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "model": "gemini-3.5-flash-lite",
+    "repeats": 5,
+    "fault_repeats": 3,
+    "dry_run": false,
+    "demo_root": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent-e2e\\demo",
+    "utc": "20261001T213031Z",
+    "llm_only_system_sha256": "da3e5dc9b80bdc42fa2bd5c9eacde73127c0c4212fac1d1ccd837c7b7029f5d2",
+    "blind_keys_removed": [
+      "acceptance",
+      "allowed_actions",
+      "allowed_diagnoses",
+      "deterministic_checks",
+      "deterministic_failed_checks",
+      "deterministic_status",
+      "failed_checks",
+      "final_acceptance",
+      "hard_checks_status",
+      "history_instruction",
+      "images_supplied",
+      "mass_imbalance_trend",
+      "passes_stationarity",
+      "policy_path",
+      "previous_iterations",
+      "status",
+      "task",
+      "validation_status",
+      "visual_note",
+      "visual_observation"
+    ]
+  },
+  "summary": {
+    "archived": {
+      "A_fixed_rule": {
+        "n_decisions": 16,
+        "points": 16,
+        "correct": 16,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0
+      },
+      "B_cfd_forge": {
+        "n_decisions": 79,
+        "points": 16,
+        "correct": 79,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0,
+        "proposals_refused": 0,
+        "points_unanimous_across_repeats": "16/16"
+      },
+      "B_gates_off": {
+        "n_decisions": 79,
+        "points": 16,
+        "correct": 74,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0
+      },
+      "C_llm_only": {
+        "n_decisions": 79,
+        "points": 16,
+        "correct": 72,
+        "false_accept": 7,
+        "missed_accept": 0,
+        "unneeded_rerun": 0,
+        "points_unanimous_across_repeats": "15/16"
+      }
+    },
+    "defect": {
+      "A_fixed_rule": {
+        "n_decisions": 2,
+        "points": 2,
+        "correct": 0,
+        "false_accept": 0,
+        "missed_accept": 1,
+        "unneeded_rerun": 0
+      },
+      "B_cfd_forge": {
+        "n_decisions": 10,
+        "points": 2,
+        "correct": 0,
+        "false_accept": 0,
+        "missed_accept": 5,
+        "unneeded_rerun": 0,
+        "proposals_refused": 0,
+        "points_unanimous_across_repeats": "2/2"
+      },
+      "B_gates_off": {
+        "n_decisions": 10,
+        "points": 2,
+        "correct": 0,
+        "false_accept": 0,
+        "missed_accept": 5,
+        "unneeded_rerun": 0
+      },
+      "C_llm_only": {
+        "n_decisions": 10,
+        "points": 2,
+        "correct": 5,
+        "false_accept": 0,
+        "missed_accept": 5,
+        "unneeded_rerun": 0,
+        "points_unanimous_across_repeats": "2/2"
+      }
+    },
+    "fault": {
+      "A_fixed_rule": {
+        "n_decisions": 18,
+        "points": 18,
+        "correct": 18,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0
+      },
+      "B_cfd_forge": {
+        "n_decisions": 53,
+        "points": 18,
+        "correct": 53,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0,
+        "proposals_refused": 2,
+        "points_unanimous_across_repeats": "13/18"
+      },
+      "B_gates_off": {
+        "n_decisions": 53,
+        "points": 18,
+        "correct": 53,
+        "false_accept": 0,
+        "missed_accept": 0,
+        "unneeded_rerun": 0
+      },
+      "C_llm_only": {
+        "n_decisions": 53,
+        "points": 18,
+        "correct": 3,
+        "false_accept": 50,
+        "missed_accept": 0,
+        "unneeded_rerun": 0,
+        "points_unanimous_across_repeats": "18/18"
+      }
+    },
+    "errors": 4,
+    "llm_calls_recorded": 284,
+    "latency_median_s": 1.269,
+    "tokens_total": 1099390,
+    "tokens_mean_per_call": 3871
+  }
+}
