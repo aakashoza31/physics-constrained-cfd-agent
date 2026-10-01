@@ -1,0 +1,516 @@
+[
+ {
+  "session": "forward_step_2d/case_B_mach20",
+  "start": "2026-09-22T15:36:33",
+  "end": "2026-09-22T15:39:18",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "forward_step_2d/case_C_mach35",
+  "start": "2026-09-22T15:48:14",
+  "end": "2026-09-22T15:51:43",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "forward_step_2d/case_E_step010",
+  "start": "2026-09-22T16:01:10",
+  "end": "2026-09-22T16:04:28",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "forward_step_2d/case_F_step030",
+  "start": "2026-09-22T16:15:11",
+  "end": "2026-09-22T16:18:30",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "NO_COMPRESSION_STRUCTURE",
+    "FAIL_SAFELY"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "STOPPED_FAIL_SAFELY"
+ },
+ {
+  "session": "forward_step_2d/case_G_step030_x100",
+  "start": "2026-09-22T16:28:09",
+  "end": "2026-09-22T16:31:21",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "forward_step_2d/case_H_iterative_short_run",
+  "start": "2026-09-22T17:26:09",
+  "end": "2026-09-22T17:27:43",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 9,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 7,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_INCOMPLETE",
+    "EXTEND_END_TIME"
+   ],
+   [
+    "HEALTHY_INCOMPLETE",
+    "CONTINUE_RUN"
+   ],
+   [
+    "HEALTHY_INCOMPLETE",
+    "EXTEND_END_TIME"
+   ],
+   [
+    "NUMERICALLY_UNSTABLE",
+    "FAIL_SAFELY"
+   ],
+   [
+    "HEALTHY_INCOMPLETE",
+    "EXTEND_END_TIME"
+   ],
+   [
+    "HEALTHY_INCOMPLETE",
+    "EXTEND_END_TIME"
+   ],
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 7,
+  "multimodal_events": 2,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T210551Z",
+  "start": "2026-09-22T16:38:32",
+  "end": "2026-09-22T16:40:46",
+  "request": "",
+  "n_json_calls": 4,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 2,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [],
+  "visual_files": 0,
+  "multimodal_events": 2,
+  "status": "STOPPED_ACTION_REFUSED"
+ },
+ {
+  "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212431Z",
+  "start": "2026-09-22T17:05:51",
+  "end": "2026-09-22T17:06:47",
+  "request": "",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_reference_blind_diagnosis": 2,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [],
+  "visual_files": 0,
+  "multimodal_events": 2,
+  "status": "STOPPED_FAIL_SAFELY"
+ },
+ {
+  "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z",
+  "start": "2026-09-22T17:24:31",
+  "end": "2026-09-22T17:24:59",
+  "request": "",
+  "n_json_calls": 2,
+  "by_stage": {
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [],
+  "visual_files": 0,
+  "multimodal_events": 1,
+  "status": "STOPPED_ACTION_REFUSED"
+ },
+ {
+  "session": "forward_step_2d/case_I_mesh_sensitivity",
+  "start": "2026-09-22T17:44:36",
+  "end": "2026-09-22T17:46:35",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family",
+  "n_json_calls": 4,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 2,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "HEALTHY_COMPLETE",
+    "REFINE_MESH"
+   ],
+   [
+    "HEALTHY_COMPLETE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 2,
+  "multimodal_events": 2,
+  "status": "STOPPED_ACTION_REFUSED"
+ },
+ {
+  "session": "forward_step_2d/live_run_01",
+  "start": "2026-09-22T14:59:37",
+  "end": "2026-09-22T15:02:36",
+  "request": "Simulate a 2D forward-facing step in the validated supersonic channel family wit",
+  "n_json_calls": 3,
+  "by_stage": {
+   "forward_step_case_spec_interpretation": 1,
+   "forward_step_reference_blind_diagnosis": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "NUMERICALLY_UNSTABLE",
+    "FAIL_SAFELY"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 1,
+  "status": "STOPPED_FAIL_SAFELY"
+ },
+ {
+  "session": "nozzle_e2e/case_A_reference",
+  "start": "2026-09-21T00:17:15",
+  "end": "2026-09-21T00:21:02",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 4,
+  "by_stage": {
+   "theory_blind_diagnosis": 1,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 0,
+  "multimodal_events": 0,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "nozzle_e2e/case_B_geometry",
+  "start": "2026-09-21T00:21:03",
+  "end": "2026-09-21T00:24:39",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 4,
+  "by_stage": {
+   "theory_blind_diagnosis": 1,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 0,
+  "multimodal_events": 0,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "nozzle_e2e/case_C_conditions",
+  "start": "2026-09-21T00:24:40",
+  "end": "2026-09-21T00:27:06",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 4,
+  "by_stage": {
+   "theory_blind_diagnosis": 1,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 0,
+  "multimodal_events": 0,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "nozzle_feedback/case_A_reference",
+  "start": "2026-09-21T01:06:13",
+  "end": "2026-09-21T01:06:52",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 5,
+  "by_stage": {
+   "theory_blind_diagnosis": 2,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "UNCONVERGED",
+    "REQUEST_DIAGNOSTIC"
+   ],
+   [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ]
+  ],
+  "visual_files": 0,
+  "multimodal_events": 0,
+  "status": "REJECTED_BY_VALIDATOR"
+ },
+ {
+  "session": "nozzle_feedback_final/case_B_geometry",
+  "start": "2026-09-21T01:32:11",
+  "end": "2026-09-21T01:34:01",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 6,
+  "by_stage": {
+   "theory_blind_diagnosis": 2,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 2
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ],
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 2,
+  "multimodal_events": 0,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "nozzle_feedback_final/case_C_conditions",
+  "start": "2026-09-21T01:34:16",
+  "end": "2026-09-21T01:36:00",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 6,
+  "by_stage": {
+   "theory_blind_diagnosis": 2,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 2
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ],
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ]
+  ],
+  "visual_files": 2,
+  "multimodal_events": 0,
+  "status": "ACCEPTED"
+ },
+ {
+  "session": "nozzle_feedback_v2/case_A_reference",
+  "start": "2026-09-21T01:22:50",
+  "end": "2026-09-21T01:23:29",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 4,
+  "by_stage": {
+   "theory_blind_diagnosis": 1,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 1
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ]
+  ],
+  "visual_files": 1,
+  "multimodal_events": 0,
+  "status": "REJECTED_BY_VALIDATOR"
+ },
+ {
+  "session": "nozzle_feedback_v2_hotfix/case_A_reference",
+  "start": "2026-09-21T01:27:49",
+  "end": "2026-09-21T01:28:30",
+  "request": "Simulate compressible inviscid air flow through an axisymmetric conical convergi",
+  "n_json_calls": 7,
+  "by_stage": {
+   "theory_blind_diagnosis": 3,
+   "case_spec_interpretation": 1,
+   "mesh_evidence_review": 1,
+   "engineering_summary": 2
+  },
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "non_llm": [],
+  "proposals": [
+   [
+    "ACCEPTABLE",
+    "ACCEPT"
+   ],
+   [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ],
+   [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ]
+  ],
+  "visual_files": 3,
+  "multimodal_events": 0,
+  "status": "REJECTED_BY_VALIDATOR"
+ }
+]

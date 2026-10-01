@@ -42,3 +42,17 @@ needs any data movement at all, and none needs a new solver run.
 - New figures, all from archived data: fig_agent_loop (architecture; counts from agent_stats.json), fig_agent_stats, fig_mesh_nozzle (exact blockMesh wedge + prototype Gmsh surface), fig_mesh_step_cube (native polyMesh), fig_nozzle_fields, fig_step_evolution, fig_cube_wake. fig2_configurations is no longer used in main.tex.
 - New paragraph on the prototype CAD->Gmsh run (Sec. 5.2) from data/prototype and data/gmsh records. It states only what those records show; the Gmsh path is not claimed as validated.
 - Cube "wake" field = `U_Z` (ParaView Calculator in src/reporting/paraview_field_video.py, lines 195-201); labelled U_z/U_b with U_b = 1. Verified 2026-10-01.
+
+## Amir review, 2026-10-01: status
+- Point 1 (cube): DONE. 3 LLM calls reported (2 STILL_DEVELOPING/CONTINUE_RUN, 1 NUMERICALLY_UNHEALTHY/FAIL_SAFELY).
+- Point 2 (controller comparison): OPEN. Needs a run with the API key (harness: src/eval/harness.py, evaluation/README.md).
+- Point 3 (novelty): DONE in draft. Intro rewritten; Table tab:related; PolyJarvis named as closest precedent. The table entries come from model-summarized readings of the papers (arXiv was reached only through a summarizing fetch tool). SPOT-CHECK every row against the PDFs before submission, especially Foam-Agent v3 (journal version) and ChatCFD success definition.
+- Lab citations: DONE (PolyJarvis v3, Jadhav JED 2026, NAMD-Agent, MeshDQN, Adsorb-Agent). Polymer-Agent (JCIM 2026) not added.
+- Point 4 (reproducibility): DONE in draft (Appendix B). Model named exactly (user decision). Session ledger, hardware, OpenFOAM build, MPI ranks, commits, dates, budgets, counting method.
+  * COUNTS CORRECTED: events-only count (82 calls / 23 proposals) missed nozzle feedback-loop iterations. Recount from all call records: 97 calls (16 interp, 8 mesh, 28 diag, 23 field obs [5 failed HTTP 503], 22 summaries), 28 proposals (14 ACCEPT, 5 CONTINUE_RUN, 4 EXTEND, 3 FAIL_SAFELY, 1 REFINE_MESH, 1 REQUEST_DIAGNOSTIC), 25 approved / 3 refused. Script: scripts/recount_agent_calls.py; output data/session_ledger.json.
+  * Field observer: same GEMINI_MODEL env var, identifier not written to its record. 5/23 failures = provider 503, not schema/usefulness failures.
+  * USER ACTION before posting: make GitHub repo public; deposit the e2e demo session archive (physics-constrained-cfd-agent-e2e/demo, most of it is NOT in git) + CFD_Verification_Package on Zenodo; then put the DOI into the Code and Data Availability section.
+- Point 5 (claims/definitions): DONE in draft. Four decisions defined (incl. CORRECT_AND_RERUN); refused action vs rejected solution; case_I now INCONCLUSIVE (was "recorded as a rejection", wrong); mass-closure construction + "not accuracy"; 'validated' wording; threshold registration dates; all sessions are development cases; cube gate registered 28 Sep AFTER cube data (23-24 Sep) - disclosed.
+  * New finding reported: live_run_01 FAIL_SAFELY was caused by a validator false positive (sigFpe banner); the LLM followed the wrong check; deterministic reanalysis later PASS.
+- Point 6 (length/figures): PARTIAL. Fig. 1 caption now says schematic + cube offline. Paper is now 31 pages (appendix growth); shortening and abstract numbers still open.
+- Note: stationarity.py docstring says the cube "misses the drift bound by more than an order of magnitude" - false (drift 0.075%, passes). Fix the docstring in the repo; the paper is correct.

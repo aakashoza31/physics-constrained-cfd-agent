@@ -274,7 +274,7 @@ def fig_agent_stats():
     st = json.loads((DATA / "agent_stats.json").read_text())
     calls = st["model_calls_by_stage"]
     order = ["interpretation", "mesh review", "diagnosis", "field observation", "summary"]
-    fig, axs = plt.subplots(1, 2, figsize=(W, 1.9), gridspec_kw=dict(wspace=0.55, width_ratios=[1, 1.1]))
+    fig, axs = plt.subplots(1, 2, figsize=(W, 2.1), gridspec_kw=dict(wspace=0.55, width_ratios=[1, 1.1]))
     ax = axs[0]
     vals = [calls.get(k, 0) for k in order]
     failed = calls.get("field observation (failed)", 0)
@@ -284,12 +284,12 @@ def fig_agent_stats():
     for yy, v in zip(y, vals):
         ax.text(v + 0.4, yy, str(v), va="center", fontsize=7)
     ax.text(failed / 2, y[3], f"{failed} failed", va="center", ha="center", fontsize=6, color="white")
-    ax.set_yticks(y, order); ax.set_xlim(0, 27)
+    ax.set_yticks(y, order); ax.set_xlim(0, 33)
     ax.set_xlabel("model calls")
     ax.set_title(f"(a) {sum(vals)} model calls in {st['n_sessions']} sessions")
     ax.grid(axis="x", color=GRID, lw=0.5); ax.set_axisbelow(True)
     ax = axs[1]
-    acts = ["ACCEPT", "CONTINUE_RUN", "EXTEND_END_TIME", "FAIL_SAFELY", "REFINE_MESH"]
+    acts = ["ACCEPT", "CONTINUE_RUN", "EXTEND_END_TIME", "FAIL_SAFELY", "REFINE_MESH", "REQUEST_DIAGNOSTIC"]
     ok = [st["rulings"].get(f"{a}|APPROVED", 0) for a in acts]
     no = [st["rulings"].get(f"{a}|REJECTED", 0) for a in acts]
     y = np.arange(len(acts))[::-1]
@@ -297,7 +297,7 @@ def fig_agent_stats():
     ax.barh(y, no, left=ok, color=C2, height=0.6, label="refused by validator")
     for yy, a, b in zip(y, ok, no):
         ax.text(a + b + 0.3, yy, f"{a}" + (f" + {b}" if b else ""), va="center", fontsize=7)
-    ax.set_yticks(y, acts, fontsize=6.5); ax.set_xlim(0, 13.5)
+    ax.set_yticks(y, acts, fontsize=6.5); ax.set_xlim(0, 16.5)
     ax.set_xlabel("proposals")
     ax.set_title(f"(b) {sum(ok)+sum(no)} action proposals, {sum(no)} refused")
     ax.legend(loc="lower right")
