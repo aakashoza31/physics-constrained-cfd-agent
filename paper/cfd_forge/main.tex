@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{graphicx}
+\graphicspath{{./}{Figures/}{Figures/figures/}}
 \usepackage[section]{placeins}
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -98,22 +99,22 @@ source of modeling or numerical uncertainty has been eliminated.
 
 Figure~\ref{fig:agent_loop} shows how the model calls sit inside the
 execution loop, and Table~\ref{tab:llm_stages} lists them.
-Each call is a single request to a Gemini model through the
-\texttt{google-genai} interface. The request has a fixed system
+Each call is a single request to a hosted LLM through its provider's
+API. The request has a fixed system
 instruction, a JSON evidence payload, and a Pydantic response schema; it uses
 temperature 0, and the structured response is parsed into a typed record
-before any code acts on it. The archived campaigns used
-\texttt{gemini-3.5-flash-lite} for interpretation, mesh review, diagnosis,
-and reporting. If the model is unavailable or its response fails the schema, the stage
+before any code acts on it. The archived campaigns used one lightweight
+general-purpose LLM for interpretation, mesh review, diagnosis, and
+reporting, and its model identifier is recorded with every call. If the model is unavailable or its response fails the schema, the stage
 stops, unless a deterministic fallback has been explicitly enabled; any such
 fallback is recorded as non-LLM in the call log. Each call is logged with its
 stage, model identifier, latency, number of attempts, and parsed output. The
-step runs additionally use a Gemini multimodal observer on rendered field
+step runs additionally use a multimodal LLM observer on rendered field
 images; its model identifier was not recorded in the run provenance.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_agent_loop.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_agent_loop.pdf}
     \caption{The agent loop as implemented. Blue: model calls, each a single
     schema-constrained request; orange: deterministic gates and validators;
     green: registered tools. A proposed correction is executed only after the
@@ -258,7 +259,7 @@ family defaults}, so the origin of each simulation parameter is explicit.
 \begin{minipage}{0.96\linewidth}
 \footnotesize
 \begin{verbatim}
-model output (gemini-3.5-flash-lite, schema-constrained, temperature 0)
+model output (LLM, schema-constrained, temperature 0)
   case_name: mach2p0_step0p20     mach: 2.0   step_height: 0.2   step_x: 0.6
   length, height, pressure, temperature, end_time, max_co, nx, ny: null
   requests_unsupported_physics: false
@@ -306,7 +307,7 @@ actions. Reference comparisons are removed before the call. In this family
 the model therefore sees the check outcomes; its task is to interpret them
 and to choose the next action, not to recompute them.
 
-\paragraph{Diagnosis and decision.} A multimodal Gemini observer first
+\paragraph{Diagnosis and decision.} A multimodal LLM observer first
 inspects the field images. The diagnosis call then returns
 \texttt{HEALTHY\_COMPLETE} with high confidence, cites solver health,
 horizon, mesh, field ranges, Courant number, transient conservation, and the
@@ -329,8 +330,8 @@ against, the deterministic record.
 \begin{table}[!htbp]
 \centering
 \caption{Timeline of the walkthrough session, from the archived event log.
-``LLM'' marks a \texttt{gemini-3.5-flash-lite} call (the image observer is a
-Gemini multimodal call whose model identifier was not recorded).}
+``LLM'' marks a model call (the image observer is a multimodal call whose
+model identifier was not recorded).}
 \label{tab:timeline}
 \small
 \begin{tabular}{@{}rlll@{}}
@@ -381,7 +382,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_mesh_nozzle.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_mesh_nozzle.pdf}
     \caption{Nozzle meshes. (a) The agent-built wedge mesh in the $x$--$r$
     plane, every cell shown: five blocks with 20, 40, 4, 48, and 20 axial
     divisions and 16 radial divisions, reconstructed exactly from the archived
@@ -396,7 +397,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_mesh_step_cube.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_mesh_step_cube.pdf}
     \caption{Step and cube meshes, plotted from the native OpenFOAM
     \texttt{polyMesh} files. (c) Forward-facing-step domain (every fourth grid
     line) with the step in grey and (d) every cell near the step corner; the
@@ -470,7 +471,7 @@ complete diagnosis record.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_agent_stats.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_agent_stats.pdf}
     \caption{Model activity in the 19 archived agent sessions, counted from
     the session event logs by \texttt{scripts/scan\_agent\_sessions.py}.
     (a) Model calls by stage; in 5 of the 15 field-observation calls the
@@ -504,7 +505,7 @@ scientific validator: FAIL (steady_mass_balance, monitors_stationary,
                             fields_stationary)
 \end{verbatim}
 \end{minipage}
-\caption{Archived \texttt{gemini-3.5-flash-lite} diagnosis record for the
+\caption{Archived LLM diagnosis record for the
 nozzle continuation run at $t=1$\,ms (abridged from
 \texttt{agent\_decision.json}; wording verbatim). The model separates
 insufficient run time from local under-resolution using the evidence packet,
@@ -577,8 +578,8 @@ Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \t
 
 \begin{table}[!htbp]
 \centering
-\caption{Recorded decision points with genuine model calls
-(\texttt{gemini-3.5-flash-lite}). ``Approved'' and ``Refused'' denote rulings of the
+\caption{Recorded decision points with genuine LLM calls.
+``Approved'' and ``Refused'' denote rulings of the
 deterministic action validator; the verdict column is computed by the
 scientific validator.}
 \label{tab:actions}
@@ -692,7 +693,7 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig3_nozzle.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig3_nozzle.pdf}
     \caption{Nozzle results. (a,b) Axial profiles of the canonical run at
     $t=6$\,ms (solid) and the isentropic quasi-one-dimensional solution for
     the registered area distribution (dashed). (c) The three stationarity
@@ -704,7 +705,7 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_nozzle_fields.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_nozzle_fields.pdf}
     \caption{Canonical agent nozzle run at $t=6$\,ms: Mach number, static
     pressure, and static temperature from the archived ParaView renderings of
     the native fields (fixed colour ranges recorded in the field-evolution
@@ -792,7 +793,7 @@ equality would have rejected a correctly conservative transient solution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig4_step.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig4_step.pdf}
     \caption{Mach-2 forward-facing step. (a) Mach number and (b) density
     contours at $t=4$, reproduced from the archived pipeline renderings of the
     native fields with new axes. (c) Position of the detected compression
@@ -804,7 +805,7 @@ equality would have rejected a correctly conservative transient solution.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_step_evolution.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_step_evolution.pdf}
     \caption{Evolution of the agent's Mach-2 step solution: Mach number at
     $t=0.5$, 1, 2, and 4 from the archived ParaView renderings of the native
     fields, on one fixed colour range. The detached front moves upstream
@@ -858,7 +859,7 @@ reveal the growing mode that the force history exposes.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_cube_wake.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig_cube_wake.pdf}
     \caption{Lateral velocity $U_z/U_b$ on the plane $y/H=0.5$ at four
     times, from the archived ParaView renderings of the native cube fields on
     one fixed colour range. The snapshots differ little, although the
@@ -869,7 +870,7 @@ reveal the growing mode that the force history exposes.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{figures/fig5_cube.pdf}
+    \includegraphics[width=\linewidth]{Figures/fig5_cube.pdf}
     \caption{Turbulent cube diagnostic study. (a) Velocity magnitude on the
     plane $y/H=0.5$ at $t^*=80$, from the archived ParaView rendering of the
     native field with new axes. (b) Drag coefficient history; the shaded band
@@ -882,7 +883,7 @@ reveal the growing mode that the force history exposes.
 \end{figure}
 
 \textbf{TODO (pending \texttt{scripts/cube\_llm\_diagnosis.py}):} report the
-agent's Gemini diagnosis of the archived cube evidence. The packet contains
+agent's LLM diagnosis of the archived cube evidence. The packet contains
 solver health and force statistics but no gate verdict or thresholds. Report
 all repeats, the proposed action, the validator ruling against the registered
 gate, latency, and token usage.

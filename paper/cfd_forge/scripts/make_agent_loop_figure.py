@@ -26,7 +26,7 @@ plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 7})
 
 fig, ax = plt.subplots(figsize=(6.5, 3.5))
 ax.set_xlim(-0.5, 100.5); ax.set_ylim(3, 54); ax.axis("off")
-lanes = [(41, 53, "Language model (Gemini, schema-constrained JSON): proposes", "llm", 45.5),
+lanes = [(41, 53, "Language model (LLM, schema-constrained JSON): proposes", "llm", 45.5),
          (23, 35, "Deterministic layer: decides admissibility and acceptance", "det", 28),
          (5, 17, "Registered tools: execute", "tool", 10)]
 for y0, y1, lab, k, _ in lanes:
