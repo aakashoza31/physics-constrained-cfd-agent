@@ -647,9 +647,25 @@ verdict did not. The run used 280 successful calls, $1.10\times10^6$ tokens,
 and a median latency of 1.27\,s per call. The script
 (\texttt{controller\_comparison.py} in \texttt{paper/cfd\_forge/scripts/}), prompts,
 blinded keys and per-call records are in the repository under
-\texttt{evidence/controller\_comparison/}. The comparison uses one model,
-archived rather than new runs, and faults planted in one family; it is not a
-held-out benchmark.
+\texttt{evidence/controller\_comparison/}. The comparison uses one small,
+low-latency model, archived rather than new runs, and faults planted in one
+family; it is not a held-out benchmark, and a stronger model may perform
+better in arm~C.
+
+The comparison also bounds what the model contributes. At these decision
+points the fixed rule reached the same verdicts as CFD Forge, and at every
+archived point it proposed the same action as the model. The two differed only
+on planted faults, where the rule always failed safely and the model, at 8
+of 18 faults, proposed a targeted correction in at least one repeat, such as
+\texttt{REDUCE\_MAX\_CO} for a non-finite Courant number or
+\texttt{REBUILD\_FROM\_VALIDATED\_SPEC} for a cell-count mismatch; whether
+those corrections would have succeeded was not tested. The model's role is
+therefore not to improve acceptance decisions but to do what a fixed rule
+cannot: interpret a free-text request
+into a registered specification, construct new cases within a family
+(Section~\ref{sec:variants}), explain the evidence and propose among several
+admissible corrections. The comparison does not measure those
+contributions.
 \par}
 
 \subsection{New Cases Within the Registered Families}
@@ -1044,7 +1060,9 @@ operating conditions, and their results followed the expected physical
 trends. For a three-dimensional turbulent cube run outside the agent loop, a
 retrospectively registered stationarity gate withheld acceptance because a
 growing lateral mode showed that solver completion and a settled mean drag
-did not establish a developed flow. Case files, model
+did not establish a developed flow. A controller comparison showed why the
+division matters: without the deterministic results, the same model accepted
+most of the planted faults, and with them it accepted none. Case files, model
 calls, action rulings, and field-evolution records keep each decision
 auditable. These elements provide a basis for high-throughput simulation,
 active learning, and design-optimization loops in which automated

@@ -23,10 +23,10 @@ Each is scale-free and stated as a physical requirement:
   * LATERAL_RELATIVE_MAX -- a converged symmetric configuration may not carry a
     mean lateral force above 5% of the streamwise force.
 
-These are bounds a reviewer can argue with before seeing any result. The archived
-run misses the growth bound by a factor of about six and the drift bound by more
-than an order of magnitude, so the verdict does not depend on where inside a
-plausible range the numbers were set.
+These bounds were registered on 2026-09-28, after the archived cube data existed
+(2026-09-23/24), so the gate is retrospective. On the archived run the drag drift
+is 0.075%, within the 2% bound, and the lateral growth ratio is 2.10 against the
+1.25 bound (a factor of about 1.7); the verdict comes from the lateral growth.
 """
 from __future__ import annotations
 
