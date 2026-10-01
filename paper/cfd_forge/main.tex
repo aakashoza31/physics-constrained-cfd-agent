@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations include a converging-diverging nozzle and a two-dimensional Mach-2 forward-facing step that satisfy their registered criteria. A three-dimensional turbulent cube serves as a diagnostic stress test: quantitative wake analysis exposes continuing lateral-mode development despite comparatively stable mean quantities, preventing premature acceptance. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
+Computational fluid dynamics (CFD) requires substantial manual coordination across geometry preparation, meshing, solver setup, diagnosis, and interpretation. Repeating this work across design alternatives limits high-throughput screening and rapid engineering iteration. We present CFD Forge, a programmable agentic CFD framework built around OpenFOAM. The framework connects engineering requests and geometry parameters to case construction, meshing, boundary and initial conditions, solver execution, diagnostics, visualization, and reporting. A large language model reasons across simulation evidence, interprets flow behavior, identifies likely causes of problems, and proposes bounded corrective actions. Modular scientific contracts complement this reasoning with deterministic measurements and acceptance criteria, retaining final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. Demonstrations include a converging-diverging nozzle and a two-dimensional Mach-2 forward-facing step that satisfy their registered criteria. A three-dimensional turbulent cube, run outside the agent loop, serves as a retrospective diagnostic stress test: a stationarity gate, defined after the run, withholds acceptance because the lateral force is still growing although the mean drag is stable. Case files, diagnostic evidence, action histories, and field-evolution visualizations make the workflow auditable. CFD Forge brings execution, reasoning, and scientific assessment into a common workflow, with future applications in high-throughput simulation, active learning, and engineering design optimization.
 \end{abstract}
 
 \section{Introduction}
@@ -41,7 +41,7 @@ Large language models (LLMs) offer a way to coordinate such operations through n
 
 Agents for other kinds of simulation already combine LLM planning with deterministic execution. In our group, an LLM agent refined structural designs from finite-element feedback \cite{jadhav2026mechdesigner}; NAMD-Agent automated the preparation and execution of protein molecular-dynamics simulations \cite{chandrasekhar2025namdagent}; and Adsorb-Agent chose which adsorption configurations to evaluate computationally \cite{ock2026adsorbagent}. PolyJarvis is the closest precedent \cite{zhao2026polyjarvis}. It executes all-atom polymer molecular dynamics from a validated run plan through deterministic stage scripts, applies deterministic equilibration gates, and consults a recovery agent only on structured failures, within a fixed decision budget and a closed set of recovery actions. CFD Forge applies the same division of labour to CFD. Learned methods have also been applied to CFD meshing: MeshDQN coarsens a mesh by reinforcement learning while preserving a target quantity \cite{lorsung2023meshdqn}. The mesh actions in CFD Forge are different in kind: bounded refinements that follow a registered rule, proposed by the model and approved by a validator.
 
-Because the division between model proposals and deterministic checks is already established, we do not present that architecture as the contribution. What CFD Forge adds concerns the acceptance of CFD results (Table~\ref{tab:related}). Numerical acceptance contracts are registered for each flow family and decide \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} independently of the model. Corrective actions come from a closed vocabulary, and a deterministic validator rules on, and can refuse, each one. Development tests examine every monitored quantity---for the cube, every force component---so that a settled mean drag cannot certify a flow whose lateral mode is still growing. Transient mass conservation is tested as a storage-aware balance rather than as inlet--outlet equality. And every refusal of an unjustified acceptance is recorded and reported. Table~\ref{tab:related} records only what each paper describes. Several of these systems cover far more cases and solver configurations than the three studies reported here, and none has been compared with CFD Forge on common tasks.
+Because the division between model proposals and deterministic checks is already established, we do not present that architecture as the contribution. CFD Forge occupies a complementary design point: deterministic, family-specific numerical acceptance of CFD results after execution, coupled to validator-controlled corrective actions (Table~\ref{tab:related}). Numerical acceptance contracts are registered for each flow family and decide \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} independently of the model. Corrective actions come from a closed vocabulary, and a deterministic validator rules on, and can refuse, each one. Development tests examine every monitored quantity---for the cube, every force component---so that a settled mean drag cannot certify a flow whose lateral mode is still growing. Transient mass conservation is tested as a storage-aware balance rather than as inlet--outlet equality. And every refusal of an unjustified acceptance is recorded and reported. Table~\ref{tab:related} records only what each paper describes; a dash means that a feature is not described there, not that the system cannot have it. Several of these systems cover far more cases and solver configurations than the three studies reported here, and none has been compared with CFD Forge on common tasks.
 
 \begin{table}[!htbp]
 \centering
@@ -67,7 +67,7 @@ PhyNiKCE~\cite{fan2026phynikce} & Execution without failure; accuracy scored aft
 AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (open-ended reruns) & -- & -- & 5 tasks; planted failures \\
 PolyJarvis~\cite{zhao2026polyjarvis} (MD) & Deterministic gates & Yes & Yes (recovery set, fixed budget) & Yes (drift, block error) & n/a & 7 polymers, 3 replicates, vs.\ experiment \\
 \midrule
-CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 3 studies, 19 sessions; no ablation \\
+CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; no ablation \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -76,7 +76,7 @@ Integrating execution with scientific assessment requires attention to what coun
 
 CFD Forge connects engineering intent and geometry parameters to case construction, meshing, boundary and initial conditions, OpenFOAM execution, diagnostics, corrective actions, and reporting. The LLM reasons across solver logs, field diagnostics, conservation measures, and flow histories to interpret behavior, identify likely causes of problems, and propose what should be tried next. Deterministic scientific checks measure explicit criteria, enforce thresholds, and retain final \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} authority. This division gives reasoning a substantive role while keeping acceptance reproducible. Modular scientific contracts organize physical assumptions, numerical requirements, and allowed actions so that additional simulation families can be incorporated. The current evaluation uses registered families and parameterized geometries.
 
-We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a Mach-2 forward-facing step assessed for transient numerical health and conservation. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. The framework uses this evidence to prevent premature acceptance under the stationarity criterion, illustrating why several physical signals must be examined together. The contribution is the realization of model-proposes, code-decides for CFD acceptance: family-specific numerical contracts, a bounded vocabulary of actions that the validator can refuse, transient and development diagnostics that resist premature acceptance, and a complete record of model calls, proposals, and refusals. This architecture provides a basis for larger simulation campaigns and future integration with active-learning and design-optimization loops.
+We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a Mach-2 forward-facing step assessed for transient numerical health and conservation. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. Applied retrospectively, the stationarity gate withholds acceptance on this evidence, illustrating why several physical signals must be examined together. The contribution is the realization of model-proposes, code-decides for CFD acceptance: family-specific numerical contracts, a bounded vocabulary of actions that the validator can refuse, transient and development diagnostics that resist premature acceptance, and an auditable record of model calls, proposals, and refusals. This architecture provides a basis for larger simulation campaigns and future integration with active-learning and design-optimization loops.
 
 \section{The CFD Forge Agent}
 \label{sec:framework}
@@ -112,20 +112,21 @@ The LLM provides a flexible interface for interpreting engineering requests and 
 
 Scientific acceptance is evaluated separately. Deterministic routines calculate the relevant quantities and compare them with the registered criteria. The LLM can propose that a run appears complete or requires further work, but its statement does not override a failed or unresolved check. Similarly, a proposed correction must be permitted by the family contract before it can be applied.
 
-Within these bounds, the language model is the decision-making component that
-automates the workflow. It translates a natural-language engineering request
+Within these bounds, the language model is the component that drives the
+workflow by proposing what to do. It translates a natural-language engineering request
 into a structured case specification that drives geometry, mesh, and
 boundary-condition construction; reviews mesh evidence before setup proceeds;
 diagnoses each completed run from solver, conservation, and field evidence;
-and selects the next action---accept, continue, extend the horizon, refine the
-mesh, or stop safely---which the orchestrator executes by invoking the
+and proposes the next action---accept, continue, extend the horizon, refine the
+mesh, or stop safely---which the orchestrator executes, once approved, by invoking the
 corresponding meshing, solver, and post-processing tools. It also interprets
-rendered field images and writes the engineering summary. The decision of
-what to do next therefore rests with the model, while the admissibility of
-that action and the acceptance of the result rest with deterministic checks.
+rendered field images and writes the engineering summary. The model therefore proposes the next action, and deterministic validators
+decide whether it may be executed and whether the result is accepted.
 
-The deterministic layer returns one of four decisions, and the model never
-writes one:
+The deterministic layer returns one of four decisions. The model never
+writes the binding verdict: an \texttt{ACCEPT} from the model is an action
+proposal, which the validators may refuse, whereas the decisions below are
+computed by code:
 \begin{itemize}
     \item \texttt{ACCEPT}: every registered check of the family passes, and
     every criterion the request depends on is registered.
@@ -232,20 +233,11 @@ refuses to emit one that contains them. The model therefore diagnoses from
 the simulation's own evidence, and agreement with theory is checked
 afterwards, by code.
 
-{\sloppy Actions come from closed, family-specific vocabularies. The nozzle family
-admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
-\texttt{REQUEST\_DIAGNOSTIC}, \texttt{REFINE\_THROAT},
-\texttt{REFINE\_GRADIENT\_REGION}, \texttt{REPAIR\_MESH},
-\texttt{RESTART\_CLEAN}, and \texttt{REJECT\_OUTSIDE\_DOMAIN}. The step
-family admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
-\texttt{EXTEND\_END\_TIME}, \texttt{REDUCE\_MAX\_CO},
-\texttt{REFINE\_MESH}, \texttt{REBUILD\_FROM\_VALIDATED\_SPEC},
-\texttt{REQUEST\_CLARIFICATION}, \texttt{REJECT\_UNSUPPORTED}, and
-\texttt{FAIL\_SAFELY}. The action validator checks each proposal against the
-evidence and a fixed iteration budget. For example, \texttt{CONTINUE\_RUN}
-is refused once the requested horizon has been reached, \texttt{REFINE\_MESH}
-is refused unless the current solution is healthy, and \texttt{ACCEPT} is
-refused unless the registered scientific status is final.\par}
+Actions come from closed, family-specific vocabularies (listed in
+Appendix~\ref{app:repro}). The action validator checks each proposal against
+the evidence and a fixed iteration budget: for example, \texttt{CONTINUE\_RUN}
+is refused once the requested horizon has been reached, and \texttt{ACCEPT}
+is refused unless the registered scientific status is final.
 
 \subsection{Scientific Contracts and Corrective Actions}
 \label{sec:contracts}
@@ -303,7 +295,7 @@ forward-facing-step, and turbulent-cube studies.
 We first follow one complete agent session, the canonical Mach-2
 forward-facing-step run, from the engineering request to the final verdict.
 Every artifact quoted below is taken from the archived session record.
-Table~\ref{tab:timeline} lists the stages, who performed each one, and when.
+Table~\ref{tab:timeline} in Appendix~\ref{app:records} lists the stages, who performed each one, and when.
 
 \paragraph{Request.} The session starts from a short natural-language request:
 
@@ -334,9 +326,9 @@ Mach number, 2.000006. The family builder then writes a three-block
 $\Delta x=\Delta y=0.0125$) and sets the inlet and initial state
 $p=T=1$, $\mathbf{U}=(2,0,0)$. It copies the numerical recipe unchanged and
 hash-checks it, and runs \texttt{blockMesh} and \texttt{checkMesh}, which
-reports a valid mesh with two solution directions. The model chooses the
-quantities that define the case; deterministic primitives turn them into
-OpenFOAM inputs.
+reports a valid mesh with two solution directions. The model structures the quantities the user specified;
+deterministic family defaults complete the executable specification, and
+deterministic primitives turn it into OpenFOAM inputs.
 
 \paragraph{Execution and evidence.} OpenFOAM \texttt{shockFluid} advances
 the flow to $t=4$ in 5,428 steps (102\,s). Deterministic diagnostics then
@@ -369,33 +361,6 @@ to this case. Such errors are why the summary is treated as narrative and
 never as evidence: every number in it can be traced back to, and checked
 against, the deterministic record.
 
-\begin{table}[!htbp]
-\centering
-\caption{Timeline of the walkthrough session, from the archived event log.
-``LLM'' marks a model call (the image observer is a multimodal call whose
-model identifier was not recorded).}
-\label{tab:timeline}
-\small
-\begin{tabular}{@{}rlll@{}}
-\toprule
-Time (s) & Stage & Performed by & Outcome \\
-\midrule
-0.0 & Request received & -- & 313-character prompt \\
-5.9 & Request interpretation & LLM & Mach 2, $h=0.2$, $x=0.6$ \\
-5.9 & Scope gate & Deterministic & 14/14 checks, in scope \\
-22.0 & Case and mesh generation & Deterministic & 16,128 cells, recipe hash-checked \\
-28.3 & Mesh check & OpenFOAM & Mesh OK \\
-134.2 & Solver run & OpenFOAM & Completed to $t=4$ \\
-148.9 & Evidence extraction & Deterministic & 17/17 hard checks \\
-158.8 & Field-image observation & LLM (multimodal) & Observation complete \\
-161.7 & Diagnosis and action & LLM & \texttt{HEALTHY\_COMPLETE} $\rightarrow$ \texttt{ACCEPT} \\
-161.7 & Action validation & Deterministic & Approved \\
-161.7 & Scientific verdict & Deterministic & \texttt{PASS\_2D\_FORWARD\_STEP} \\
-165.4 & Engineering summary & LLM & Report written \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 The full session took 165\,s from request to report. The OpenFOAM run took
 102\,s of that, and the four model calls took about 22\,s.
 
@@ -419,7 +384,8 @@ The nozzle and step runs were executed by the agent from natural-language
 requests, and every model call is recorded. The cube campaign was executed
 outside the agent loop; afterwards we applied the agent's diagnosis stage to
 its archived evidence three times and ruled on each proposal with the
-registered gate (Sec.~\ref{sec:cube_results}). Archived-case replay is used only to check
+stationarity gate, which was registered retrospectively, after the cube
+data existed (Sec.~\ref{sec:cube_results}, Appendix~\ref{app:repro}). Archived-case replay is used only to check
 that recorded verdicts are reproduced, never as evidence of new execution.
 
 \begin{figure}[!htbp]
@@ -431,7 +397,7 @@ that recorded verdicts are reproduced, never as evidence of new execution.
     \texttt{blockMeshDict} (linear edges, uniform grading), whose digest
     matches the native case. (b) The tetrahedral mesh from the earlier
     CAD$\rightarrow$Gmsh prototype of the same nozzle
-    (Sec.~\ref{sec:nozzle_results}): wall-surface triangles of the archived
+    (Appendix~\ref{app:repro}): wall-surface triangles of the archived
     \texttt{.msh} file, back half only, viewed from the side, showing the
     throat refinement selected by the model.}
     \label{fig:case_geometries}
@@ -540,9 +506,9 @@ Evidence & Nozzle & Forward-facing step & Cube \\
 Mesh & checkMesh OK & checkMesh OK; 2 solution directions & checkMesh OK \\
 Solver health & Completed; $p,T,\rho>0$ at all saved times & Completed; positive at every step; no fatal signature & Completed; no warnings in final segments \\
 Conservation & Window mismatch $0.055\%$ ($<0.1\%$) & Closure residual $5.7\times10^{-11}$ ($<10^{-6}$) & Volume-flux imbalance $3\times10^{-11}$ \\
-Physical or reference & Quasi-1-D differences $\le1.83\%$ & $p$, $\rho$, $T$ rise across front & Not assessed (no accepted reference data) \\
+Physical or reference & Canonical run: quasi-1-D differences $\le1.83\%$ & $p$, $\rho$, $T$ rise across front & Not assessed (no accepted reference data) \\
 Stationarity or development & Drift $0.081\%$, field change $0.111\%$ ($<0.2\%$) & Not required (transient family) & Lateral growth ratio 2.10 ($>1.25$) \\
-Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \texttt{ACCEPT} \newline (\texttt{PASS\_2D\_FORWARD\_STEP}) & \texttt{REJECT} \newline (\texttt{STILL\_DEVELOPING}) \\
+Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \texttt{ACCEPT} \newline (\texttt{PASS\_2D\_FORWARD\_STEP}) & \texttt{REJECT} \newline (\texttt{STILL\_DEVELOPING}; retrospective gate) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -551,8 +517,9 @@ Registered outcome & \texttt{ACCEPT} \newline (\texttt{PASS\_SINGLE\_MESH}) & \t
 \centering
 \caption{Recorded decision points with genuine LLM calls.
 ``Approved'' and ``Refused'' denote rulings of the
-deterministic action validator; the verdict column is computed by the
-scientific validator.}
+deterministic action validator; the last column gives the archived family status computed
+by the scientific validator, with the decision of Sec.~\ref{sec:authority}
+in parentheses.}
 \label{tab:actions}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -562,13 +529,13 @@ scientific validator.}
 \toprule
 Run and state & Deterministic evidence & Model proposal & Validator & Verdict \\
 \midrule
-Nozzle, $t=1$\,ms & 17/20 checks; mass mismatch $1.35\%$, drift $2.0\%$, field change $1.2\%$ & \texttt{CONTINUE\_RUN} & Approved & \texttt{FAIL} $\rightarrow$ continue \\
+Nozzle, $t=1$\,ms & 17/20 checks; mass mismatch $1.35\%$, drift $2.0\%$, field change $1.2\%$ & \texttt{CONTINUE\_RUN} & Approved & \texttt{FAIL} (\texttt{CORRECT\_AND\_\allowbreak RERUN}) \\
 Nozzle, $t=6$\,ms & 20/20 checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_SINGLE\_MESH} \\
 Step, Mach 2, $t=4$ & 17/17 hard checks; compression rises measured & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
-Step, Mach 3, $t=2$ of 4 (resumed) & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Healthy, not final $\rightarrow$ extend \\
+Step, Mach 3, $t=2$ of 4 (resumed) & Hard checks pass; registered horizon not reached & \texttt{EXTEND\_END\_TIME} ($2\to4$) & Approved & Target not reached (\texttt{CORRECT\_AND\_\allowbreak RERUN}) \\
 Step, Mach 3, $t=4$ & 17/17 hard checks & \texttt{ACCEPT} & Approved & \texttt{PASS\_2D\_FORWARD\_STEP} \\
 Step, Mach 3, $h=0.3$ & Compression front not measurable & \texttt{FAIL\_SAFELY} & Approved & \texttt{FAIL} (preserved) \\
-Step, Mach 3, sensitivity request, 4,032 cells & Hard checks pass; one grid cannot establish sensitivity & \texttt{REFINE\_MESH} ($\times2$) & Approved & Healthy $\rightarrow$ refine \\
+Step, Mach 3, sensitivity request, 4,032 cells & Hard checks pass; one grid cannot establish sensitivity & \texttt{REFINE\_MESH} ($\times2$) & Approved & \texttt{PASS} on one grid (\texttt{CORRECT\_AND\_\allowbreak RERUN}) \\
 Same, 16,128 cells & Hard checks pass; no registered cross-grid tolerance & \texttt{ACCEPT} & \textbf{Refused} & \texttt{STOPPED\_ACTION\_\allowbreak REFUSED} (\texttt{INCONCLUSIVE}) \\
 \bottomrule
 \end{tabularx}
@@ -595,36 +562,13 @@ with an underexpanded nozzle.
 The agent-constructed canonical run reproduces the coarsest mesh of the
 LLM-free reference campaign exactly: every reported quantity, the 30,471
 time steps, and the stationarity metrics agree to machine precision. The
-reference refinement study (Table~\ref{tab:nozzle_grid}) passed its
+reference refinement study (Table~\ref{tab:nozzle_grid}, Appendix~\ref{app:setup}) passed its
 registered criteria, with last-pair changes of at most $0.41\%$ (throat
 Mach number) and $0.27\%$ (exit pressure). Refinement increases the exit Mach
 number from 1.513 to 1.524 and moves the solution slightly further from
 quasi-one-dimensional theory, to $-3.16\%$ in exit pressure on the finest
-mesh, which is still within the $5\%$ limit. This trend is consistent with
-resolving multidimensional corner effects that the one-dimensional model
-omits. No formal grid-convergence index is reported.
-
-\begin{table}[!htbp]
-\centering
-\caption{Frozen LLM-free nozzle reference campaign: mesh refinement at
-$t=6$\,ms. Mesh 1 is identical to the agent's canonical run. Coarse-mesh
-controls (halved Courant number, halved wedge angle, $2\%$ startup
-perturbation) changed all reported quantities by at most $0.036\%$.}
-\label{tab:nozzle_grid}
-\small
-\begin{tabular}{@{}lrrrrr@{}}
-\toprule
-Mesh (axial $\times$ radial) & Cells & Throat $M$ & Exit $M$ & Exit $p$ (kPa) & $\dot m$ (kg\,s$^{-1}$) \\
-\midrule
-$132\times16$ & 2,112 & 1.0290 & 1.5133 & 53.14 & 1.5409 \\
-$198\times24$ & 4,752 & 1.0432 & 1.5189 & 52.78 & 1.5378 \\
-$264\times32$ & 8,448 & 1.0512 & 1.5221 & 52.57 & 1.5361 \\
-$330\times40$ & 13,200 & 1.0555 & 1.5244 & 52.43 & 1.5349 \\
-\midrule
-Last-pair change & & $0.41\%$ & $0.15\%$ & $0.27\%$ & $0.07\%$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+mesh, which is still within the $5\%$ limit. This trend may reflect multidimensional corner effects that the
+one-dimensional model omits; we have not established the cause. No formal grid-convergence index is reported.
 
 Table~\ref{tab:nozzle} lists the deterministic comparison with theory.
 All differences are below $2\%$; the largest is the exit static pressure
@@ -697,29 +641,9 @@ establish that the flow had settled, and the stationarity evidence
 determined the outcome. After an approved continuation to 6\,ms, all three
 metrics fell below their limits (ratios 0.59, 0.41, and 0.66) and the run
 was accepted. Figure~\ref{fig:nozzle_fields} shows the accepted canonical
-fields.
-
-The registered nozzle family replaced an earlier, less constrained
-prototype that is preserved in the archive, and its record shows why the
-contracts were introduced. Given the same geometry and operating conditions
-as text, the prototype generated the geometry through a CAD$\rightarrow$Gmsh
-path, and the model chose the meshing strategy: a global size of 10\,mm,
-2\,mm at the throat, and throat and curvature refinement
-(Fig.~\ref{fig:case_geometries}b). The resulting 63,747-tetrahedron mesh met
-its quality constraint (minimum minSICN 0.349, mean 0.882), and the model
-accepted it. The model's solver-setup proposal, however, was internally
-inconsistent for the inviscid request: it selected laminar flow with a
-Sutherland viscous transport model while its rationale cited
-$k$--$\omega$ SST turbulence. Its design plan also recorded the 30\,kPa back
-pressure as the outlet static pressure. After two approved continuations
-the archived run ends at $t=0.2$\,ms with status
-\texttt{STABLE\_UNCONVERGED} and a $50.8\%$ mass-flow imbalance. In the
-registered family, the physical model and boundary-condition formulation
-are fixed by the contract, the model supplies only case parameters, and
-acceptance requires the stationarity and conservation checks reported
-above. Carrying the Gmsh path through to a solution that passes the
-registered checks is left to future work.
-
+fields. An earlier CAD$\rightarrow$Gmsh prototype of the nozzle workflow, whose
+record motivated the registered contracts, is described in
+Appendix~\ref{app:repro}.
 
 \subsection{Mach-2 Forward-Facing Step}
 \label{sec:step_results}
@@ -740,7 +664,7 @@ upstream, but these gradient-based regional measurements are not
 grid-converged and are not used as acceptance bands.
 
 The detected front moves upstream monotonically, from $x=0.525$ at $t=0.1$
-to $x=0.113$ at $t=4$ (Figs.~\ref{fig:step}c and~\ref{fig:step_evolution}).
+to $x=0.113$ at $t=4$ (Fig.~\ref{fig:step}c; snapshots in Fig.~\ref{fig:step_evolution}, Appendix~\ref{app:setup}).
 A quasi-one-dimensional
 estimate explains this behavior. Behind a normal shock at Mach 2 the flow
 has $M=0.577$, whose sonic area is $0.822$ of the channel height. This
@@ -777,18 +701,6 @@ for, not that the solution is accurate.
     \label{fig:step}
 \end{figure}
 
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=0.92\linewidth]{Figures/fig_step_evolution.pdf}
-    \caption{Evolution of the agent's Mach-2 step solution: Mach number at
-    $t=0.5$, 1, 2, and 4 from the archived ParaView renderings of the native
-    fields, on one fixed colour range. The detached front moves upstream
-    throughout, while the shoulder expansion and the reflected oblique shock
-    reorganize behind it.}
-    \label{fig:step_evolution}
-\end{figure}
-
-
 \subsection{Turbulent Cube Diagnostic Study}
 \label{sec:cube_results}
 
@@ -799,8 +711,8 @@ outlet and inlet volume fluxes balanced to a relative $3\times10^{-11}$.
 Instantaneous fields at $t^*=80$ show a physically plausible horseshoe
 region, separated shear layers from the leading edges, and a recirculating
 wake (Fig.~\ref{fig:cube}a). The streamwise force also appears settled. Over
-the registered window $t^*\in[59.98, 79.98]$, the mean drag coefficient is
-$C_D=2F_x=1.412$ and its drift is $0.075\%$ of the mean, well within the
+the retrospectively registered window $t^*\in[59.98, 79.98]$, the mean drag coefficient is
+$C_D=F_x/(\tfrac12\rho U_b^2H^2)=2F_x=1.412$ and its drift is $0.075\%$ of the mean, well within the
 $2\%$ limit, and the mean lateral force is $0.063\%$ of the drag (limit
 $5\%$).
 
@@ -911,7 +823,9 @@ neither a registered cross-grid criterion nor a quantitative reference-field
 comparison. The
 cube wall treatment is uncertain: at $t^*=80$ the cube-surface $y^+$ has a
 median of 24.7 and a range of 2.8--96.5, with $67\%$ of the area below
-$y^+=30$. A provisional comparison of its evolving mean wake with
+$y^+=30$. Its 20-unit gate window contains only about two periods of the lateral
+oscillation, enough to show continued growth but too short for a statistical
+stationarity claim. A provisional comparison of its evolving mean wake with
 ERCOFTAC centre-line profiles is not satisfactory, so no experimental
 validation is claimed. The model's diagnoses are not repeatable: one of
 three identical calls on the cube evidence gave a different diagnosis, and
@@ -936,9 +850,10 @@ is accepted. Under this division, a converging--diverging nozzle was accepted
 with sub-$2\%$ agreement with quasi-one-dimensional theory after its
 stationarity evidence, not its reference agreement, determined when the run
 was complete. A transient Mach-2 forward-facing-step flow was accepted with
-storage-aware mass closure at round-off. A three-dimensional turbulent cube
-was rejected because a growing lateral mode showed that solver completion and
-a settled mean drag did not establish a developed flow. Case files, model
+storage-aware mass closure at round-off. For a three-dimensional turbulent cube run outside the agent loop, a
+retrospectively registered stationarity gate withheld acceptance because a
+growing lateral mode showed that solver completion and a settled mean drag
+did not establish a developed flow. Case files, model
 calls, action rulings, and field-evolution records keep each decision
 auditable. These elements provide a basis for high-throughput simulation,
 active learning, and design-optimization loops in which automated
@@ -1059,6 +974,28 @@ perturbation), whose acceptance required last-pair changes below $0.5\%$ and
 control changes below $0.2\%$.
 
 
+\begin{table}[!htbp]
+\centering
+\caption{Frozen LLM-free nozzle reference campaign: mesh refinement at
+$t=6$\,ms. Mesh 1 is identical to the agent's canonical run. Coarse-mesh
+controls (halved Courant number, halved wedge angle, $2\%$ startup
+perturbation) changed all reported quantities by at most $0.036\%$.}
+\label{tab:nozzle_grid}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Mesh (axial $\times$ radial) & Cells & Throat $M$ & Exit $M$ & Exit $p$ (kPa) & $\dot m$ (kg\,s$^{-1}$) \\
+\midrule
+$132\times16$ & 2,112 & 1.0290 & 1.5133 & 53.14 & 1.5409 \\
+$198\times24$ & 4,752 & 1.0432 & 1.5189 & 52.78 & 1.5378 \\
+$264\times32$ & 8,448 & 1.0512 & 1.5221 & 52.57 & 1.5361 \\
+$330\times40$ & 13,200 & 1.0555 & 1.5244 & 52.43 & 1.5349 \\
+\midrule
+Last-pair change & & $0.41\%$ & $0.15\%$ & $0.27\%$ & $0.07\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Mach-2 Forward-Facing Step}
 \label{sec:step_setup}
 
@@ -1130,6 +1067,17 @@ Mach-3 forward-facing-step problem~\cite{woodward1984strong} and is not
 presented as a reproduction of it.
 
 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.92\linewidth]{Figures/fig_step_evolution.pdf}
+    \caption{Evolution of the agent's Mach-2 step solution: Mach number at
+    $t=0.5$, 1, 2, and 4 from the archived ParaView renderings of the native
+    fields, on one fixed colour range. The detached front moves upstream
+    throughout, while the shoulder expansion and the reflected oblique shock
+    reorganize behind it.}
+    \label{fig:step_evolution}
+\end{figure}
+
 \subsection{Turbulent Cube Diagnostic Study}
 \label{sec:cube_setup}
 
@@ -1161,8 +1109,13 @@ $t^*=tU_b/H=80$; force histories are analyzed from $t^*=20$.
 Development is assessed using force histories, six wake probes, block-mean
 fields, and fluctuation measures rather than solver residuals alone.
 
-The registered stationarity gate is applied to the pressure-plus-viscous
-force on the cube over the final 20 time units. It requires that the
+Forces are the pressure-plus-viscous forces on the cube computed from the
+kinematic pressure and stress, in units with $\rho=U_b=H=1$. The drag
+coefficient $C_D=F_x/(\tfrac12\rho U_b^2H^2)$ is therefore $2F_x$, and the
+lateral coefficient is $2F_z$; $F_z$ is plotted in these units. The
+stationarity gate, registered retrospectively after the run
+(Appendix~\ref{app:repro}), is applied to this force over the final 20 time
+units. It requires that the
 least-squares drift of each force component across the window remain below
 $2\%$ of the mean streamwise force, that the mean lateral force remain below
 $5\%$ of the streamwise force, and that the mean of $|F_z|$ over the second
@@ -1187,7 +1140,8 @@ not as an accepted turbulent reference solution.
 \label{app:records}
 
 Figures~\ref{fig:walk_spec} and~\ref{fig:trace} reproduce two archived model
-outputs referred to in the main text.
+outputs referred to in the main text, and Table~\ref{tab:timeline} gives the
+timeline of the walkthrough session.
 
 \begin{figure}[!h]
 \centering
@@ -1250,6 +1204,33 @@ and its proposal is executed only after the action validator approves it.}
 \label{fig:trace}
 \end{figure}
 
+\begin{table}[!h]
+\centering
+\caption{Timeline of the walkthrough session, from the archived event log.
+``LLM'' marks a model call (the image observer is a multimodal call whose
+model identifier was not recorded).}
+\label{tab:timeline}
+\small
+\begin{tabular}{@{}rlll@{}}
+\toprule
+Time (s) & Stage & Performed by & Outcome \\
+\midrule
+0.0 & Request received & -- & 313-character prompt \\
+5.9 & Request interpretation & LLM & Mach 2, $h=0.2$, $x=0.6$ \\
+5.9 & Scope gate & Deterministic & 14/14 checks, in scope \\
+22.0 & Case and mesh generation & Deterministic & 16,128 cells, recipe hash-checked \\
+28.3 & Mesh check & OpenFOAM & Mesh OK \\
+134.2 & Solver run & OpenFOAM & Completed to $t=4$ \\
+148.9 & Evidence extraction & Deterministic & 17/17 hard checks \\
+158.8 & Field-image observation & LLM (multimodal) & Observation complete \\
+161.7 & Diagnosis and action & LLM & \texttt{HEALTHY\_COMPLETE} $\rightarrow$ \texttt{ACCEPT} \\
+161.7 & Action validation & Deterministic & Approved \\
+161.7 & Scientific verdict & Deterministic & \texttt{PASS\_2D\_FORWARD\_STEP} \\
+165.4 & Engineering summary & LLM & Report written \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Reproducibility, Session Ledger, and Development History}
 \label{app:repro}
 
@@ -1268,6 +1249,18 @@ cube diagnosis, in \nolinkurl{paper/cfd_forge/scripts/cube_llm_diagnosis.py}.
 Each run allowed at most four iterations of solve, diagnosis, and action. Token counts were recorded only for the cube
 diagnosis.
 
+{\sloppy\paragraph{Action vocabularies.} The nozzle family
+admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
+\texttt{REQUEST\_DIAGNOSTIC}, \texttt{REFINE\_THROAT},
+\texttt{REFINE\_GRADIENT\_REGION}, \texttt{REPAIR\_MESH},
+\texttt{RESTART\_CLEAN}, and \texttt{REJECT\_OUTSIDE\_DOMAIN}. The step
+family admits \texttt{ACCEPT}, \texttt{CONTINUE\_RUN},
+\texttt{EXTEND\_END\_TIME}, \texttt{REDUCE\_MAX\_CO},
+\texttt{REFINE\_MESH}, \texttt{REBUILD\_FROM\_VALIDATED\_SPEC},
+\texttt{REQUEST\_CLARIFICATION}, \texttt{REJECT\_UNSUPPORTED}, and
+\texttt{FAIL\_SAFELY}. \texttt{REFINE\_MESH} is refused unless the current solution is
+healthy.\par}
+
 \paragraph{Counting.} Model calls were counted from every call record in the
 session archive---the per-session call logs and the per-iteration decision,
 mesh-review, and report records---and deduplicated within each run by stage
@@ -1276,6 +1269,16 @@ folders. Field-observation calls were counted from the per-iteration
 observation records. An earlier count taken from the event logs alone (82
 calls, 23 proposals) missed the iterations of the nozzle feedback loop and
 is superseded by the numbers in Sec.~\ref{sec:agent_results}.
+
+\paragraph{What is reproducible.} The archive reproduces the analyses,
+figures, and tables from the recorded evidence, and the case files allow each
+CFD run to be repeated. The historical agent sessions ran from uncommitted
+development trees, so the release does not reproduce the historical agent
+execution byte for byte. Model outputs are not reproducible either:
+temperature 0 does not make the provider deterministic, as the cube
+diagnosis shows (Sec.~\ref{sec:cube_results}). Reproducibility here means
+reproducibility of the artifacts and the workflow, not of the exact model
+outputs.
 
 \paragraph{Hardware and software.} All calculations ran on one Windows laptop
 with an Intel Core i5-11400H processor (six cores), under OpenFOAM Foundation
@@ -1307,6 +1310,27 @@ thresholds are stated as physical bounds (Sec.~\ref{sec:cube_setup}), and the
 measured growth ratio, 2.10 against 1.25, is far enough from the bound that
 the verdict does not depend on where within a plausible range it was set.
 The gate was nonetheless not frozen before the data existed.
+
+\paragraph{Prototype before the registered contracts.} The registered nozzle family replaced an earlier, less constrained
+prototype that is preserved in the archive, and its record shows why the
+contracts were introduced. Given the same geometry and operating conditions
+as text, the prototype generated the geometry through a CAD$\rightarrow$Gmsh
+path, and the model chose the meshing strategy: a global size of 10\,mm,
+2\,mm at the throat, and throat and curvature refinement
+(Fig.~\ref{fig:case_geometries}b). The resulting 63,747-tetrahedron mesh met
+its quality constraint (minimum minSICN 0.349, mean 0.882), and the model
+accepted it. The model's solver-setup proposal, however, was internally
+inconsistent for the inviscid request: it selected laminar flow with a
+Sutherland viscous transport model while its rationale cited
+$k$--$\omega$ SST turbulence. Its design plan also recorded the 30\,kPa back
+pressure as the outlet static pressure. After two approved continuations
+the archived run ends at $t=0.2$\,ms with status
+\texttt{STABLE\_UNCONVERGED} and a $50.8\%$ mass-flow imbalance. In the
+registered family, the physical model and boundary-condition formulation
+are fixed by the contract, the model supplies only case parameters, and
+acceptance requires the stationarity and conservation checks reported
+in Sec.~\ref{sec:nozzle_results}. Carrying the Gmsh path through to a solution that passes the
+registered checks is left to future work.
 
 \paragraph{Session ledger.} Table~\ref{tab:ledger} lists all 19 sessions.
 Proposals are given in order with the action validator's ruling; the final
@@ -1355,9 +1379,10 @@ S8 \texttt{case\_I} (1) & Mach 3, $h=0.2$, sensitivity request & \texttt{REFINE\
 The CFD Forge source code, family recipes, validators, prompts, and response
 schemas are available at\\
 \url{https://github.com/aakashoza31/physics-constrained-cfd-agent}.\\ The
-archived session records, case files, solver logs, evidence packets, and
-the scripts that produce every figure and table in this paper will be
-deposited on Zenodo with the release of this preprint.
+archived session records, case files (including the precursor channel
+case that supplies the cube inflow), solver logs, evidence packets, source
+snapshots, and the scripts that produce every figure and table in this paper
+will be deposited on Zenodo with the release of this preprint.
 
 
 \begin{thebibliography}{99}
