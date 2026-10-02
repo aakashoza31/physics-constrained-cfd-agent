@@ -433,7 +433,8 @@ def markdown(summary: Dict[str, Any]) -> str:
             lines.append(f"| {arm} | {s['points']} | {s['n_decisions']} | {s['correct']} | {s['false_accept']} | "
                          f"{s['missed_accept']} | {s['unneeded_rerun']} | {s.get('proposals_refused', '')} | "
                          f"{s.get('points_unanimous_across_repeats', '')} |")
-    lines.append(f"\nLLM calls recorded: {summary.get('llm_calls_recorded')}, errors: {summary.get('errors')}, "
+    ok, bad = summary.get('llm_calls_recorded'), summary.get('errors')
+    lines.append(f"\nLLM calls attempted: {(ok or 0) + (bad or 0)}, succeeded (recorded): {ok}, failed: {bad}, "
                  f"median latency {summary.get('latency_median_s')} s, tokens {summary.get('tokens_total')}")
     return "\n".join(lines)
 
