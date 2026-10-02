@@ -12,6 +12,7 @@ authors:
   - family-names: Barati Farimani
     given-names: Amir
     affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+license: MIT
 repository-code: "https://github.com/aakashoza31/physics-constrained-cfd-agent"
 keywords:
   - computational fluid dynamics

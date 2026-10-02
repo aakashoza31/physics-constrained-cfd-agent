@@ -3,9 +3,25 @@
   "upload_type": "software",
   "description": "Source code, family recipes, validators, prompts, response schemas, controller-comparison evidence and paper scripts for the CFD Forge preprint. Archived agent session records and case files are deposited as a separate Zenodo dataset.",
   "creators": [
-    {"name": "Oza, Aakash Shailesh", "affiliation": "Carnegie Mellon University"},
-    {"name": "Johnson, Ryan F.", "affiliation": "Carnegie Mellon University"},
-    {"name": "Barati Farimani, Amir", "affiliation": "Carnegie Mellon University"}
+    {
+      "name": "Oza, Aakash Shailesh",
+      "affiliation": "Carnegie Mellon University"
+    },
+    {
+      "name": "Johnson, Ryan F.",
+      "affiliation": "Carnegie Mellon University"
+    },
+    {
+      "name": "Barati Farimani, Amir",
+      "affiliation": "Carnegie Mellon University"
+    }
   ],
-  "keywords": ["computational fluid dynamics", "OpenFOAM", "large language models", "scientific agents", "verification"]
+  "keywords": [
+    "computational fluid dynamics",
+    "OpenFOAM",
+    "large language models",
+    "scientific agents",
+    "verification"
+  ],
+  "license": "MIT"
 }
