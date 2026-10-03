@@ -264,6 +264,14 @@ def arm_b(adapter, spec, ev, dry: bool):
 
 
 # ----------------------------------------------------------------------
+def _portable(path: Path) -> str:
+    """Record the archive location without machine-specific prefixes."""
+    try:
+        return Path(path).resolve().relative_to(REPO.parent).as_posix()
+    except ValueError:
+        return Path(path).name
+
+
 def load_points(demo: Path):
     from src.families.forward_step_2d_adapter import ForwardStep2DAdapter
     from src.families.nozzle_adapter import NozzleAdapter
@@ -503,7 +511,7 @@ def main():
 
     summary = summarise(rows)
     meta = {"model": model, "repeats": args.repeats, "fault_repeats": args.fault_repeats,
-            "dry_run": args.dry_run, "demo_root": str(args.demo_root), "utc": stamp,
+            "dry_run": args.dry_run, "demo_root": _portable(args.demo_root), "utc": stamp,
             "llm_only_system_sha256": hashlib.sha256(LLM_ONLY_SYSTEM.encode()).hexdigest(),
             "blind_keys_removed": sorted(BLIND_KEYS)}
     (out / "records.jsonl").write_text("\n".join(json.dumps(r, default=str) for r in rows))

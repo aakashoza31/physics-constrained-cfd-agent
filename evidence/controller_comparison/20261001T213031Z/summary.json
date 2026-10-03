@@ -4,7 +4,7 @@
     "repeats": 5,
     "fault_repeats": 3,
     "dry_run": false,
-    "demo_root": "C:\\Backup from one drive\\Desktop\\Research\\physics-constrained-cfd-agent-e2e\\demo",
+    "demo_root": "physics-constrained-cfd-agent-e2e/demo",
     "utc": "20261001T213031Z",
     "llm_only_system_sha256": "da3e5dc9b80bdc42fa2bd5c9eacde73127c0c4212fac1d1ccd837c7b7029f5d2",
     "blind_keys_removed": [
