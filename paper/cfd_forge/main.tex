@@ -165,19 +165,25 @@ Figure~\ref{fig:agent_loop} shows how the model calls sit inside the
 execution loop, and Table~\ref{tab:llm_stages} lists them.
 Each call is a single request to the Google Gemini API through the
 \texttt{google-genai} Python SDK. The request has a fixed system
-instruction, a JSON evidence payload, and a Pydantic response schema; it uses
+instruction, a JSON evidence payload, and, except for the plain-text summary, a Pydantic
+response schema; it uses
 temperature 0, and the structured response is parsed into a typed record
 before any code acts on it. The archived campaigns used
 \texttt{gemini-3.5-flash-lite} for interpretation, mesh review, diagnosis,
 and reporting, and the identifier is recorded with every call. If the model is unavailable or its response fails the schema, the stage
 stops, unless a deterministic fallback has been explicitly enabled; any such
-fallback is recorded as non-LLM in the call log. Each call is logged with its
+fallback is recorded as non-LLM in the call log. The fallback is enabled by
+default only for the step report summary, and no fallback occurred in the
+archived sessions. Each call is logged with its
 stage, model identifier, latency, number of attempts, and parsed output.
-The runs also use a multimodal observer on rendered field images. It reads
-the same \texttt{GEMINI\_MODEL} environment variable as the other stages,
-which was set to \texttt{gemini-3.5-flash-lite} in these runs, but it does
-not write the identifier into its own record, so we report its model as
-unrecorded. Five of its 23 calls failed with an HTTP 503 (service
+The runs also use a multimodal observer on rendered field images. It does not
+write the model identifier into its own record. The provider's per-model
+usage records show that its 15 calls in the step sessions went to
+\texttt{gemini-3.6-flash}, its code default when the model variable is
+unset, and that no \texttt{gemini-3.6-flash} requests were made on the day
+of the nozzle sessions, so its 8 nozzle calls used
+\texttt{gemini-3.5-flash-lite}. Five of its 23 calls, all in the step
+sessions, failed with an HTTP 503 (service
 unavailable) error from the provider and were not retried; the other 18
 returned a schema-valid observation. Observation is advisory, so no failure
 changed a decision. System instructions, response schemas, and iteration
@@ -187,7 +193,7 @@ budgets are listed in Appendix~\ref{app:repro}.
     \centering
     \includegraphics[width=0.95\linewidth]{Figures/fig_agent_loop.pdf}
     \caption{The agent loop as implemented. Blue: model calls, each a single
-    schema-constrained request; orange: deterministic gates and validators;
+    request, schema-constrained except the summary; orange: deterministic gates and validators;
     green: registered tools. A proposed correction is executed only after the
     action validator approves it, and the run then returns to the solver; a
     proposed \texttt{ACCEPT} is passed to the scientific validator, whose
@@ -211,9 +217,9 @@ deterministic component that receives the structured output.}
 \toprule
 Stage & Model input & Structured output & Consumer \\
 \midrule
-Request interpretation & Engineering request text & Case parameters, with each field marked as stated or defaulted; unsupported-physics flags & Scope gate (family envelope) \\
+Request interpretation & Engineering request text & Case parameters and unsupported-physics flags (step: unstated fields returned empty and filled by family defaults) & Scope gate (family envelope) \\
 Mesh-evidence review (nozzle) & checkMesh and mesh-generation records & Proceed or stop, with cited evidence & Mesh gate \\
-Diagnosis and action & Theory- or reference-blind evidence packet: solver health, conservation, stationarity, admissibility, boundaries, mesh, flow features & Diagnosis label, cited evidence, competing hypotheses with evidence for and against, one action from the family vocabulary, confidence & Action validator, then scientific validator \\
+Diagnosis and action & Theory- or reference-blind evidence packet: solver health, conservation, stationarity, admissibility, boundaries, mesh, flow features & Diagnosis label, cited evidence, competing hypotheses with evidence for and against (nozzle), one action from the family vocabulary, confidence & Action validator, then scientific validator \\
 Field observation & Rendered field images & Qualitative observations and suspected regions & Advisory only; no gate \\
 Reporting & Final evidence and verdict & Engineering summary & Report \\
 \bottomrule
@@ -228,16 +234,18 @@ measurements, to distinguish insufficient run time from local
 under-resolution and from numerical failure, not to treat solver completion
 as evidence of stationarity, and to request a diagnostic when the evidence
 cannot separate competing hypotheses. Analytical and reference targets are
-removed from the evidence packet before the call, and the packet builder
-refuses to emit one that contains them. The model therefore diagnoses from
+removed from the evidence packet before the call, and a key-based check
+rejects a packet that still contains them. The model therefore diagnoses from
 the simulation's own evidence, and agreement with theory is checked
 afterwards, by code.
 
 Actions come from closed, family-specific vocabularies (listed in
 Appendix~\ref{app:repro}). The action validator checks each proposal against
 the evidence and a fixed iteration budget: for example, \texttt{CONTINUE\_RUN}
-is refused once the requested horizon has been reached, and \texttt{ACCEPT}
-is refused unless the registered scientific status is final.
+is refused once the requested horizon has been reached, and, for the step
+family, \texttt{ACCEPT} is refused unless the registered scientific status
+is final; for both families the final decision is taken by the scientific
+validator.
 
 \subsection{Scientific Contracts and Corrective Actions}
 \label{sec:contracts}
@@ -426,6 +434,11 @@ per stage; 5 of the 23 field-observation calls failed with a provider error
 (Fig.~\ref{fig:agent_stats}). Table~\ref{tab:actions}
 lists representative decision points, and Fig.~\ref{fig:trace} in
 Appendix~\ref{app:records} shows one complete diagnosis record.
+These counts are taken from the call records. In one nozzle iteration (N4,
+second iteration) the diagnosis module, after the action validator refused
+its first proposal, made a second call with the refusal reasons and recorded
+only the second proposal; the refused proposal and the extra call are
+therefore not included in the counts above.
 
 \begin{figure}[!htbp]
     \centering
@@ -663,11 +676,13 @@ Repeat consistency was also measured. Arm~B gave the same diagnosis and
 action in all repeats at 16 of 16 archived points, including five of five on
 the cube evidence, and at 13 of 18 faults; at the other five faults the
 proposed corrective action varied (\texttt{FAIL\_SAFELY},
-\texttt{REBUILD\_FROM\_VALIDATED\_SPEC}, \texttt{REFINE\_MESH}) but the
+\texttt{REBUILD\_FROM\_VALIDATED\_SPEC}, \texttt{REFINE\_MESH},
+\texttt{REJECT\_UNSUPPORTED}) but the
 verdict did not. The run made 288 model calls, of which 284 succeeded, using $1.10\times10^6$ tokens,
 and a median latency of 1.27\,s per call. The script
-(\texttt{controller\_comparison.py} in \texttt{paper/cfd\_forge/scripts/}), prompts,
-blinded keys and per-call records are in the repository under
+(\texttt{controller\_comparison.py} in \texttt{paper/cfd\_forge/scripts/}),
+which also contains the prompts and the list of blinded keys, is in the
+repository, and the per-call records are under
 \texttt{evidence/controller\_comparison/}. The comparison uses one small,
 low-latency model, archived rather than new runs, and faults planted in one
 family; it is not a held-out benchmark, and a stronger model may perform
@@ -731,7 +746,8 @@ Sec.~\ref{sec:agent_results} and passes after the corrected reanalysis.
 \caption{New cases built and run by the agent from text requests. Nozzle
 values are at $t=6$\,ms on the 2,112-cell wedge, with differences from
 quasi-one-dimensional theory in parentheses. Step values are at $t=4$ on the
-16,128-cell mesh: the detected front position below the step height, the
+family mesh ($\Delta x=\Delta y=0.0125$; the cell count varies with $h$
+and $x_s$): the detected front position below the step height, the
 pressure rise across it with the stationary normal-shock ratio in
 parentheses, and the post-shock sonic area $A^*/A$ compared with the opening
 $1-h$ above the step (choked when $A^*/A>1-h$).}
@@ -1438,7 +1454,8 @@ and its proposal is executed only after the action validator approves it.}
 \centering
 \caption{Timeline of the walkthrough session, from the archived event log.
 ``LLM'' marks a model call (the image observer is a multimodal call whose
-model identifier was not recorded).}
+model identifier was not recorded; provider usage records show
+\texttt{gemini-3.6-flash} for the step sessions).}
 \label{tab:timeline}
 \small
 \begin{tabular}{@{}rlll@{}}
@@ -1467,14 +1484,19 @@ Time (s) & Stage & Performed by & Outcome \\
 \paragraph{Models and calls.} All recorded text calls used
 \texttt{gemini-3.5-flash-lite} through the Google Gemini API
 (\texttt{google-genai} Python SDK) at temperature 0, with a Pydantic response
-schema passed as the structured-output schema. The field observer reads the
-same model variable but does not record it (Sec.~\ref{sec:model}). The
+schema passed as the structured-output schema for every stage except the
+plain-text summary. The field observer does not
+record its model; from the provider's usage records it used
+\texttt{gemini-3.6-flash} in the step sessions and
+\texttt{gemini-3.5-flash-lite} in the nozzle sessions (Sec.~\ref{sec:model}). The
 nozzle sessions ran on 21 September 2026 and the step sessions on 22
 September 2026; the cube calculation ran on 23--24 September 2026, and its
 LLM diagnosis (Sec.~\ref{sec:cube_results}) and the controller comparison (Sec.~\ref{sec:controller}) on 1 October 2026. The system
 instructions and schemas are defined in the repository in
-\texttt{src/agents/} (request interpretation, mesh review, theory- and
-reference-blind diagnosis, field observation, and reporting) and, for the
+\texttt{src/agents/} (request interpretation, mesh review, theory-blind
+diagnosis, field observation, and reporting), in
+\nolinkurl{src/reasoning/forward_step_diagnosis.py} (reference-blind
+diagnosis), and, for the
 cube diagnosis, in \nolinkurl{paper/cfd_forge/scripts/cube_llm_diagnosis.py}.
 Each run allowed at most four iterations of solve, diagnosis, and action. Token counts were recorded for the cube
 diagnosis and the controller comparison, but not for the historical nozzle
