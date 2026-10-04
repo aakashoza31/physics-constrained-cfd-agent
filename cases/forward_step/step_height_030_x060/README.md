@@ -1,6 +1,6 @@
 # Step height 0.30, short horizon
 
-**Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_short_horizon` &nbsp;|&nbsp;
+**Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_x060` &nbsp;|&nbsp;
 **Original id:** `case_F_step030` &nbsp;|&nbsp; **Archived verdict:** `REJECT`
 
 The inadmissible variation: the run stopped safely instead of being accepted.

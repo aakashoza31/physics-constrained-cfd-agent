@@ -4,7 +4,7 @@
     "verdict": "REJECT",
     "reason": "replayed from archived evidence: the run recorded STOPPED_FAIL_SAFELY with failed checks ['compression_front_measurable']. No solver was executed by this replay.",
     "family": "forward_step_2d",
-    "case": "step_height_030_short_horizon",
+    "case": "step_height_030_x060",
     "failed_gates": [
       "convergence",
       "validation"
@@ -16,14 +16,14 @@
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
     "started_utc": "2026-09-28T03:03:54Z",
-    "prompt": "run the registered forward_step case step_height_030_short_horizon",
+    "prompt": "run the registered forward_step case step_height_030_x060",
     "mode": "replay",
     "family": "forward_step_2d",
-    "case": "step_height_030_short_horizon",
+    "case": "step_height_030_x060",
     "interpretation": {
       "interpreter_version": "request-interpreter/1.0.0",
       "interpreter": "deterministic",
-      "prompt": "run the registered forward_step case step_height_030_short_horizon",
+      "prompt": "run the registered forward_step case step_height_030_x060",
       "proposed_family": "forward_step",
       "parameters": {},
       "operating_conditions": {},
@@ -60,7 +60,7 @@
         "detail": {
           "selected": "forward_step_2d",
           "replay": true,
-          "detail": "registered case forward_step/step_height_030_short_horizon"
+          "detail": "registered case forward_step/step_height_030_x060"
         }
       },
       {
@@ -78,7 +78,7 @@
         "decided_by": "deterministic",
         "detail": {
           "source": "registered case",
-          "case_dir": "cases/forward_step/step_height_030_short_horizon"
+          "case_dir": "cases/forward_step/step_height_030_x060"
         }
       },
       {
@@ -118,7 +118,7 @@
     "stopped_at": "execution",
     "authority_trace": {
       "family": "forward_step_2d",
-      "case": "step_height_030_short_horizon",
+      "case": "step_height_030_x060",
       "started_utc": "2026-09-28T03:03:54Z",
       "authority_questions": [
         "family_compatibility",
@@ -156,10 +156,10 @@
           "passed": true,
           "measured": {
             "family": "forward_step_2d",
-            "case": "step_height_030_short_horizon"
+            "case": "step_height_030_x060"
           },
           "threshold": "the case must be in the registered library",
-          "detail": "registered case forward_step/step_height_030_short_horizon",
+          "detail": "registered case forward_step/step_height_030_x060",
           "decided_by": "deterministic"
         },
         {
@@ -237,7 +237,7 @@
           "content": {
             "interpreter_version": "request-interpreter/1.0.0",
             "interpreter": "deterministic",
-            "prompt": "run the registered forward_step case step_height_030_short_horizon",
+            "prompt": "run the registered forward_step case step_height_030_x060",
             "proposed_family": "forward_step",
             "parameters": {},
             "operating_conditions": {},
@@ -259,7 +259,7 @@
       "verdict": "REJECT",
       "reason": "replayed from archived evidence: the run recorded STOPPED_FAIL_SAFELY with failed checks ['compression_front_measurable']. No solver was executed by this replay.",
       "family": "forward_step_2d",
-      "case": "step_height_030_short_horizon",
+      "case": "step_height_030_x060",
       "failed_gates": [
         "convergence",
         "validation"
@@ -360,8 +360,8 @@
       "solver_invoked": false,
       "replay_version": "replay/1.0.0",
       "case": {
-        "case_dir": "cases/forward_step/step_height_030_short_horizon",
-        "case_id": "step_height_030_short_horizon",
+        "case_dir": "cases/forward_step/step_height_030_x060",
+        "case_id": "step_height_030_x060",
         "original_id": "case_F_step030",
         "family": "forward_step",
         "title": "Step height 0.30, short horizon",
@@ -373,7 +373,7 @@
         "solver": "OpenFOAM Foundation v14",
         "builder_version": "case-library/1.0.0",
         "expected": {
-          "case_id": "step_height_030_short_horizon",
+          "case_id": "step_height_030_x060",
           "family": "forward_step",
           "original_id": "case_F_step030",
           "expected": {
@@ -403,12 +403,12 @@
           "model": "",
           "temperature": null,
           "prompt_schema_version": "agent-prompts/1.0.0",
-          "prompt": "run the registered forward_step case step_height_030_short_horizon",
+          "prompt": "run the registered forward_step case step_height_030_x060",
           "raw_response": null,
           "parsed": {
             "interpreter_version": "request-interpreter/1.0.0",
             "interpreter": "deterministic",
-            "prompt": "run the registered forward_step case step_height_030_short_horizon",
+            "prompt": "run the registered forward_step case step_height_030_x060",
             "proposed_family": null,
             "parameters": {},
             "operating_conditions": {},
@@ -501,14 +501,14 @@
   "provenance": {
     "report_version": "report-builder/1.0.0",
     "generated_utc": "2026-09-28T03:03:59Z",
-    "prompt": "run the registered forward_step case step_height_030_short_horizon",
+    "prompt": "run the registered forward_step case step_height_030_x060",
     "mode": "replay",
     "family": "forward_step_2d",
-    "case": "step_height_030_short_horizon",
+    "case": "step_height_030_x060",
     "solver_invoked": false,
     "solver": "OpenFOAM Foundation v14",
     "evidence_root": "demo/forward_step_2d/case_F_step030",
-    "case_directory": "cases/forward_step/step_height_030_short_horizon",
+    "case_directory": "cases/forward_step/step_height_030_x060",
     "python": "3.10.12",
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
     "git_commit": "NOT_AVAILABLE",

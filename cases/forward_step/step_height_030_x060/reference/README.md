@@ -1,4 +1,4 @@
-# Reference data — forward_step/step_height_030_short_horizon
+# Reference data — forward_step/step_height_030_x060
 
 Compact series extracted from the archived run, committed so that a replay works
 from a clone:

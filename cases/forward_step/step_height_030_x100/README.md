@@ -1,6 +1,6 @@
 # Step height 0.30, extended horizon
 
-**Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_extended` &nbsp;|&nbsp;
+**Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_x100` &nbsp;|&nbsp;
 **Original id:** `case_G_step030_x100` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
 Accepted after the horizon was extended.

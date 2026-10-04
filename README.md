@@ -169,7 +169,7 @@ See [`docs/cad_and_step_input.md`](docs/cad_and_step_input.md).
 # every registered case, replayed
 python scripts/run_demo.py --family nozzle       --case canonical_reference            --mode replay
 python scripts/run_demo.py --family forward_step --case mach20_canonical               --mode replay
-python scripts/run_demo.py --family forward_step --case step_height_030_short_horizon  --mode replay
+python scripts/run_demo.py --family forward_step --case step_height_030_x060  --mode replay
 python scripts/run_demo.py --family airfoil      --case mesh_rejection                 --mode replay
 
 # live (requires OpenFOAM Foundation v14)

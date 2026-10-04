@@ -75,14 +75,14 @@ CATALOGUE: Dict[str, Dict[str, Dict[str, Any]]] = {
             "title": "Reduced step height 0.10",
             "purpose": "accepted geometry variation",
         },
-        "step_height_030_short_horizon": {
+        "step_height_030_x060": {
             "original_id": "case_F_step030",
             "evidence": "demo/forward_step_2d/case_F_step030",
             "title": "Step height 0.30, short horizon",
             "purpose": ("the INADMISSIBLE variation: the run stopped safely "
                         "instead of being accepted"),
         },
-        "step_height_030_extended": {
+        "step_height_030_x100": {
             "original_id": "case_G_step030_x100",
             "evidence": "demo/forward_step_2d/case_G_step030_x100",
             "title": "Step height 0.30, extended horizon",

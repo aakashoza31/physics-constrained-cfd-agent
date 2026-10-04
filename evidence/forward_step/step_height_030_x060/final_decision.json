@@ -2,7 +2,7 @@
   "verdict": "REJECT",
   "reason": "replayed from archived evidence: the run recorded STOPPED_FAIL_SAFELY with failed checks ['compression_front_measurable']. No solver was executed by this replay.",
   "family": "forward_step_2d",
-  "case": "step_height_030_short_horizon",
+  "case": "step_height_030_x060",
   "failed_gates": [
     "convergence",
     "validation"

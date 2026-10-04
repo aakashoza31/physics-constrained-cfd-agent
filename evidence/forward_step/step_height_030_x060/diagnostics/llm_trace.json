@@ -5,7 +5,7 @@
       "content": {
         "interpreter_version": "request-interpreter/1.0.0",
         "interpreter": "deterministic",
-        "prompt": "run the registered forward_step case step_height_030_short_horizon",
+        "prompt": "run the registered forward_step case step_height_030_x060",
         "proposed_family": "forward_step",
         "parameters": {},
         "operating_conditions": {},

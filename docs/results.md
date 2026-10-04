@@ -32,16 +32,16 @@ Correction behaviour is preserved in the feedback campaigns under
 | `mach20_canonical` | `case_B_mach20` | `ACCEPTED` / `PASS_2D_FORWARD_STEP` | ACCEPT |
 | `mach35_variation` | `case_C_mach35` | `ACCEPTED` | ACCEPT |
 | `step_height_010` | `case_E_step010` | `ACCEPTED` | ACCEPT |
-| `step_height_030_extended` | `case_G_step030_x100` | `ACCEPTED` | ACCEPT |
+| `step_height_030_x100` | `case_G_step030_x100` | `ACCEPTED` | ACCEPT |
 | `iterative_correction` | `case_H_iterative_short_run` | `ACCEPTED` after 7 iterations | ACCEPT |
-| `step_height_030_short_horizon` | `case_F_step030` | `STOPPED_FAIL_SAFELY` | REJECT |
+| `step_height_030_x060` | `case_F_step030` | `STOPPED_FAIL_SAFELY` | REJECT |
 | `mesh_sensitivity` | `case_I_mesh_sensitivity` | `STOPPED_ACTION_REFUSED` | REJECT |
 | `live_run` | `live_run_01` | `STOPPED_FAIL_SAFELY` | REJECT |
 
-`step_height_030_short_horizon` is the inadmissible variation: the solver
+`step_height_030_x060` is the inadmissible variation: the solver
 completed and the fields were sane, but the registered compression-front check
 was not measurable within the requested horizon, so the run stopped safely
-instead of being accepted. `step_height_030_extended` is the same geometry with
+instead of being accepted. `step_height_030_x100` is the same geometry with
 the horizon extended, and it is accepted.
 
 ## X1 — surface-mounted cube (supplementary exploratory study)

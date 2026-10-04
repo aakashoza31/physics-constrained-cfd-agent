@@ -1,15 +1,15 @@
-# Engineering report — forward_step_2d / step_height_030_short_horizon
+# Engineering report — forward_step_2d / step_height_030_x060
 
 **Decision: `REJECT`** — replayed from archived evidence: the run recorded STOPPED_FAIL_SAFELY with failed checks ['compression_front_measurable']. No solver was executed by this replay.
 
 ## 1. Request
 
-> run the registered forward_step case step_height_030_short_horizon
+> run the registered forward_step case step_height_030_x060
 
 | Field | Value |
 |---|---|
 | Interpreted family | forward_step_2d |
-| Case | step_height_030_short_horizon |
+| Case | step_height_030_x060 |
 | Mode | replay |
 | Geometry source | parametric |
 | Geometry status | FEATURES_EXTRACTED |
@@ -35,7 +35,7 @@ Every row below was decided by code. No model output appears in this table.
 | Gate | Result | Threshold | Measured |
 |---|---|---|---|
 | `geometry_admissibility` | PASS | "the geometry must be characterisable" | "FEATURES_EXTRACTED" |
-| `family_compatibility` | PASS | "the case must be in the registered library" | {"family": "forward_step_2d", "case": "step_height_030_short_horizon"} |
+| `family_compatibility` | PASS | "the case must be in the registered library" | {"family": "forward_step_2d", "case": "step_height_030_x060"} |
 | `numerical_health` | PASS | "the solver must complete without a fatal error" | {"archived_status": "STOPPED_FAIL_SAFELY"} |
 | `conservation` | PASS | "the family's registered conservation criterion" | {"failed_checks": ["compression_front_measurable"]} |
 | `convergence` | FAIL | "the family's registered convergence criterion" | {"iterations": 1} |
@@ -80,14 +80,14 @@ Every row below was decided by code. No model output appears in this table.
 {
   "report_version": "report-builder/1.0.0",
   "generated_utc": "2026-09-28T03:03:59Z",
-  "prompt": "run the registered forward_step case step_height_030_short_horizon",
+  "prompt": "run the registered forward_step case step_height_030_x060",
   "mode": "replay",
   "family": "forward_step_2d",
-  "case": "step_height_030_short_horizon",
+  "case": "step_height_030_x060",
   "solver_invoked": false,
   "solver": "OpenFOAM Foundation v14",
   "evidence_root": "demo/forward_step_2d/case_F_step030",
-  "case_directory": "cases/forward_step/step_height_030_short_horizon",
+  "case_directory": "cases/forward_step/step_height_030_x060",
   "python": "3.10.12",
   "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
   "git_commit": "NOT_AVAILABLE",
