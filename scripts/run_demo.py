@@ -4,7 +4,7 @@
     python scripts/run_demo.py --family nozzle --case canonical_reference --mode replay
     python scripts/run_demo.py --family forward_step --case mach20_canonical --mode replay
     python scripts/run_demo.py --family cube --case drifting_wake --mode replay
-    python scripts/run_demo.py --family nozzle --case canonical_reference --mode live
+    python scripts/run_demo.py --family nozzle --case canonical_reference --mode live --i-want-to-run-cfd
     python scripts/run_demo.py --list
 
 Replay reads the archived evidence of that case and re-derives the deterministic

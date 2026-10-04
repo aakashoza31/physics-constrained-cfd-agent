@@ -4,7 +4,6 @@
   "family": "forward_step_2d",
   "case": "step_height_030_x060",
   "failed_gates": [
-    "convergence",
     "validation"
   ],
   "unresolved_gates": [],

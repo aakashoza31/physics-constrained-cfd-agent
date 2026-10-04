@@ -2,7 +2,7 @@
   "report_version": "report-builder/1.0.0",
   "decision": {
     "verdict": "REJECT",
-    "reason": "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after our own converter defects were corrected, so neither is a NASA-grid failure. No solver was ever launched.",
+    "reason": "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after defects in the mesh-conversion and diagnostic scripts were corrected, so neither is a NASA-grid failure. No solver was ever launched.",
     "family": "airfoil",
     "case": "mesh_rejection",
     "failed_gates": [
@@ -16,7 +16,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T03:04:17Z",
+    "started_utc": "2026-10-04T23:43:31Z",
     "prompt": "run the registered airfoil case mesh_rejection",
     "mode": "replay",
     "family": "airfoil",
@@ -105,10 +105,11 @@
       },
       {
         "stage": "llm_diagnosis",
-        "status": "PROPOSED",
+        "status": "SKIPPED",
         "decided_by": "deterministic",
         "detail": {
-          "proposals": 0
+          "proposals": 0,
+          "note": "no model call recorded for this case"
         }
       },
       {
@@ -124,7 +125,7 @@
     "authority_trace": {
       "family": "airfoil",
       "case": "mesh_rejection",
-      "started_utc": "2026-09-28T03:04:17Z",
+      "started_utc": "2026-10-04T23:43:31Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -227,7 +228,7 @@
             ]
           },
           "threshold": "max_in_plane_stretching <= 10000.0",
-          "detail": "the decisive genuine failure is in-plane stretching, measured on the correctly selected constant-span flow-plane quad. Foundation-v14 skewness PASSES on all three levels, and cell orientation and in-plane validity are clean once our own converter defects are corrected -- neither is a NASA-grid failure.",
+          "detail": "the decisive genuine failure is in-plane stretching, measured on the correctly selected constant-span flow-plane quad. Foundation-v14 skewness PASSES on all three levels, and cell orientation and in-plane validity are clean once defects in the mesh-conversion and diagnostic scripts are corrected -- neither is a NASA-grid failure.",
           "decided_by": "deterministic"
         },
         {
@@ -289,7 +290,7 @@
     },
     "final_decision": {
       "verdict": "REJECT",
-      "reason": "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after our own converter defects were corrected, so neither is a NASA-grid failure. No solver was ever launched.",
+      "reason": "MESH REJECTED, CFD_NOT_RUN. The decisive genuine failure is max_in_plane_stretching against a frozen limit of 10,000: coarse 31,734,384 (974 cells over limit), medium 36,320,937 (3924 cells over limit), fine 38,855,541 (15678 cells over limit). Foundation-v14 skewness passes on all three levels, and orientation and in-plane validity are clean after defects in the mesh-conversion and diagnostic scripts were corrected, so neither is a NASA-grid failure. No solver was ever launched.",
       "family": "airfoil",
       "case": "mesh_rejection",
       "failed_gates": [
@@ -346,7 +347,7 @@
             "mesh_rejection"
           ],
           "solver": "not executed",
-          "notes": "S1 supplementary MESH-REJECTION case. No CFD was ever run for this family: every candidate mesh failed the frozen quality contract, so the family never became routable."
+          "notes": "Not part of the CFD Forge paper. Supplementary mesh-rejection case. No CFD was ever run for this family: every candidate mesh failed the frozen quality contract, so the family is not routable (register status CORE-PENDING: inspectable, not executable)."
         },
         "registered": true,
         "register_status": "CORE-PENDING",
@@ -362,7 +363,7 @@
         ]
       },
       "evidence_root": "outputs/airfoil_mesh",
-      "evidence_present": true,
+      "evidence_present": false,
       "archived_record": {
         "verdict": "REJECT",
         "archived_status": "MESH_REJECTED_CFD_NOT_RUN",
@@ -490,17 +491,21 @@
           }
         }
       },
-      "superseded_reports": "outputs/airfoil_mesh/ -- historical only; contains converter/diagnostic defects",
       "replay_version": "replay/1.0.0",
       "case": {
         "case_dir": "cases/airfoil/mesh_rejection",
         "case_id": "mesh_rejection",
         "original_id": "naca0012_2DN00",
         "family": "airfoil",
-        "title": "NACA0012 mesh rejection (supplementary)",
-        "purpose": "S1 supplementary: the NASA Family II grids fail the frozen in-plane stretching contract by three to four orders of magnitude, so CFD was never run",
+        "title": "NACA0012 mesh rejection",
+        "purpose": "Not part of the CFD Forge paper; development record of a mesh-qualification check. The maximum in-plane stretching of the NASA Family II NACA0012 grids exceeds this project's frozen limit (10,000) on all three levels, so the grids were not qualified for this pipeline and CFD was not run",
         "evidence_root": "outputs/airfoil_mesh",
-        "evidence_present": true,
+        "evidence_present": false,
+        "archived_records": "The raw mesh-qualification outputs are not distributed (this family is not part of the CFD Forge paper); the corrected record is in reference/.",
+        "evidence_in_clone": [
+          "evidence/airfoil/mesh_rejection"
+        ],
+        "paper_ledger": "not part of the CFD Forge paper",
         "config": null,
         "related_campaigns": [],
         "solver": "OpenFOAM Foundation v14",
@@ -644,11 +649,24 @@
       "convergence.png"
     ],
     "contours": [],
-    "video": null
+    "video": null,
+    "history": null,
+    "field_videos": []
   },
+  "visualization": {
+    "family": "airfoil",
+    "case": "mesh_rejection",
+    "verdict": "REJECT",
+    "solver_invoked": false,
+    "source_kind": "archived_raw_fields",
+    "status": "VIDEO_NOT_AVAILABLE_CFD_NOT_RUN",
+    "output_files": [],
+    "reason": "CFD was not executed for this request."
+  },
+  "artifact_complete": true,
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T03:04:19Z",
+    "generated_utc": "2026-10-04T23:43:31Z",
     "prompt": "run the registered airfoil case mesh_rejection",
     "mode": "replay",
     "family": "airfoil",
@@ -657,9 +675,9 @@
     "solver": "not executed",
     "evidence_root": "outputs/airfoil_mesh",
     "case_directory": "cases/airfoil/mesh_rejection",
-    "python": "3.10.12",
-    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-    "git_commit": "NOT_AVAILABLE",
+    "python": "3.11.15",
+    "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+    "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
     "pipeline_stages": [
       "request_interpretation",
       "geometry_characterization",

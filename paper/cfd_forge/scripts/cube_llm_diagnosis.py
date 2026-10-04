@@ -17,7 +17,13 @@ the raw response. Report all repeats, not a selected one.
 Usage (repository root, in an environment with google-genai and a key):
     set GEMINI_API_KEY=...            (PowerShell: $env:GEMINI_API_KEY="...")
     set GEMINI_MODEL=gemini-3.5-flash-lite
-    python paper/cfd_forge/scripts/cube_llm_diagnosis.py --repeats 3
+    python paper/cfd_forge/scripts/cube_llm_diagnosis.py --repeats 3 \
+        [--logs <archive>/CFD_Verification_Package_20260929/03_cube/logs]
+
+The solver logs come from the verification package in the session archive on
+Zenodo (DOI to be added on release); give their location with --logs or the
+environment variable CFD_FORGE_CUBE_LOGS. Without them the packet records
+"logs not available to this script" in place of the solver-health block.
 """
 from __future__ import annotations
 
@@ -41,7 +47,12 @@ REPO = Path(__file__).resolve().parents[3]
 FORCES = REPO / "cases/cube/drifting_wake/reference/force_history.json"
 GATE = REPO / "src/families/cube/stationarity.py"
 OUT = REPO / "evidence/cube/drifting_wake/llm_diagnosis"
-DEFAULT_LOGS = REPO.parent / "CFD_Verification_Package_20260929/03_cube/logs"
+# Solver logs of the cube run: 03_cube/logs/ of the verification package
+# CFD_Verification_Package_20260929/, which is part of the session archive on
+# Zenodo (DOI to be added on release). Set with --logs or CFD_FORGE_CUBE_LOGS;
+# the default is a copy of the package placed next to the repository.
+DEFAULT_LOGS = Path(os.environ.get(
+    "CFD_FORGE_CUBE_LOGS", REPO.parent / "CFD_Verification_Package_20260929/03_cube/logs"))
 
 
 class CubeDiagnosis(str, Enum):
@@ -196,7 +207,9 @@ def validate(decision: CubeDecision, gate_result: dict):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repeats", type=int, default=3)
-    ap.add_argument("--logs", type=Path, default=DEFAULT_LOGS)
+    ap.add_argument("--logs", type=Path, default=DEFAULT_LOGS,
+                    help="03_cube/logs of CFD_Verification_Package_20260929 (session archive, Zenodo); "
+                         "default: $CFD_FORGE_CUBE_LOGS or ../CFD_Verification_Package_20260929/03_cube/logs")
     args = ap.parse_args()
 
     from google import genai

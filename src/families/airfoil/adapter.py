@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Family 3 adapter: 2D turbulent NACA0012, NASA TMR 2DN00.
+"""Airfoil adapter: 2D turbulent NACA0012, NASA TMR 2DN00.
+
+Not part of the CFD Forge paper (planned family; no CFD was run).
 
 Delegates to src/pipeline/airfoil/*. Adds no science and no thresholds.
 
@@ -247,11 +249,23 @@ class AirfoilAdapter:
     def audit_mesh(self, grid_key: str, *, out_dir: Optional[Path] = None,
                    repo_root: Optional[Path] = None,
                    runtime: Optional[Any] = None) -> Dict[str, Any]:
-        """The zero-CFD mesh audit. Never launches the flow solver.
+        """The zero-CFD mesh audit of a NASA 2DN00 Plot3D grid. Never launches the flow solver.
+
+        Not part of the CFD Forge paper. ``grid_key`` is a registered Plot3D
+        asset key (e.g. the 2DN00 canonical or sensitivity grid). The run levels
+        coarse / medium / fine (NASA TMR Family II) are converted and qualified
+        by scripts/qualify_family2_meshes.py, not here; passing one of them
+        raises NotImplementedError instead of reporting an unregistered grid.
 
         ``runtime`` is a FoamRuntime; supplying it enables Stage B (gmshToFoam,
         the boundary rewrite and checkMesh), which are mesh utilities.
         """
+        if grid_key in GRID_KEYS:
+            raise NotImplementedError(
+                f"{FAMILY}: level {grid_key!r} is a NASA TMR Family II run level; "
+                "it is converted and qualified by scripts/qualify_family2_meshes.py. "
+                "audit_mesh audits only the registered 2DN00 Plot3D grids."
+            )
         return mesh_audit.audit_grid(
             grid_key, repo_root=repo_root, out_dir=out_dir, runtime=runtime
         ).to_dict()

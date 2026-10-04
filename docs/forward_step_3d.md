@@ -1,12 +1,14 @@
-# Periodic 3D forward-facing-step Euler family
+# Periodic 3-D forward-facing-step Euler family (experimental)
 
-**Current scientific status: BLOCKED_PLANAR_INVARIANCE.** FS-A completed to t=4 with positive fields and excellent transient mass closure, but developed Uz up to 0.360 from a zero-Uz initialization. Small differences between z planes do not establish planar flow. FS-B/C/D are prepared configs only and were deliberately not run. The family is implemented and unit-tested, but is not a verified production CFD family. See the accompanying checkpoint report and scientific_review.json. Resolve the numerical spanwise-velocity growth before further campaign execution or router integration.
+**Not part of the CFD Forge paper; experimental, status `BLOCKED_PLANAR_INVARIANCE`.** The paper's forward-facing-step family is the 2-D family (`src/pipeline/forward_step_2d/`, `scripts/run_forward_step_2d.py`). This 3-D variant is not registered, not routable and has no LLM layer.
+
+FS-A completed to t=4 with positive fields and small transient mass-closure residuals, but developed Uz up to 0.360 from a zero-Uz initialization. Small differences between z planes do not establish planar flow. FS-B/C/D are prepared configs only and were not run. The family is implemented and unit-tested, but is not a verified CFD family; the numerical spanwise-velocity growth is unresolved.
 
 This isolated family reproduces the OpenFOAM Foundation v14 `shockFluid/forwardStep` physics in a true three-dimensional extruded mesh. It does not generalize to arbitrary CFD, viscosity, turbulence, side-wall boundary layers, arbitrary obstacles, reacting gas, or arbitrary numerical schemes. No LLM/router is implemented.
 
 ## Provenance and physical interpretation
 
-The source is `/opt/openfoam14/tutorials/shockFluid/forwardStep`, build `14-7b05503f98a8`. The prior verified 2D run completed at t=4 with 16,128 cells, one empty layer and credible large-scale shock structure. It remains a tutorial reproduction without formal mesh independence or independent uncertainty quantification. The preserved original nine inputs are included in `src/pipeline/forward_step/template/`; the builder copies them without editing the installed tutorial.
+The source is `/opt/openfoam14/tutorials/shockFluid/forwardStep`, build `14-7b05503f98a8`. The 2-D tutorial reproduction completed at t=4 with 16,128 cells, one empty layer and credible large-scale shock structure. It remains a tutorial reproduction without formal mesh independence or independent uncertainty quantification. The preserved original nine inputs are included in `src/pipeline/forward_step/template/`; the builder copies them without editing the installed tutorial.
 
 The canonical 3D domain is 3 x 1 with a step beginning at x=0.6, height 0.2 and span 0.1. At nominal Nx=240, Ny=80 and Nz=8 it contains 129,024 fluid cells, with dx=dy=dz=0.0125. Nx/Ny describe full-domain division counts; the three fluid blocks omit the solid step. Splits are rounded proportionally while preserving exact geometric vertices. Non-aligned geometry therefore produces piecewise uniform spacings, which are exposed in the generated dictionary and checked by checkMesh.
 
@@ -18,11 +20,11 @@ The original Kurganov, vanLeer/vanLeerV and Euler recipe is retained. maxCo defa
 
 ## Interfaces and commands
 
-Modules expose `ForwardStep3DSpec`, `build`, `initial_state`, `execute`, `diagnose` and `validate`. `scripts/run_forward_step.py` provides separate build/execute/analyze operations and `all`. They run inside Linux/WSL with a sourced Foundation v14 environment. Native Linux case directories avoid slow Windows-mounted solver I/O. The existing generic FoamRuntime remains untouched; callers can invoke this CLI through it later.
+Modules expose `ForwardStep3DSpec`, `build`, `initial_state`, `execute`, `diagnose` and `validate`. `scripts/run_forward_step.py` provides separate build/execute/analyze operations and `all`. They run inside Linux/WSL with a sourced Foundation v14 environment. Native Linux case directories avoid slow Windows-mounted solver I/O.
 
 ```bash
 source /opt/openfoam14/etc/bashrc
-python3 scripts/run_forward_step.py all --config configs/forward_step/case_A_reference.yaml --case /home/USER/new_FS_A --reference /path/to/verified_2d/native_final.npz
+python3 scripts/run_forward_step.py all --config configs/forward_step/case_A_reference.yaml --case /home/USER/new_FS_A --reference /path/to/2d_reference/native_final.npz
 python3 scripts/run_forward_step.py all --config configs/forward_step/case_B_step_height.yaml --case /home/USER/new_FS_B --ranks 4
 python3 scripts/run_forward_step.py all --config configs/forward_step/case_C_mach.yaml --case /home/USER/new_FS_C --ranks 4
 python3 scripts/run_forward_step.py all --config configs/forward_step/case_D_span.yaml --case /home/USER/new_FS_D --ranks 4
@@ -50,6 +52,8 @@ Every plotted scalar comes from native OpenFOAM cells. Three-dimensional mesh pl
 python3 -m unittest discover -s tests/forward_step -v
 ```
 
-These tests do not launch CFD. The explicit CLI `all` commands above are expensive integration runs; they are not part of ordinary test discovery. Executed case diagnostics, configs, figures, timings and full logs are recorded in the accompanying campaign report. Nozzle modules and existing untracked outputs are preserved.
+These tests do not launch CFD. The explicit CLI `all` commands above are expensive integration runs; they are not part of ordinary test discovery.
 
-Before later router registration, retain scope rejection, explicit numeric specs, evidence paths and qualified validator states. Important scientific gaps remain mesh/time-step sensitivity, independent benchmark digitization with uncertainty, corner treatment, exact energy/momentum flux audits and robustness to nonuniform spanwise perturbations. An AI layer must not turn a measured value or a successful solver exit into an unconditional physical-validation claim.
+## Open gaps
+
+The spanwise-velocity growth above, mesh/time-step sensitivity, independent benchmark digitization with uncertainty, corner treatment, exact energy/momentum flux audits and robustness to nonuniform spanwise perturbations remain unresolved. A measured value or a successful solver exit is not a physical-validation claim.

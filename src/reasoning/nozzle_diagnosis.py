@@ -16,6 +16,14 @@ Nothing about that behaviour is changed here.  This module adds only:
 
 The action validator runs in both paths, so a fallback decision is policed by
 exactly the same deterministic rules as a model decision.
+
+Repair call.  ``diagnose_theory_blind`` (default
+``allow_one_repair_attempt=True``) makes a second model call when the action
+validator refuses the first proposal.  The record built here then carries
+``attempts=2`` and ``refused_first_decision`` (the first decision and its
+validator reasons), plus a note; ``latency_s`` is the total over both calls.
+The archived N4 iteration-2 record predates this and records the repaired
+decision only (``attempts=1``), as disclosed in the paper.
 """
 from __future__ import annotations
 
@@ -143,9 +151,24 @@ def diagnose(
         try:
             from src.agents.theory_blind_cfd_agent import diagnose_theory_blind
 
+            audit: Dict[str, Any] = {}
+
             decision, validation = diagnose_theory_blind(
-                problem, evidence, history=history
+                problem, evidence, history=history, audit=audit
             )
+
+            attempts = max(1, int(audit.get("attempts") or 1))
+            refused_first = audit.get("refused_first_decision")
+            notes: List[str] = []
+
+            if refused_first is not None:
+                first = refused_first.get("decision", {})
+                notes.append(
+                    "repair call: first proposal "
+                    f"{first.get('diagnosis')}/{first.get('action')} was "
+                    "refused by the action validator; the returned decision "
+                    "is from the second call"
+                )
 
             return (
                 decision,
@@ -153,8 +176,12 @@ def diagnose(
                 LLMCallRecord(
                     stage=STAGE,
                     source=GEMINI,
-                    model=gemini_model_name(),
+                    model=audit.get("model") or gemini_model_name(),
                     latency_s=round(time.monotonic() - started, 3),
+                    attempts=attempts,
+                    notes=notes,
+                    model_version=audit.get("model_version"),
+                    refused_first_decision=refused_first,
                 ),
             )
 

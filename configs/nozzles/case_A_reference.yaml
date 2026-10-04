@@ -1,5 +1,5 @@
 case_id: nozzle_A_reference
-description: Canonical validated reference nozzle
+description: Canonical reference nozzle (PASS_SINGLE_MESH under the registered contract)
 
 physics:
   model: internal_axisymmetric_euler

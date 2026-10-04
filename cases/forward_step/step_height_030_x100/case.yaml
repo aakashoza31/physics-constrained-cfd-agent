@@ -1,10 +1,13 @@
 case_id: "step_height_030_x100"
 original_id: "case_G_step030_x100"
 family: "forward_step"
-title: "Step height 0.30, extended horizon"
-purpose: "accepted after the horizon was extended"
+title: "Step height 0.30, step at x=1.0"
+purpose: "Step-position variation (paper ledger S6): Mach 3, h=0.3 with the step at x=1.0. The front had not reached the inlet at t=4 and the run passed its contract: PASS_2D_FORWARD_STEP -> ACCEPT in one iteration. This is a separate request with a different step position, not a continuation of step_height_030_x060"
 evidence_root: "demo/forward_step_2d/case_G_step030_x100"
-evidence_present: true
+evidence_present: false
+archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_G_step030_x100; they are not in this repository."
+evidence_in_clone: []
+paper_ledger: "S6"
 config: null
 related_campaigns: []
 solver: "OpenFOAM Foundation v14"

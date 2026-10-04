@@ -3,7 +3,7 @@
 validation/canonical_reference/ is the scientific authority and is never
 modified.  src/pipeline/nozzle/ is a parameterized derivative of it.  These
 tests exist so that the parameterization cannot silently drift away from the
-validated method.
+registered method.
 
 What is compared:
 

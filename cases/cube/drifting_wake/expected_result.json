@@ -4,7 +4,9 @@
   "original_id": "family3_baseline_compact",
   "expected": {
     "verdict": "REJECT",
-    "archived_status": "RUNTIME_REJECTED",
+    "archived_status": "RETROSPECTIVE_GATE_STILL_DEVELOPING",
+    "gate_version": "cube-stationarity/1.0.0",
+    "gate_registered_on": "2026-09-28",
     "rejected_on": "STILL_DEVELOPING",
     "failed_checks": [
       "lateral_force_growth"
@@ -52,6 +54,6 @@
     "solver_invoked_in_archive": true,
     "note": "the solver ran to the requested end time and reported no numerical failure; the rejection is on flow development"
   },
-  "source_of_truth": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+  "source_of_truth": "CFD_Verification_Package_20260929/03_cube",
   "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
 }

@@ -91,6 +91,48 @@ def _gate(question: str, passed: Optional[bool], measured: Any = None,
             "threshold": threshold, "detail": detail}
 
 
+#: Archived statuses that record a refused or unexecuted needed action. They
+#: map to INCONCLUSIVE (paper Sec. 2.2), never to ACCEPT or REJECT.
+_INCONCLUSIVE_STATUSES = ("STOPPED_ACTION_REFUSED",)
+
+
+def _load_cube_llm_records(path: Path) -> List[Dict[str, Any]]:
+    """The archived model-diagnosis records for the cube evidence, if present.
+
+    They live under evidence/cube/<case>/llm_diagnosis/*_runNN.json in the
+    repository that holds the case directory. Each record is a real model call
+    on the archived evidence packet; nothing here is synthesised.
+    """
+    repo = path.parents[2]
+    folder = repo / "evidence" / "cube" / path.name / "llm_diagnosis"
+    records: List[Dict[str, Any]] = []
+    if not folder.is_dir():
+        return records
+    for item in sorted(folder.glob("*_run[0-9]*.json")):
+        try:
+            data = json.loads(item.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        decision = data.get("decision") or {}
+        validation = data.get("action_validation") or {}
+        usage = data.get("usage") or {}
+        records.append({
+            "record": str(item.relative_to(repo)),
+            "model": data.get("model"),
+            "source": data.get("source"),
+            "repeat": data.get("repeat"),
+            "diagnosis": decision.get("diagnosis"),
+            "reasoning_summary": decision.get("reasoning_summary", ""),
+            "action": decision.get("action"),
+            "approved": validation.get("approved"),
+            "executed": validation.get("executed"),
+            "validator_reason": validation.get("reason", ""),
+            "latency_s": data.get("latency_s"),
+            "total_tokens": usage.get("total_token_count"),
+        })
+    return records
+
+
 def _cube_gates(meta: Dict[str, Any], path: Path) -> Tuple[List[Dict[str, Any]],
                                                            List[Dict[str, Any]],
                                                            Dict[str, Any], str]:
@@ -129,49 +171,72 @@ def _cube_gates(meta: Dict[str, Any], path: Path) -> Tuple[List[Dict[str, Any]],
                       "assessment window, so the flow is not developed")),
         _gate("validation", None,
               measured="not reached",
-              threshold="a validated result requires a stationary flow first",
+              threshold="a reference comparison requires a stationary flow first",
               detail=("validation was never attempted: a run that is still "
                       "developing cannot be compared against a reference")),
     ]
-    proposals = [{
-        "activity": "diagnose_evidence",
-        "content": ("the streamwise load has settled but the lateral force keeps "
-                    "growing; the wake appears to be drifting rather than "
-                    "reaching a statistically steady state"),
-        "model": "archived diagnosis",
-        "accepted_by_authority": True,
-    }, {
-        "activity": "propose_bounded_action",
-        "content": "CONTINUE_RUN to let the lateral mode settle",
-        "model": "archived diagnosis",
-        "accepted_by_authority": False,
-    }]
+    # Archived model calls on the cube evidence (made after the run, which was
+    # executed outside the agent loop). The validator's approval is reported as
+    # recorded; an approved action was never executed and never decides.
+    records = _load_cube_llm_records(path)
+    proposals: List[Dict[str, Any]] = []
+    for rec in records:
+        model = f"{rec.get('source') or 'model'}:{rec.get('model')}"
+        proposals.append({
+            "activity": "diagnose_evidence",
+            "content": (f"{rec.get('diagnosis')}: {rec.get('reasoning_summary')}"
+                        if rec.get("reasoning_summary") else rec.get("diagnosis")),
+            "model": model,
+            "accepted_by_authority": rec.get("approved"),
+            "latency_s": rec.get("latency_s"),
+            "total_tokens": rec.get("total_tokens"),
+            "record": rec.get("record"),
+        })
+        if rec.get("action"):
+            proposals.append({
+                "activity": "propose_bounded_action",
+                "content": rec["action"],
+                "model": model,
+                "accepted_by_authority": rec.get("approved"),
+                "executed": rec.get("executed"),
+                "record": rec.get("record"),
+            })
     artifacts = {
         "evidence_root": str(Path(_ROOT) / meta.get("evidence_root", "")),
         "force_history": str(path / "reference" / "force_history.json"),
         "force_samples": len(samples),
         "stationarity": result.to_dict(),
         "solver_invoked": False,
+        "llm_diagnosis": (
+            {"records": records,
+             "note": ("archived model diagnoses of the cube evidence; the "
+                      "validator's approval is recorded, no action was "
+                      "executed, and the verdict comes from the gates")}
+            if records else
+            {"records": [],
+             "note": "no model call recorded for this case"}),
     }
     mode_path = path / "reference" / "lateral_mode.json"
     mode = json.loads(mode_path.read_text()) if mode_path.exists() else {}
     if mode:
         artifacts["lateral_mode"] = mode
+    cycles = mode.get("complete_cycle_amplitude_changes") if mode else None
     reason = (
         "REJECTED on flow development. The streamwise load is settled -- it "
-        f"drifts by {measured['drift_fraction']['fx']:.2%} of its mean over the "
-        "assessment window -- but the flow carries a periodic LATERAL mode"
-        + (f" of period {mode['period']:.1f} time units whose amplitude grew "
-           f"{mode['amplitude_growth_factor']:.0f}x "
-           f"({mode['first_peak']['abs_fz']:.2e} to "
-           f"{mode['last_peak']['abs_fz']:.2e}) at an exponential rate of "
-           f"{mode['exponential_growth_rate_per_time']:.3f} per time unit, "
-           f"e-folding in {mode['e_folding_time']:.1f}" if mode else "") +
-        ". Across the final window the mean |lateral force| still grew by a "
-        f"factor of {measured['lateral_growth_ratio']:.2f} against a registered "
-        f"limit of {result.thresholds['lateral_growth_ratio_max']}, so the flow "
-        "has not reached a statistically steady state. A convergence test that "
-        "watched the drag alone would have accepted this run."
+        f"drifts by {measured['drift_fraction']['fx']:.3%} of its mean over the "
+        "assessment window -- but the flow carries a growing LATERAL mode"
+        + (f" of period {mode['period']:.1f} time units" if mode else "") +
+        ". Across the final window the mean |lateral force| over the second "
+        "half is "
+        f"{measured['lateral_growth_ratio']:.2f} times that over the first half, "
+        "against a registered limit of "
+        f"{result.thresholds['lateral_growth_ratio_max']}"
+        + (", and successive complete-cycle amplitudes changed by "
+           + ", ".join(f"{float(c):+.0%}" for c in cycles) if cycles else "") +
+        ", so the flow has not reached a statistically steady state. A "
+        "convergence test that watched the drag alone would have accepted this "
+        "run. The cube was run outside the agent loop and this gate was "
+        "registered retrospectively."
     )
     return gates, proposals, artifacts, reason
 
@@ -184,6 +249,12 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
     failed = list(expected.get("failed_checks") or [])
     verdict = expected["verdict"]
     root = Path(_ROOT) / meta.get("evidence_root", "")
+    # A refused or unexecuted needed action is INCONCLUSIVE, not a rejection:
+    # the validation gate is left unresolved rather than failed.
+    inconclusive = (verdict == "INCONCLUSIVE"
+                    or expected.get("archived_status") in _INCONCLUSIVE_STATUSES)
+    validation_passed: Optional[bool] = (
+        True if verdict == "ACCEPT" else (None if inconclusive else False))
 
     gates = [
         _gate("numerical_health", True,
@@ -194,15 +265,23 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
               measured={"failed_checks": failed},
               threshold="the family's registered conservation criterion",
               detail="re-read from the archived validation record"),
-        _gate("convergence", verdict == "ACCEPT" or not failed,
+        # Convergence/stationarity fails only if a convergence-type check failed;
+        # the transient forward-step family registers no stationarity criterion.
+        _gate("convergence", verdict == "ACCEPT" or not any(
+                  k in f for f in failed
+                  for k in ("stationar", "converg", "horizon", "steady")),
               measured={"iterations": expected.get("iterations")},
               threshold="the family's registered convergence criterion"),
-        _gate("validation", verdict == "ACCEPT",
+        _gate("validation", validation_passed,
               measured={"validation_status": expected.get("validation_status")
                         or expected.get("archived_status"),
                         "failed_checks": failed},
               threshold="every registered validation check must pass",
-              detail=expected.get("message", "") or ""),
+              detail=("archived validator status and failed checks; the "
+                      "archived message is the model's non-binding summary: "
+                      + (expected.get("message", "") or "none")
+                      if expected.get("message") else
+                      "archived validator status and failed checks")),
     ]
     if expected.get("solver_invoked_in_archive") is False:
         decisive = expected.get("decisive_failure") or {}
@@ -218,8 +297,9 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
                           "measured on the correctly selected constant-span "
                           "flow-plane quad. Foundation-v14 skewness PASSES on all "
                           "three levels, and cell orientation and in-plane "
-                          "validity are clean once our own converter defects are "
-                          "corrected -- neither is a NASA-grid failure.")),
+                          "validity are clean once defects in the mesh-conversion "
+                          "and diagnostic scripts are corrected -- neither is a "
+                          "NASA-grid failure.")),
             _gate("numerical_health", None, measured="CFD_NOT_RUN",
                   threshold="not reachable without a qualified mesh",
                   detail="no solver was launched for this family"),
@@ -228,8 +308,6 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
             "corrected_diagnosis": expected.get("source_of_truth"),
             "decisive_failure": decisive,
             "foundation_v14_metrics": metrics,
-            "superseded_reports": ("outputs/airfoil_mesh/ -- historical only; "
-                                   "contains converter/diagnostic defects"),
         }
     proposals: List[Dict[str, Any]] = []
     if expected.get("llm_diagnosis"):
@@ -264,8 +342,9 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
             f"{decisive.get('check')} against a frozen limit of "
             f"{decisive.get('frozen_limit'):,.0f}: {worst}. Foundation-v14 "
             "skewness passes on all three levels, and orientation and in-plane "
-            "validity are clean after our own converter defects were corrected, "
-            "so neither is a NASA-grid failure. No solver was ever launched.")
+            "validity are clean after defects in the mesh-conversion and "
+            "diagnostic scripts were corrected, so neither is a NASA-grid "
+            "failure. No solver was ever launched.")
     else:
         reason = (
             f"replayed from archived evidence: the run recorded "
@@ -293,7 +372,10 @@ def replay_case(family: str, case: Optional[str],
           "note": "archived evidence was read; no solver was launched"}),
         ("evidence_extraction", "OK",
          {"evidence_root": meta.get("evidence_root")}),
-        ("llm_diagnosis", "PROPOSED", {"proposals": len(proposals)}),
+        (("llm_diagnosis", "PROPOSED", {"proposals": len(proposals)})
+         if proposals else
+         ("llm_diagnosis", "SKIPPED",
+          {"proposals": 0, "note": "no model call recorded for this case"})),
         ("bounded_correction", "SKIPPED",
          {"reason": "replay does not issue new corrective actions"}),
     ]

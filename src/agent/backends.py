@@ -10,14 +10,26 @@ the deterministic gates still decide.
   gemini         a real model call through the repository's existing LLM
                  infrastructure (`src/agents/llm_provenance.py`, `google.genai`).
                  Credentials come from GEMINI_API_KEY; nothing is stored in git.
-  replay         a recorded model response, for tests and for reproducing a
-                 published run without spending tokens.
+  replay         no model call. Recorded model responses are NOT replayed by
+                 this backend: it behaves like the deterministic backend
+                 (keyword interpretation; the diagnosis proposal comes from
+                 the family recipe), and in pipeline replay mode the archived
+                 proposals are read from the case evidence by
+                 `src/orchestration/replay.py`, not by this backend.
 
 What a model may return is bounded by schema, not by trust: an interpretation
 names a registered family or none, and a diagnosis names an action from the
 family's registered vocabulary. Anything else is dropped with a reason, and the
 drop is recorded. A model cannot change a threshold, and it cannot reach the
 verdict -- `src/authority/boundary.py` enforces both.
+
+Scope note: the generic `gemini` backend here is a simplified demonstration
+path. It sends a plain prompt with no system instruction, no response schema
+and no theory-blind evidence packet, and it is not the path used for the
+paper's runs. Those runs go through the family runners
+(`scripts/run_nozzle_feedback.py`, `scripts/run_nozzle_e2e.py`,
+`scripts/run_forward_step_2d.py`), which use `src/agents/` and
+`src/reasoning/` with structured schemas and deterministic action validators.
 """
 from __future__ import annotations
 
@@ -46,7 +58,7 @@ class BackendUnavailable(RuntimeError):
 
 @dataclass
 class ModelCall:
-    """Everything a reviewer needs to judge one model contribution."""
+    """Everything needed to audit one model contribution."""
 
     stage: str
     backend: str

@@ -1,7 +1,7 @@
 {
   "family": "forward_step_2d",
   "case": "mach20_canonical",
-  "started_utc": "2026-09-28T03:03:48Z",
+  "started_utc": "2026-10-04T23:43:30Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -82,7 +82,7 @@
         "failed_checks": []
       },
       "threshold": "every registered validation check must pass",
-      "detail": "PASS_2D_FORWARD_STEP",
+      "detail": "archived validator status and failed checks; the archived message is the model's non-binding summary: PASS_2D_FORWARD_STEP",
       "decided_by": "deterministic"
     },
     {
@@ -93,7 +93,10 @@
         "allowed": [
           "ACCEPT",
           "CONTINUE_RUN",
+          "EXTEND_END_TIME",
+          "REDUCE_MAX_CO",
           "REFINE_MESH",
+          "REBUILD_FROM_VALIDATED_SPEC",
           "REQUEST_CLARIFICATION",
           "REJECT_UNSUPPORTED",
           "FAIL_SAFELY"

@@ -2,7 +2,7 @@
   "report_version": "report-builder/1.0.0",
   "decision": {
     "verdict": "REJECT",
-    "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.",
+    "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.075% of its mean over the assessment window -- but the flow carries a growing LATERAL mode of period 10.1 time units. Across the final window the mean |lateral force| over the second half is 2.10 times that over the first half, against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run. The cube was run outside the agent loop and this gate was registered retrospectively.",
     "family": "cube",
     "case": "drifting_wake",
     "failed_gates": [
@@ -16,7 +16,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T03:04:00Z",
+    "started_utc": "2026-10-04T23:43:15Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",
@@ -73,7 +73,7 @@
         "status": "OK",
         "decided_by": "deterministic",
         "detail": {
-          "family_status": "RUNTIME_REJECTED",
+          "family_status": "SUPPLEMENTARY",
           "routable": false
         }
       },
@@ -108,7 +108,7 @@
         "status": "PROPOSED",
         "decided_by": "deterministic",
         "detail": {
-          "proposals": 2
+          "proposals": 6
         }
       },
       {
@@ -124,7 +124,7 @@
     "authority_trace": {
       "family": "cube",
       "case": "drifting_wake",
-      "started_utc": "2026-09-28T03:04:00Z",
+      "started_utc": "2026-10-04T23:43:15Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -204,7 +204,7 @@
           "question": "validation",
           "passed": null,
           "measured": "not reached",
-          "threshold": "a validated result requires a stationary flow first",
+          "threshold": "a reference comparison requires a stationary flow first",
           "detail": "validation was never attempted: a run that is still developing cannot be compared against a reference",
           "decided_by": "deterministic"
         },
@@ -213,7 +213,9 @@
           "passed": true,
           "measured": {
             "proposed": [
-              "CONTINUE_RUN to let the lateral mode settle"
+              "CONTINUE_RUN",
+              "FAIL_SAFELY",
+              "CONTINUE_RUN"
             ],
             "allowed": [
               "CONTINUE_RUN",
@@ -258,16 +260,44 @@
         },
         {
           "activity": "diagnose_evidence",
-          "content": "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reaching a statistically steady state",
-          "model": "archived diagnosis",
+          "content": "STILL_DEVELOPING: While the streamwise (fx) and vertical (fy) force components appear stabilized in the latter half of the simulation, the spanwise force (fz) exhibits growing fluctuations and increasing half-cycle extrema amplitudes all the way to the end of the record (t = 79.98). This indicates that the 3-D shedding and recirculation structures have not reached full statistical stationarity across all force components.",
+          "model": "gemini:gemini-3.5-flash-lite",
           "accepted_by_authority": true,
           "binding": false
         },
         {
           "activity": "propose_bounded_action",
-          "content": "CONTINUE_RUN to let the lateral mode settle",
-          "model": "archived diagnosis",
-          "accepted_by_authority": false,
+          "content": "CONTINUE_RUN",
+          "model": "gemini:gemini-3.5-flash-lite",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "diagnose_evidence",
+          "content": "NUMERICALLY_UNHEALTHY: Although the streamwise force fx and vertical force fy appear to reach a steady mean, the lateral force fz exhibits an unbounded, escalating oscillation amplitude over time. This systematic growth in lateral force fluctuations indicates a numerical instability or unphysical feedback loop in the spanwise direction, requiring a safe stop.",
+          "model": "gemini:gemini-3.5-flash-lite",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "propose_bounded_action",
+          "content": "FAIL_SAFELY",
+          "model": "gemini:gemini-3.5-flash-lite",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "diagnose_evidence",
+          "content": "STILL_DEVELOPING: Although streamwise and vertical force components (fx and fy) appear largely stable in the later time windows, the lateral force component (fz) exhibits growing fluctuation amplitude and standard deviation up to the final recorded window (t = 70 to 80). This indicates that the 3-D wake structures are still developing and have not reached a statistically stationary state across all components.",
+          "model": "gemini:gemini-3.5-flash-lite",
+          "accepted_by_authority": true,
+          "binding": false
+        },
+        {
+          "activity": "propose_bounded_action",
+          "content": "CONTINUE_RUN",
+          "model": "gemini:gemini-3.5-flash-lite",
+          "accepted_by_authority": true,
           "binding": false
         }
       ],
@@ -276,7 +306,7 @@
     },
     "final_decision": {
       "verdict": "REJECT",
-      "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.",
+      "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.075% of its mean over the assessment window -- but the flow carries a growing LATERAL mode of period 10.1 time units. Across the final window the mean |lateral force| over the second half is 2.10 times that over the first half, against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run. The cube was run outside the agent loop and this gate was registered retrospectively.",
       "family": "cube",
       "case": "drifting_wake",
       "failed_gates": [
@@ -306,7 +336,7 @@
       "contract": {
         "capabilities": {
           "family": "cube",
-          "status": "RUNTIME_REJECTED",
+          "status": "SUPPLEMENTARY",
           "routable": false,
           "geometry_inputs": {
             "parametric": true,
@@ -318,7 +348,7 @@
             "turbulent": true,
             "transient": true,
             "dimensionality": "3-D",
-            "model": "incompressible RANS, surface-mounted cube"
+            "model": "incompressible URANS, k-omega SST, surface-mounted cube"
           },
           "allowed_actions": [
             "CONTINUE_RUN",
@@ -328,17 +358,17 @@
           "characteristic_dimension": "cube_height",
           "envelope": {
             "regime": "3-D turbulent flow over a wall-mounted cube",
-            "validation": "not reached: the run was rejected before validation, on stationarity/development"
+            "validation": "not reached: the exploratory run did not satisfy the stationarity/development criterion"
           },
           "cases": [
             "drifting_wake"
           ],
           "solver": "OpenFOAM Foundation v14",
-          "notes": "F3 headline demonstration, RUNTIME REJECTED. The archived run executed, drifted laterally and was refused by the deterministic stationarity gate. It is NOT a successful validation and is not routable for acceptance."
+          "notes": "Exploratory 3-D turbulent stationarity/development study, run outside the agent loop; the stationarity gate was registered retrospectively. The archived run is preserved for provenance, is not a validated benchmark result, and is not routable for acceptance."
         },
         "registered": true,
-        "register_status": "NONACCEPTED",
-        "adapter_error": "KeyError: \"'cube' has no adapter (status NONACCEPTED)\""
+        "register_status": "SUPPORTING",
+        "adapter_error": "KeyError: \"'cube' has no adapter (status SUPPORTING)\""
       },
       "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
       "force_history": "cases/cube/drifting_wake/reference/force_history.json",
@@ -384,8 +414,56 @@
         "note": "the streamwise force may look settled while a lateral mode grows; this gate fails on the growth, not on the drag"
       },
       "solver_invoked": false,
+      "llm_diagnosis": {
+        "records": [
+          {
+            "record": "evidence/cube/drifting_wake/llm_diagnosis/20261001T154401Z_run01.json",
+            "model": "gemini-3.5-flash-lite",
+            "source": "gemini",
+            "repeat": 1,
+            "diagnosis": "STILL_DEVELOPING",
+            "reasoning_summary": "While the streamwise (fx) and vertical (fy) force components appear stabilized in the latter half of the simulation, the spanwise force (fz) exhibits growing fluctuations and increasing half-cycle extrema amplitudes all the way to the end of the record (t = 79.98). This indicates that the 3-D shedding and recirculation structures have not reached full statistical stationarity across all force components.",
+            "action": "CONTINUE_RUN",
+            "approved": true,
+            "executed": false,
+            "validator_reason": "CONTINUE_RUN permitted for a healthy, still-developing run; not executed here because the cube campaign was run outside the agent loop.",
+            "latency_s": 2.496,
+            "total_tokens": 4805
+          },
+          {
+            "record": "evidence/cube/drifting_wake/llm_diagnosis/20261001T154401Z_run02.json",
+            "model": "gemini-3.5-flash-lite",
+            "source": "gemini",
+            "repeat": 2,
+            "diagnosis": "NUMERICALLY_UNHEALTHY",
+            "reasoning_summary": "Although the streamwise force fx and vertical force fy appear to reach a steady mean, the lateral force fz exhibits an unbounded, escalating oscillation amplitude over time. This systematic growth in lateral force fluctuations indicates a numerical instability or unphysical feedback loop in the spanwise direction, requiring a safe stop.",
+            "action": "FAIL_SAFELY",
+            "approved": true,
+            "executed": false,
+            "validator_reason": "FAIL_SAFELY permitted.",
+            "latency_s": 2.162,
+            "total_tokens": 4709
+          },
+          {
+            "record": "evidence/cube/drifting_wake/llm_diagnosis/20261001T154401Z_run03.json",
+            "model": "gemini-3.5-flash-lite",
+            "source": "gemini",
+            "repeat": 3,
+            "diagnosis": "STILL_DEVELOPING",
+            "reasoning_summary": "Although streamwise and vertical force components (fx and fy) appear largely stable in the later time windows, the lateral force component (fz) exhibits growing fluctuation amplitude and standard deviation up to the final recorded window (t = 70 to 80). This indicates that the 3-D wake structures are still developing and have not reached a statistically stationary state across all components.",
+            "action": "CONTINUE_RUN",
+            "approved": true,
+            "executed": false,
+            "validator_reason": "CONTINUE_RUN permitted for a healthy, still-developing run; not executed here because the cube campaign was run outside the agent loop.",
+            "latency_s": 1.731,
+            "total_tokens": 4764
+          }
+        ],
+        "note": "archived model diagnoses of the cube evidence; the validator's approval is recorded, no action was executed, and the verdict comes from the gates"
+      },
       "lateral_mode": {
-        "description": "the lateral force is not a slow one-way drift: it is a periodic lateral mode whose amplitude grows exponentially and has not saturated by the end of the run",
+        "description": "the lateral force is a periodic lateral mode, not a slow one-way drift; its peak amplitude is larger at the end of the run than at the start and has not saturated by the end of the run",
+        "note": "not used by the registered gate; the paper reports the half-window ratio and complete-cycle amplitudes",
         "period": 10.144000000000005,
         "zero_crossings": 16,
         "first_peak": {
@@ -399,7 +477,7 @@
         "amplitude_growth_factor": 68.40449651439921,
         "exponential_growth_rate_per_time": 0.09090874700908845,
         "e_folding_time": 11.000041612057712,
-        "method": "peaks are local maxima of |Fz| above 1e-4; the rate is the log slope between the first and last peak"
+        "method": "peaks are local maxima of |Fz| above 1e-4; exponential_growth_rate_per_time and e_folding_time are a two-point log-slope fit between the first and last peak, kept as computed and not a claim that the growth is exponential"
       },
       "replay_version": "replay/1.0.0",
       "case": {
@@ -408,9 +486,14 @@
         "original_id": "family3_baseline_compact",
         "family": "cube",
         "title": "Surface-mounted cube with a drifting lateral wake",
-        "purpose": "F3 headline demonstration: a 3-D turbulent run that executed, looked healthy, and was REJECTED on stationarity / development",
+        "purpose": "Diagnostic study of a 3-D URANS (k-omega SST) surface-mounted cube, run outside the agent loop. The stationarity gate cube-stationarity/1.0.0 was registered retrospectively and applied to the archived force history; it returns STILL_DEVELOPING, so the decision is REJECT",
         "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
-        "evidence_present": true,
+        "evidence_present": false,
+        "archived_records": "The archived run is in the Zenodo archive (DOI to be added on release) under CFD_Verification_Package_20260929/03_cube (originally handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact); it is not in this repository.",
+        "evidence_in_clone": [
+          "evidence/cube/drifting_wake"
+        ],
+        "paper_ledger": "cube study (not a ledger session)",
         "config": null,
         "related_campaigns": [],
         "solver": "OpenFOAM Foundation v14",
@@ -421,7 +504,7 @@
           "original_id": "family3_baseline_compact",
           "expected": {
             "verdict": "REJECT",
-            "archived_status": "RUNTIME_REJECTED",
+            "archived_status": "RETROSPECTIVE_GATE_STILL_DEVELOPING",
             "rejected_on": "STILL_DEVELOPING",
             "failed_checks": [
               "lateral_force_growth"
@@ -594,11 +677,24 @@
       "convergence.png"
     ],
     "contours": [],
-    "video": "simulation.mp4"
+    "video": null,
+    "history": "history_evolution.mp4",
+    "field_videos": []
   },
+  "visualization": {
+    "family": "cube",
+    "case": "drifting_wake",
+    "verdict": "REJECT",
+    "solver_invoked": false,
+    "source_kind": "archived_raw_fields",
+    "status": "VISUALIZATION_INCOMPLETE",
+    "output_files": [],
+    "reason": "No raw OpenFOAM case located; histories are not field movies."
+  },
+  "artifact_complete": false,
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T03:04:17Z",
+    "generated_utc": "2026-10-04T23:43:29Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",
@@ -607,9 +703,9 @@
     "solver": "OpenFOAM Foundation v14",
     "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
     "case_directory": "cases/cube/drifting_wake",
-    "python": "3.10.12",
-    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-    "git_commit": "NOT_AVAILABLE",
+    "python": "3.11.15",
+    "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+    "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
     "pipeline_stages": [
       "request_interpretation",
       "geometry_characterization",

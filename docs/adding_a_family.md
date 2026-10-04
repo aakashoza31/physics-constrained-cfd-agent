@@ -7,7 +7,11 @@ a case directory; nothing in `src/agent/` or `src/authority/` changes.
 
 `src/families/capabilities.py` — add a `FamilyCapabilities` entry. Be honest
 about `geometry_inputs`: if there is no STEP path, `step: false` and say why in
-`step_note`. The matcher enforces that declaration.
+`step_note`. The matcher enforces that declaration. A new family starts as
+`NOT_IMPLEMENTED` or `SUPPLEMENTARY`; only a family whose contract is complete is
+set to `ACCEPTED`, the code status for a registered, routable family (see
+`docs/family_protocol.md`). Registration means the family's checks are
+registered; it is not a claim of physical validation.
 
 ## 2. Write the recipe
 
@@ -30,7 +34,9 @@ The gates are the family's scientific contract in code: mesh quality,
 conservation, convergence, stationarity, validation. They must be pure functions
 of evidence, and they must carry their thresholds as module constants with the
 reasoning written down. `src/families/cube/stationarity.py` is a compact worked
-example.
+example. Register the gate and its thresholds before the data it will judge
+exist; the cube gate was registered retrospectively, after the cube data existed,
+and the paper reports that as a limitation.
 
 ## 5. Register the cases
 
@@ -43,7 +49,7 @@ cases/<family>/<case>/
     reproduce.sh / .ps1
 ```
 
-`scripts/build_case_library.py` regenerates these from archived evidence, so the
+`scripts/build_case_library.py --archive-root <session archive>` regenerates `expected_result.json` from the archived evidence (narrative files only with `--rewrite-narrative`; it refuses to run without the archive), so the
 status a case advertises is the status its evidence records.
 
 ## 6. Add tests

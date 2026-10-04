@@ -41,7 +41,7 @@ def test_rejects_imposed_ambient_at_the_outlet():
     assert any("pressure-free" in r for r in result.reasons)
 
 
-def test_rejects_a_gas_outside_the_validated_envelope():
+def test_rejects_a_gas_outside_the_registered_envelope():
     result = evaluate_scope(_spec(gamma=1.667, gas_constant_j_per_kg_k=2077.0))
 
     assert not result.approved

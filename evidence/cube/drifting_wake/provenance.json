@@ -1,6 +1,6 @@
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T03:04:17Z",
+  "generated_utc": "2026-10-04T23:43:29Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",
@@ -9,9 +9,9 @@
   "solver": "OpenFOAM Foundation v14",
   "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
   "case_directory": "cases/cube/drifting_wake",
-  "python": "3.10.12",
-  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-  "git_commit": "NOT_AVAILABLE",
+  "python": "3.11.15",
+  "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+  "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",

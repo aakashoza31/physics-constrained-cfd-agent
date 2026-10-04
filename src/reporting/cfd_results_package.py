@@ -959,14 +959,14 @@ def create_final_results_package(
     final_mesh: Path | None = None,
     gamma: float = 1.4,
     gas_constant: float = 287.0,
-    open_folder: bool = True,
+    open_folder: bool = False,
 ) -> dict[
     str,
     Any,
 ]:
 
     """
-    Build the professor-facing final output package.
+    Build the final results package.
 
     The directory contains:
 
@@ -984,8 +984,8 @@ def create_final_results_package(
           mesh.png
       package_manifest.json
 
-    On Windows, the results folder is automatically opened when
-    open_folder=True.
+    On Windows, the results folder is opened in the file browser only when
+    open_folder=True (default False).
     """
 
     output_dir = Path(

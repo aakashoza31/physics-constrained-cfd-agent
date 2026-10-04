@@ -3,7 +3,7 @@
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `mach20_canonical` &nbsp;|&nbsp;
 **Original id:** `case_B_mach20` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Accepted reference run of the f2 family.
+Canonical Mach-2 run of the registered 2-D forward-step family (paper ledger S2): Mach 2, h=0.2, step at x=0.6; `PASS_2D_FORWARD_STEP` -> `ACCEPT` in one iteration.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Accepted reference run of the f2 family.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/case_B_mach20` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_B_mach20`; they are not in this repository.
 
 ## Archived outcome
 

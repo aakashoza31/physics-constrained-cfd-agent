@@ -55,3 +55,6 @@ evaluation/records/
 !validation/canonical_reference/results/**
 
 .video-tools/
+
+# Small cube mesh log cited by the paper (checkMesh aspect ratio)
+!paper/cfd_forge/data/cube/log.checkMesh

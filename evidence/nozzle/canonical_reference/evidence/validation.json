@@ -6,6 +6,6 @@
     "failed_checks": []
   },
   "threshold": "every registered validation check must pass",
-  "detail": "",
+  "detail": "archived validator status and failed checks",
   "decided_by": "deterministic"
 }

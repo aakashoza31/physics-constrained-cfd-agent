@@ -1,4 +1,22 @@
-﻿from __future__ import annotations
+"""Legacy: mass-imbalance trend gate for refinement actions (unused).
+
+Not part of the CFD Forge paper; not imported by the registered families'
+runners (``scripts/run_nozzle_feedback.py``, ``scripts/run_nozzle_e2e.py``,
+``scripts/run_forward_step_2d.py``) or by ``src/pipeline``.  Kept for
+reference only.  Despite the module name, it is not the paper's safety gate.
+
+``apply_decision_safety_gate`` takes a requested action name, a raw
+diagnostics dictionary and the iteration history.  It reads the mass-imbalance
+percentage from several possible keys, compares it with the previous
+iterations, and can override a requested refinement action
+(``REFINE_THROAT`` / ``REFINE_GRADIENT_REGION``) when the imbalance did not
+improve by ``min_relative_improvement_pct`` or worsened by more than
+``severe_worsening_pct``.  It returns the possibly overridden action and an
+audit dictionary.  The registered families instead use
+``src/reasoning/action_validator.py`` (nozzle) and
+``src/reasoning/forward_step_actions.py`` (step).
+"""
+from __future__ import annotations
 
 from typing import Any
 

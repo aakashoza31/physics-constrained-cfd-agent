@@ -25,19 +25,47 @@
     },
     {
       "activity": "diagnose_evidence",
-      "content": "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reaching a statistically steady state",
-      "model": "archived diagnosis",
+      "content": "STILL_DEVELOPING: While the streamwise (fx) and vertical (fy) force components appear stabilized in the latter half of the simulation, the spanwise force (fz) exhibits growing fluctuations and increasing half-cycle extrema amplitudes all the way to the end of the record (t = 79.98). This indicates that the 3-D shedding and recirculation structures have not reached full statistical stationarity across all force components.",
+      "model": "gemini:gemini-3.5-flash-lite",
       "accepted_by_authority": true,
       "binding": false
     },
     {
       "activity": "propose_bounded_action",
-      "content": "CONTINUE_RUN to let the lateral mode settle",
-      "model": "archived diagnosis",
-      "accepted_by_authority": false,
+      "content": "CONTINUE_RUN",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "NUMERICALLY_UNHEALTHY: Although the streamwise force fx and vertical force fy appear to reach a steady mean, the lateral force fz exhibits an unbounded, escalating oscillation amplitude over time. This systematic growth in lateral force fluctuations indicates a numerical instability or unphysical feedback loop in the spanwise direction, requiring a safe stop.",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "FAIL_SAFELY",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "diagnose_evidence",
+      "content": "STILL_DEVELOPING: Although streamwise and vertical force components (fx and fy) appear largely stable in the later time windows, the lateral force component (fz) exhibits growing fluctuation amplitude and standard deviation up to the final recorded window (t = 70 to 80). This indicates that the 3-D wake structures are still developing and have not reached a statistically stationary state across all components.",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "CONTINUE_RUN",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
       "binding": false
     }
   ],
-  "count": 3,
+  "count": 7,
   "note": "every entry is a PROPOSAL. None of them decided anything; the verdict comes from the authority trace."
 }

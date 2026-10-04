@@ -44,7 +44,7 @@ class FamilyRecipe:
     #: Constants required only by an OPTIONAL capability, keyed by the action
     #: that needs them. An unresolved entry here disables THAT capability; it
     #: does not block acceptance of a result that never used it. Keeping these
-    #: separate from `tolerances` is what lets a frozen, already-validated
+    #: separate from `tolerances` is what lets a frozen, already-registered
     #: family still ACCEPT while a newer capability remains unregistered.
     capability_criteria: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     #: Free-form notes carried into the provenance record.

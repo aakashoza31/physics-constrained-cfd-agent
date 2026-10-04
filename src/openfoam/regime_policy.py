@@ -1,4 +1,11 @@
-﻿from __future__ import annotations
+﻿"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype nozzle-regime policy. Not imported by the registered family runners
+or by src/pipeline.
+"""
+from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from enum import Enum
@@ -790,7 +797,7 @@ def classify_nozzle_regime(
 
     if re <= rt:
         raise ValueError(
-            "Validated C-D nozzle kernel requires "
+            "Prototype C-D nozzle kernel requires "
             "exit radius > throat radius."
         )
 

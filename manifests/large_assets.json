@@ -1,5 +1,5 @@
 {
-  "note": "large archived evidence is not committed. This manifest is the inventory: counts, byte totals and digests of the key files each registered case points at.",
+  "note": "Large archived evidence is not committed. This manifest is the inventory: counts, byte totals and digests of the key files each registered case points at. The counts and byte totals of the gitignored directories were measured on the development machine when the repository was consolidated and are approximate; those directories are not part of the public repository. The agent session records are deposited in the Zenodo session archive (DOI to be added on release). Digests are of the files as they were when recorded; regenerate them if a listed file changes.",
   "directories": {
     "handoff": {
       "files": 823,
@@ -14,7 +14,8 @@
     "demo": {
       "files": 951,
       "bytes": 60446641,
-      "gitignored": true
+      "gitignored": true,
+      "note": "gitignored except a small committed subset (36 files, 1,511,776 bytes in the working copy: demo/published_campaign/ and a few session records); the full session records are in the Zenodo session archive"
     },
     "build": {
       "files": 1,
@@ -37,10 +38,10 @@
       "gitignored": true
     },
     "validation": {
-      "files": 50,
-      "bytes": 986758,
+      "files": 45,
+      "bytes": 962657,
       "gitignored": false,
-      "note": "committed: small enough to ship with the repository"
+      "note": "committed: small enough to ship with the repository (tracked files measured in the working copy)"
     }
   },
   "key_files": {
@@ -75,8 +76,8 @@
       "bytes": 4917
     },
     "cases/cube/drifting_wake/reference/lateral_mode.json": {
-      "sha256": "77d46b57e8cbdba7b3409f7c541cc3a014904a98f03183af4bfb198ea52e8629",
-      "bytes": 623
+      "sha256": "0257b63acc73eaba636029fab098f8d18a509f43f9e489a1ae579c7c7acd4a2a",
+      "bytes": 887
     }
   }
 }

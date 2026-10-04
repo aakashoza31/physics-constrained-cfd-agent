@@ -5,6 +5,12 @@ This script does not run CFD. It discovers accepted feedback_summary.json files
 under demo/, selects the demonstrated A/B/C runs, copies compact sanitized
 results and field images into demo/published_campaign/, and intentionally omits
 machine paths and LLM provider/model labels.
+
+Where labels are stripped: compact_feedback(), compact_validation() and
+sanitize_visual() copy only an explicit allow-list of fields, so the "model",
+"source" and "provider" entries of the session records are not published, and
+images_examined keeps file names only. The model identities remain in the full
+session records (Zenodo archive, DOI to be added on release).
 """
 from __future__ import annotations
 
@@ -110,6 +116,7 @@ def compact_validation(path: Path) -> dict[str, Any] | None:
 
 
 def sanitize_visual(path: Path) -> dict[str, Any] | None:
+    """Field-observer record without its model/provider label or machine paths."""
     if not path.exists():
         return None
     raw = read_json(path)

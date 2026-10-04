@@ -33,12 +33,26 @@ claiming the part is unsuitable, only that it cannot judge it.
    family's frozen mesh contract;
 4. the frozen quality gates passing on the resulting mesh.
 
-Item 4 is the hard one, and the NACA0012 supplementary case is the evidence: even
-with an analytically exact geometry and a purpose-built mesher, every candidate
-mesh failed the frozen contract. Arbitrary CAD is strictly harder.
+Item 4 is the hard one. The NACA0012 airfoil mesh study (not part of the CFD Forge
+paper) is an example: even with an analytically exact geometry and a
+purpose-built mesher, every candidate mesh failed the frozen contract. Arbitrary
+CAD is strictly harder.
+
+## The CAD→Gmsh prototype
+
+Before the registered nozzle family existed, a less constrained prototype
+generated the nozzle geometry through a CAD→Gmsh path (`src/cad/`,
+`src/meshing/`, `src/openfoam/`, `src/agents/nozzle_design_agent.py`), with the
+model choosing the meshing strategy. Its archived run ended at t = 0.2 ms with
+status `STABLE_UNCONVERGED` and a 50.8% mass-flow imbalance; the paper describes
+it in its reproducibility appendix as the record that motivated the registered
+contracts. The prototype is kept for provenance, is not part of the registered
+path, and does not accept STEP input through `scripts/run_agent.py`. Carrying the
+Gmsh path through to a solution that passes registered checks is future work.
 
 ## What this system does not claim
 
-It does not claim that arbitrary CAD geometry can be simulated. It claims that
+It does not claim that arbitrary CAD geometry can be simulated, and no family
+accepts STEP geometry. It claims that
 unsupported geometry is refused cleanly, early, and with a reason — which is the
 property an engineering user actually needs from an autonomous tool.

@@ -1,6 +1,6 @@
 {
   "verdict": "REJECT",
-  "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.",
+  "reason": "REJECTED on flow development. The streamwise load is settled -- it drifts by 0.075% of its mean over the assessment window -- but the flow carries a growing LATERAL mode of period 10.1 time units. Across the final window the mean |lateral force| over the second half is 2.10 times that over the first half, against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run. The cube was run outside the agent loop and this gate was registered retrospectively.",
   "family": "cube",
   "case": "drifting_wake",
   "failed_gates": [

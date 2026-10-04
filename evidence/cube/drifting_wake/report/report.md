@@ -1,6 +1,6 @@
 # Engineering report — cube / drifting_wake
 
-**Decision: `REJECT`** — REJECTED on flow development. The streamwise load is settled -- it drifts by 0.08% of its mean over the assessment window -- but the flow carries a periodic LATERAL mode of period 10.1 time units whose amplitude grew 68x (1.01e-04 to 6.91e-03) at an exponential rate of 0.091 per time unit, e-folding in 11.0. Across the final window the mean |lateral force| still grew by a factor of 2.10 against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run.
+**Decision: `REJECT`** — REJECTED on flow development. The streamwise load is settled -- it drifts by 0.075% of its mean over the assessment window -- but the flow carries a growing LATERAL mode of period 10.1 time units. Across the final window the mean |lateral force| over the second half is 2.10 times that over the first half, against a registered limit of 1.25, so the flow has not reached a statistically steady state. A convergence test that watched the drag alone would have accepted this run. The cube was run outside the agent loop and this gate was registered retrospectively.
 
 ## 1. Request
 
@@ -19,8 +19,8 @@
 
 | Field | Value |
 |---|---|
-| Family status | RUNTIME_REJECTED |
-| Model | incompressible RANS, surface-mounted cube |
+| Family status | SUPPLEMENTARY |
+| Model | incompressible URANS, k-omega SST, surface-mounted cube |
 | Dimensionality | 3-D |
 | Compressible | False |
 | Turbulent | True |
@@ -39,8 +39,8 @@ Every row below was decided by code. No model output appears in this table.
 | `numerical_health` | PASS | "the solver must complete without a fatal error" | {"solver_completed": true, "end_time_reached": 79.98} |
 | `convergence` | PASS | "drift over the window <= 0.02 of the mean streamwise force" | {"streamwise_force_drift_fraction": 0.0007529082884745507} |
 | `stationarity` | FAIL | "lateral force growth ratio <= 1.25" | {"lateral_growth_ratio": 2.098378164488468, "mean_abs_fz_first_half": 0.0018326531209671001, "mean_abs_fz_seco |
-| `validation` | UNRESOLVED | "a validated result requires a stationary flow first" | "not reached" |
-| `permitted_actions` | PASS | "a proposed action must be in the family's registered vocabulary" | {"proposed": ["CONTINUE_RUN to let the lateral mode settle"], "allowed": ["CONTINUE_RUN", "FAIL_SAFELY", "REJE |
+| `validation` | UNRESOLVED | "a reference comparison requires a stationary flow first" | "not reached" |
+| `permitted_actions` | PASS | "a proposed action must be in the family's registered vocabulary" | {"proposed": ["CONTINUE_RUN", "FAIL_SAFELY", "CONTINUE_RUN"], "allowed": ["CONTINUE_RUN", "FAIL_SAFELY", "REJE |
 
 ## 4. Evidence
 
@@ -54,22 +54,25 @@ Every row below was decided by code. No model output appears in this table.
 | Activity | Content | Accepted by authority |
 |---|---|---|
 | interpret_user_intent | {"interpreter_version": "request-interpreter/1.0.0", "interpreter": "deterministic", "prompt": "run the registered cube  | None |
-| diagnose_evidence | "the streamwise load has settled but the lateral force keeps growing; the wake appears to be drifting rather than reachi | True |
-| propose_bounded_action | "CONTINUE_RUN to let the lateral mode settle" | False |
+| diagnose_evidence | "STILL_DEVELOPING: While the streamwise (fx) and vertical (fy) force components appear stabilized in the latter half of  | True |
+| propose_bounded_action | "CONTINUE_RUN" | True |
+| diagnose_evidence | "NUMERICALLY_UNHEALTHY: Although the streamwise force fx and vertical force fy appear to reach a steady mean, the latera | True |
+| propose_bounded_action | "FAIL_SAFELY" | True |
+| diagnose_evidence | "STILL_DEVELOPING: Although streamwise and vertical force components (fx and fy) appear largely stable in the later time | True |
+| propose_bounded_action | "CONTINUE_RUN" | True |
 
 ## 6. Media
 
 - plot: `plots/force_history.png`
 - plot: `plots/lateral_force_growth.png`
 - plot: `plots/convergence.png`
-- video: `video/simulation.mp4`
 
 ## 7. Provenance
 
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T03:04:17Z",
+  "generated_utc": "2026-10-04T23:43:29Z",
   "prompt": "run the registered cube case drifting_wake",
   "mode": "replay",
   "family": "cube",
@@ -78,9 +81,9 @@ Every row below was decided by code. No model output appears in this table.
   "solver": "OpenFOAM Foundation v14",
   "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
   "case_directory": "cases/cube/drifting_wake",
-  "python": "3.10.12",
-  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-  "git_commit": "NOT_AVAILABLE",
+  "python": "3.11.15",
+  "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+  "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",
@@ -99,3 +102,10 @@ Every row below was decided by code. No model output appears in this table.
 ---
 Generated by `report-builder/1.0.0`. The verdict is computed from the deterministic
 gates alone; a language model cannot change it.
+
+Visualization status: **VISUALIZATION_INCOMPLETE**
+
+No raw OpenFOAM case located; histories are not field movies.
+
+- [Video manifest](../video/video_manifest.json)
+- [History animation (not a flow field)](../video/history_evolution.mp4)

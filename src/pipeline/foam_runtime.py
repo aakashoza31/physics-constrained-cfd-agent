@@ -2,7 +2,7 @@
 
 Two runtimes are supported:
 
-  wsl    - Windows host, OpenFOAM inside WSL2 (the validated development
+  wsl    - Windows host, OpenFOAM inside WSL2 (the reported runs' development
            environment). Commands are issued with
            ``wsl.exe -d <distro> -- bash -lc '...'``, which is exactly the probe
            pattern already used by scripts/check_environment.py.

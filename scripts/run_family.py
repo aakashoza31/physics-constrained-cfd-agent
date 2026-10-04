@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Orchestrator entry point: the parallel opt-in path. Family-generic.
 
-The existing runners -- scripts/run_forward_step_2d.py and
-scripts/run_nozzle_feedback.py -- are NOT modified by this refactor. They remain
-the default execution path for Families 1 and 2, byte-for-byte. This script is
-the separate, opt-in route through the shared architecture.
+The family runners -- scripts/run_forward_step_2d.py and
+scripts/run_nozzle_feedback.py -- are the execution path the paper's sessions
+used, and this script does not change them. It is a separate, opt-in route
+through the shared architecture.
 
 This CLI contains NO family-specific code. Spec loading and evidence loading go
 through adapter.load_spec() / adapter.load_evidence(), so a family is reachable

@@ -36,8 +36,10 @@ NOT_AVAILABLE = "NOT_AVAILABLE"
 EVIDENCE_APPLICABILITY: Dict[str, Dict[str, bool]] = {
     "nozzle": {"convergence": True, "conservation": True, "validation": True,
                "stationarity": True},
+    # The forward step is a transient family: its contract has no
+    # stationarity criterion, so no stationarity document is written for it.
     "forward_step_2d": {"convergence": True, "conservation": True,
-                        "validation": True, "stationarity": True},
+                        "validation": True, "stationarity": False},
     "cube": {"convergence": True, "conservation": False, "validation": False,
              "stationarity": True},
     "airfoil": {"convergence": False, "conservation": False,

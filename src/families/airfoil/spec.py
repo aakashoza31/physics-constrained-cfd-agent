@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Family 3 spec: 2D turbulent NACA0012, NASA TMR 2DN00 validation case.
+"""Airfoil spec (not part of the CFD Forge paper): 2D turbulent NACA0012, NASA TMR 2DN00 validation case.
 
 FROZEN SCIENTIFIC SCALING (reviewed and frozen; every value below was verified
 arithmetically against its definition before being written here):
@@ -45,7 +45,7 @@ NU = U_INF * CHORD_M / RE_C
 
 # -- canonical operating condition -------------------------------------
 CANONICAL_ALPHA_DEG = 0.0
-#: The first validated variation, registered but NOT run as part of canonical
+#: The first planned variation, registered but NOT run as part of canonical
 #: closure. Present so the envelope is declared rather than discovered later.
 FIRST_VARIATION_ALPHA_DEG = 10.0
 
@@ -58,7 +58,7 @@ TURBULENCE_INTENSITY = 0.052e-2          # 0.052 %
 NUT_RATIO_INF = 0.009                    # nu_t / nu
 
 #: Derived for OUR dimensional scaling. Both were recomputed from the benchmark
-#: quantities and match the reviewer's frozen values exactly:
+#: quantities and match the frozen reference values exactly:
 #:   k     = 1.5 * (U * Ti)^2      = 1.5 * (1.0 * 5.2e-4)^2 = 4.056e-7
 #:   omega = k / nu_t             = 4.056e-7 / (0.009*nu)  = 270.4
 K_INF = 4.056e-7
@@ -66,7 +66,9 @@ OMEGA_INF = 270.4
 NUT_INF = NUT_RATIO_INF * NU
 
 # -- registered grids --------------------------------------------------
-#: ACTIVE grid identifiers: the preregistered Gmsh hierarchy.
+#: Grid level identifiers. The active mesh source for these levels is the NASA
+#: TMR Family II hierarchy (src/pipeline/airfoil/family2.py); the preregistered
+#: Gmsh hierarchy that first used these names is archived evidence.
 COARSE_GRID, MEDIUM_GRID, FINE_GRID = "coarse", "medium", "fine"
 GRID_KEYS = (COARSE_GRID, MEDIUM_GRID, FINE_GRID)
 
@@ -75,7 +77,7 @@ GRID_KEYS = (COARSE_GRID, MEDIUM_GRID, FINE_GRID)
 CANONICAL_GRID = FINE_GRID
 SENSITIVITY_GRID = MEDIUM_GRID
 
-#: Retained for the optional NASA supporting branch only. Not active F3 grids.
+#: Retained for the optional NASA supporting branch only. Not active airfoil grids.
 NASA_CANONICAL_GRID = "mesh_canonical"
 NASA_SENSITIVITY_GRID = "mesh_sensitivity"
 
@@ -110,11 +112,6 @@ NASA_CANONICAL_CELLS = cells_for(NASA_CANONICAL_GRID)      # 229376
 NASA_SENSITIVITY_CELLS = cells_for(NASA_SENSITIVITY_GRID)  # 57344
 
 # -- active hierarchy cell counts --------------------------------------
-#: The active Gmsh levels have NO declared cell count. The frozen recipe carries
-#: a planning FORECAST per level and nothing else: the count is whatever the
-#: frozen recipe produces. A level is qualified by
-#: src/pipeline/airfoil/mesh_checks.py, never by its size, so no forecast here is
-#: ever an acceptance criterion.
 #: ACTIVE hierarchy: the NASA TMR Family II levels. Their cell counts are
 #: NASA-DECLARED and derived as the identity (ni-1)(nj-1), so they ARE
 #: requirements -- unlike the archived Gmsh hierarchy, whose counts were only
@@ -214,9 +211,10 @@ class AirfoilSpec:
         if self.grid not in GRID_KEYS:
             raise ValueError(
                 f"grid must be one of {GRID_KEYS}; got {self.grid!r}. "
-                "This family uses the preregistered Gmsh hierarchy only and never "
-                "substitutes a mesh. The NASA Plot3D grids are an optional "
-                "supporting branch and are not run levels."
+                "This family uses the registered coarse/medium/fine levels only "
+                "(NASA TMR Family II; the preregistered Gmsh hierarchy is "
+                "archived) and never substitutes a mesh. The NASA 2DN00 Plot3D "
+                "grids are an optional supporting branch and are not run levels."
             )
         for key in ("chord_m", "u_inf", "rho", "nu", "span_m", "k_inf", "omega_inf"):
             value = getattr(self, key)

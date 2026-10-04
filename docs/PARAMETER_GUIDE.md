@@ -1,13 +1,19 @@
-# Parameter Guide for New Nozzle Requests
+# Parameter guide for new nozzle requests
+
+This page covers the nozzle family only. Forward-facing-step requests are
+interpreted into `src/pipeline/forward_step_2d/spec.py` (inlet Mach number, step
+height and step position; unstated fields are filled from family defaults) and
+screened by the 14-check scope gate in `src/reasoning/forward_step_scope_gate.py`;
+example requests are in `examples/forward_step_2d/`.
 
 The agent can parse nearby natural-language nozzle requests and translate them into the same parameterized CFD pipeline.
 
 Two different ideas must be kept separate:
 
-1. **Demonstrated transfer:** what has actually been exercised in the A/B/C campaign.
+1. **Demonstrated transfer:** what has actually been exercised in the nozzle Case A/B/C sessions.
 2. **Software scope gate:** hard bounds used to refuse obviously unsupported requests.
 
-Passing the software scope gate does not mean the entire range has been experimentally or numerically validated.
+Passing the software scope gate does not mean the entire range has been experimentally or numerically verified.
 
 ## Demonstrated neighborhood
 

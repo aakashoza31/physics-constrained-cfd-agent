@@ -15,7 +15,17 @@ Inputs (all under ../data, listed with SHA-256 in data/DATA_MANIFEST.json):
   frames/*.png                ParaView renders of native fields from the
                               field-evolution pipeline (fixed colour ranges,
                               camera recorded in the video manifests)
-  agent_stats.json            counts from scripts/scan_agent_sessions.py
+  agent_stats.json            model-call and proposal counts from
+                              scripts/recount_agent_calls.py (every call record
+                              in the session archive, deduplicated per run)
+
+Outputs (figures/, PDF and PNG): fig_mesh_nozzle and fig_mesh_step_cube (meshes),
+fig_nozzle_fields (nozzle Mach, p, T at 6 ms), fig_step_evolution (step Mach
+number at t = 0.5, 1, 2, 4), fig_agent_stats (model calls by stage, proposals and
+rulings), and fig_cube_wake (cube lateral velocity at t* = 20-80). fig_cube_wake is
+not used in the paper; it is kept because it is generated here.
+
+Usage:  python3 scripts/make_mesh_field_figures.py   (from paper/cfd_forge/)
 """
 from __future__ import annotations
 
@@ -245,6 +255,7 @@ def fig_step_evolution():
 
 
 def fig_cube_wake():
+    """Cube lateral-velocity frames at t* = 20, 40, 60, 80. Not used in the paper."""
     man = DATA / "frames/cube_video_manifest.json"
     fig = plt.figure(figsize=(W, 1.75))
     gs = fig.add_gridspec(2, 4, height_ratios=[1, 0.1], hspace=0.6, wspace=0.08)

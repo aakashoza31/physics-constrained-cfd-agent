@@ -1,5 +1,5 @@
 {
-  "run": "/tmp/claude-0/ra/live_run_01",
+  "run": "demo/forward_step_2d/live_run_01",
   "mode": "fetched_run_directory",
   "solver_executed": false,
   "cfd_fields_modified": false,
@@ -47,7 +47,7 @@
         "end_line_present": true,
         "partial_log_note": "Only excerpts of the solver log are present in this run directory. Normal termination is established independently by the executor record (return code 0, status COMPLETED) and by the terminating 'End' line: OpenFOAM writes End only after the time loop completes, and a FOAM FATAL ERROR aborts the process before it, so the two cannot coexist. For a scan over the complete log, reanalyse the runtime case directory with --case."
       },
-      "output": "/tmp/claude-0/ra/live_run_01/iteration_01/reanalysis"
+      "output": "demo/forward_step_2d/live_run_01/iteration_01/reanalysis"
     }
   ]
 }

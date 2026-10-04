@@ -1,3 +1,11 @@
+"""Deterministic action validator for the registered nozzle family.
+
+Checks whether a proposed ``AgentAction`` is consistent with the deterministic
+CFD evidence.  Approval here permits an action; it does not accept a result.
+For ACCEPT, the final decision belongs to the deterministic scientific
+validator (``src/pipeline/nozzle/validate.py``), which applies the registered
+checks, including the 0.1% mass-closure limit.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -59,6 +67,13 @@ def validate_agent_action(
         or evidence.boundaries.outlet_reverse_flow_detected is None
     )
 
+    # Action-level screen only: an ACCEPT proposal with a mass imbalance above
+    # 1.0% is refused here.  This 1.0% value is NOT the registered mass
+    # criterion.  Acceptance additionally requires the deterministic scientific
+    # validator, whose registered mass-closure limit is 0.1%.  The reason
+    # string below ("configured mass-conservation criterion") is kept verbatim
+    # because validator reasons are fed back to the model (history and repair
+    # packet) and appear in the archived records.
     conservation_pass = (
         evidence.conservation.mass_imbalance_percent is not None
         and evidence.conservation.mass_imbalance_percent <= 1.0

@@ -1,8 +1,8 @@
-# Manual OpenFOAM Foundation v14 nozzle reference
+# Canonical nozzle reference (OpenFOAM Foundation v14)
 
-This package constructs and verifies an axisymmetric, inviscid, calorically perfect-air solution of the canonical **conical** converging-diverging nozzle. It has no LLM, API, agent framework, Gmsh, or proprietary dependency. The original research repository is not modified.
+This package constructs and verifies an axisymmetric, inviscid, calorically perfect-air solution of the canonical **conical** converging-diverging nozzle. It has no LLM, API, agent framework, Gmsh, or proprietary dependency. The CFD Forge nozzle pipeline (`src/pipeline/nozzle/`) is a parameterized derivative of these scripts.
 
-The `results` directory contains the archived verification outputs. A reference campaign is accepted only when the deterministic study validator reports `FINAL_REFERENCE`.
+The `results` directory contains the archived verification outputs (per-case validation summaries, manifests and axial profiles, and the study summary `study.json`, whose status is `FINAL_REFERENCE`). A reference campaign is accepted only when the deterministic study validator reports `FINAL_REFERENCE`. The full raw-case archive is not in this repository. The JSON files are kept byte for byte as archived (UTF-8 with BOM, mixed line endings); read them with `encoding='utf-8-sig'`.
 
 ## One command
 
@@ -52,7 +52,7 @@ At the exit, p/T/U use `zeroGradient`; density boundary values follow the thermo
 
 `foamPostProcess` writes the actual mesh cell centres and volumes. `initialize.py` computes a quasi-1D state at every cell centre and writes explicit nonuniform p/T/U internal fields. A radial startup component approximately follows the conical wall slope. The field is only an initial guess: the solver subsequently changes it freely. No source term or repeated reinitialization maintains it.
 
-The initializer reads back all written values, verifies their count and numerical agreement, and requires the expected spatial pressure range. It writes `initialization_verified.json`. It does **not** use the obsolete `defaultFieldValues/regions/boxToCell/fieldValues` syntax that the archived v14 run silently ignored.
+The initializer reads back all written values, verifies their count and numerical agreement, and requires the expected spatial pressure range. It writes `initialization_verified.json`. It does **not** use the obsolete `defaultFieldValues/regions/boxToCell/fieldValues` syntax, which an earlier archived Foundation v14 run used and which v14 ignored without an error.
 
 ## Validation and stopping
 
@@ -101,6 +101,9 @@ Reported full-nozzle mass flows use the actual planar-wedge area correction `2*p
 - `Allrun`, `RunReference.ps1`: full one-command campaign.
 - `package.py`: complete field/log archive and SHA256 manifest.
 - `test_validation.py`: targeted parser, branch, and conservation regression checks.
+- `plot_results.py`: optional figures from a completed campaign directory (`python3 plot_results.py <campaign> <out_dir>`; needs Matplotlib). It writes `reference_profiles.png` (axial profiles on the four meshes against the quasi-1D comparison), `reference_fields.png` (pressure and Mach on the finest mesh at 6 ms) and `convergence.png` (boundary mass mismatch and exit pressure against time, with the acceptance window shaded).
+- `figures/`: committed renders of the three figures above for the archived campaign, plus `crash_replay.png`.
+  `crash_replay.png` is a replay of an archived earlier failed run: the temperature in one cell (cell 106) loses positivity at about 441.6 microseconds. `plot_results.py` draws it only when `audit_evidence/failure_replay.json` is present; that input is not shipped in this repository, so the committed figure cannot be regenerated from a clone.
 
 Revalidate an existing case without running CFD:
 
@@ -115,4 +118,4 @@ python3 test_validation.py
 
 `--study` compares existing validation summaries. `Allverify` first recomputes every case's checks from native fields, logs and monitors, then compares the refreshed summaries; it does not run CFD.
 
-The raw-case archive includes generated dictionaries, all saved fields, complete logs, per-step monitors, and validation reports. No new autonomous architecture is implemented here.
+The raw-case archive includes generated dictionaries, all saved fields, complete logs, per-step monitors, and validation reports.

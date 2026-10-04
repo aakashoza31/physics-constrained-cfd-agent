@@ -1,3 +1,11 @@
+"""Legacy (CAD->Gmsh prototype, see paper Appendix C 'Prototype'); not used by the registered families.
+
+Not part of the CFD Forge paper's registered nozzle or forward-step runs; kept
+for reference.  Plans a CAD nozzle geometry case with Gemini.
+The model identifier is read at request time from
+``src.agents.llm_provenance.gemini_model_name()``.  The deterministic fallback
+is opt-in (``allow_fallback=False`` by default).
+"""
 from __future__ import annotations
 
 import json
@@ -9,9 +17,10 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
+from src.agents.llm_provenance import gemini_model_name
+
 from src.cad.nozzle_generator import NozzleSpec
 
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
 NozzleFamily = Literal[
     "conical",
@@ -175,7 +184,7 @@ def plan_nozzle_case(
     user_prompt: str,
     requested_family: str,
     case_name: str,
-    allow_fallback: bool = True,
+    allow_fallback: bool = False,
 ) -> tuple[NozzleCasePlan, str]:
     if requested_family not in {
         "auto",
@@ -212,7 +221,7 @@ USER REQUEST:
 
     try:
         response = client.models.generate_content(
-            model=MODEL_NAME,
+            model=gemini_model_name(),
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
@@ -268,7 +277,7 @@ def save_plan(
 ) -> None:
     payload = {
         "planner_source": source,
-        "model": MODEL_NAME if source == "gemini" else None,
+        "model": gemini_model_name() if source == "gemini" else None,
         "plan": plan.model_dump(),
     }
 

@@ -1,9 +1,36 @@
+"""Theory-blind Gemini diagnosis for the registered nozzle family.
+
+``diagnose_theory_blind`` builds the theory-blind reasoning packet
+(``src/reasoning/evidence_packet.py``), asks Gemini for one structured
+``AgentDecision`` at temperature 0, and runs the deterministic action
+validator on the proposal.  The model proposes; the validator decides.
+
+Repair call.  With ``allow_one_repair_attempt=True`` (the default), a proposal
+that the action validator refuses triggers exactly one further model call on
+the same packet, extended with the refused decision, the validator reasons and
+an instruction to reconsider the same measurements.  The second decision and
+its validation are returned.  So that this second call is auditable, the
+optional ``audit`` dict passed by the caller is filled with ``attempts``
+(1 or 2), the ``model`` identifier used, the response ``model_version`` when
+the SDK reports one, and, when the repair path ran, ``refused_first_decision``
+(the first decision and its validator reasons).
+``src/reasoning/nozzle_diagnosis.py`` copies these into the ``LLMCallRecord``
+(``attempts=2`` and ``refused_first_decision``); its latency is the total over
+both calls.  The archived nozzle record for N4 iteration 2 predates this
+change: its repair call happened but was not recorded (``attempts=1``, no first
+decision), as disclosed in the paper.
+
+The model identifier is read at request time from
+``llm_provenance.gemini_model_name()`` (``GEMINI_MODEL`` or the shared
+default).  Every packet sent to the model, including the history and the
+repair packet, passes ``assert_theory_blind_payload``.
+"""
 from __future__ import annotations
 
 import json
 import os
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -32,18 +59,23 @@ from src.reasoning.action_validator import (
 )
 
 from src.reasoning.evidence_packet import (
+    assert_theory_blind_payload,
     build_reasoning_packet,
 )
 
-
-MODEL_NAME = os.getenv(
-    "GEMINI_MODEL",
-    "gemini-3.6-flash",
+from src.agents.llm_provenance import (
+    gemini_model_name,
 )
 
-POLICY_PATH = Path(
-    "configs/cfd_reasoning_policy_v2.yaml"
-)
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+# Repository-relative policy path; this string is what the packet records.
+POLICY_PATH_RELATIVE = "configs/cfd_reasoning_policy_v2.yaml"
+
+# Resolved against the repository root so the agent does not depend on the
+# current working directory.
+POLICY_PATH = _REPO_ROOT / POLICY_PATH_RELATIVE
 
 
 class HypothesisSchema(BaseModel):
@@ -99,6 +131,13 @@ def _system_instruction(
     policy_text: str,
 ) -> str:
 
+    # Known inaccuracy, kept unchanged so that model behaviour stays
+    # comparable with the archived runs: rule 10 says the proposed action is
+    # "verified by another CFD calculation".  In the implemented loop the
+    # action is checked by the deterministic action validator and, after any
+    # executed action, by the deterministic scientific validator; no separate
+    # verification calculation is run.  Reword this rule in a future,
+    # separately versioned prompt.
     return f"""
 You are the CFD reasoning component of a physics-constrained
 autonomous scientific-simulation agent.
@@ -250,17 +289,30 @@ def diagnose_theory_blind(
     *,
     history: Optional[List[dict[str, Any]]] = None,
     allow_one_repair_attempt: bool = True,
+    audit: Optional[Dict[str, Any]] = None,
 ) -> tuple[
     AgentDecision,
     ActionValidationResult,
 ]:
+    """Return the (possibly repaired) decision and its action validation.
+
+    If ``audit`` is a dict it is filled in place with ``attempts``,
+    ``model``, ``model_version`` (when reported by the SDK) and, when the
+    repair call ran, ``refused_first_decision``; see the module docstring.
+    """
+
+    if audit is None:
+        audit = {}
+
+    model_name = gemini_model_name()
+
+    audit["model"] = model_name
+    audit["attempts"] = 0
 
     packet = build_reasoning_packet(
         problem,
         evidence,
-        policy_path=str(
-            POLICY_PATH
-        ),
+        policy_path=POLICY_PATH_RELATIVE,
     )
 
     if history:
@@ -314,9 +366,19 @@ def diagnose_theory_blind(
         ],
     ) -> TheoryBlindDecisionSchema:
 
+        # Fail closed if any reference-bearing key reached the final packet
+        # (history and repair fields included).
+        assert_theory_blind_payload(
+            active_packet
+        )
+
+        audit["attempts"] = (
+            int(audit.get("attempts", 0)) + 1
+        )
+
         response = (
             client.models.generate_content(
-                model=MODEL_NAME,
+                model=model_name,
 
                 contents=json.dumps(
                     active_packet,
@@ -342,6 +404,17 @@ def diagnose_theory_blind(
                 ),
             )
         )
+
+        model_version = getattr(
+            response,
+            "model_version",
+            None,
+        )
+
+        if model_version:
+            audit["model_version"] = str(
+                model_version
+            )
 
         if not response.text:
             raise RuntimeError(
@@ -378,6 +451,14 @@ def diagnose_theory_blind(
             decision,
             validation,
         )
+
+    audit["refused_first_decision"] = {
+        "decision": decision.to_dict(),
+        "validator_approved": validation.approved,
+        "validator_reasons": list(
+            validation.reasons
+        ),
+    }
 
     repair_packet = dict(
         packet

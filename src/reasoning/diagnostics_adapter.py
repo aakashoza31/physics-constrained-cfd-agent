@@ -1,4 +1,18 @@
-﻿from __future__ import annotations
+"""Legacy: adapter from raw prototype diagnostics to ``CFDEvidence`` (unused).
+
+Not part of the CFD Forge paper; not imported by the registered families'
+runners (``scripts/run_nozzle_feedback.py``, ``scripts/run_nozzle_e2e.py``,
+``scripts/run_forward_step_2d.py``) or by ``src/pipeline``.  Kept for
+reference only.
+
+``adapt_raw_diagnostics`` converts the nested diagnostics dictionary produced
+by the earlier CAD->Gmsh prototype stack (solver health, extrema, throat
+features, stationarity, mesh context and image paths) into the
+``src.contracts.cfd_evidence.CFDEvidence`` contract.  The registered nozzle
+family builds its evidence with ``src/reasoning/reference_evidence_adapter.py``
+and ``src/pipeline/nozzle/feedback_diagnostics.py`` instead.
+"""
+from __future__ import annotations
 
 from typing import Any, Dict, Optional
 

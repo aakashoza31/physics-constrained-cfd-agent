@@ -1,9 +1,23 @@
-# Live end-to-end run
+# Live end-to-end run (Mach 2.5, h=0.15)
 
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `live_run` &nbsp;|&nbsp;
 **Original id:** `live_run_01` &nbsp;|&nbsp; **Archived verdict:** `REJECT`
 
-A live execution that ended in a safe stop.
+First live forward-step session (paper ledger S1): Mach 2.5, h=0.15. It was stopped by a false-positive fatal-error check; the archived decision is `REJECT`, and a corrected deterministic reanalysis returns `PASS_2D_FORWARD_STEP`.
+
+## Known validator defect
+
+The archived session stopped on the `no_fatal_error` check, and that check was a
+false positive: the fatal-error scan matched the `FOAM_SIGFPE` start-up banner
+that OpenFOAM prints at every launch, not a runtime failure. The model proposed
+`FAIL_SAFELY`, the validator returned `FAIL`, and the archived decision is
+`REJECT`. That record is kept unchanged here and in `expected_result.json`.
+
+After the scan was corrected, a deterministic reanalysis of the same run
+directory (no solver re-run, no fields modified) returns `PASS_2D_FORWARD_STEP`.
+The reanalysis record is in this repository under
+[`demo/forward_step_2d/live_run_01/`](../../../demo/forward_step_2d/live_run_01/)
+(`REANALYSIS.json`, `iteration_01/reanalysis/`).
 
 ## Reproduce
 
@@ -17,8 +31,9 @@ A live execution that ended in a safe stop.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/live_run_01` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/live_run_01`; they are not in this repository.
 
 ## Archived outcome
 
@@ -35,6 +50,9 @@ deterministic decision from it. It never claims a solver was executed.
   "solver_invoked_in_archive": true
 }
 ```
+
+The `message` field is the archived session's summary, written by the language
+model (its `reasoning_summary`); it is not a deterministic measurement.
 
 `expected_result.json` holds the same record in machine-readable form; a replay
 that disagrees with it is a regression, not a new result.

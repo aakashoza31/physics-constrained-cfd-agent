@@ -174,6 +174,9 @@ Rules:
 """
 
 
+OBSERVER_PROVENANCE_KEYS = ("model", "model_version")
+
+
 def _strip(obj: Any) -> Any:
     """Recursively drop reference/answer keys."""
     if isinstance(obj, dict):
@@ -310,7 +313,16 @@ def build_evidence_payload(
     if images:
         payload["images_supplied"] = sorted(images)
     if visual_observation:
-        payload["visual_observation"] = _strip(visual_observation)
+        # The observer's provenance fields (model identifier and version) are
+        # recorded in visual_observation.json but are not diagnostic evidence,
+        # so they are not forwarded into the diagnosis payload.
+        payload["visual_observation"] = _strip(
+            {
+                k: v
+                for k, v in visual_observation.items()
+                if k not in OBSERVER_PROVENANCE_KEYS
+            }
+        )
 
     # Fail closed: refuse to hand over anything carrying a reference answer.
     text = json.dumps(payload)

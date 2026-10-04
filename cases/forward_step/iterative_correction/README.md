@@ -1,9 +1,9 @@
-# Bounded correction loop
+# Correction loop completed in supervised resumed sessions
 
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `iterative_correction` &nbsp;|&nbsp;
 **Original id:** `case_H_iterative_short_run` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Accepted after several bounded corrective iterations.
+Mach 3, h=0.2, staged horizon to t=4 (paper ledger S7). Seven proposals, two of them refused (`CONTINUE_RUN` after the requested horizon was reached; a further `EXTEND_END_TIME` after the iteration budget was exhausted), over four supervised resumed sessions. The run was accepted (`PASS_2D_FORWARD_STEP` -> `ACCEPT`) after the restart-seam treatment in the mass-closure diagnostic was corrected, so this acceptance is not an unattended result.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Accepted after several bounded corrective iterations.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/case_H_iterative_short_run` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_H_iterative_short_run`; they are not in this repository.
 
 ## Archived outcome
 

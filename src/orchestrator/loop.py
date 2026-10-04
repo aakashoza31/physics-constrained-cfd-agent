@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""The one orchestrator. Every family and every experiment mode runs through it.
+"""The shared orchestrator: the decision core every registered family uses.
+
+The paper's controller comparison calls decide_once for arms A, B and B'
+(paper/cfd_forge/scripts/controller_comparison.py); its arm C is implemented
+in that script. The agent sessions reported in the paper ran through the
+family runners (scripts/run_nozzle_feedback.py, scripts/run_nozzle_e2e.py,
+scripts/run_forward_step_2d.py), not through run_loop.
 
 Two entry points, deliberately separated:
 

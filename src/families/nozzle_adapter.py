@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Nozzle (Family 1) adapter.
+"""Nozzle family adapter.
 
 DECISION-LEVEL PARITY IS WIRED. build_case / run_case are NOT.
 
-Everything below delegates to Family 1's own reasoning stack:
+Everything below delegates to the nozzle family's own reasoning stack:
 ``nozzle_diagnosis.diagnose`` for the LLM path, ``_deterministic_decision`` for
 the recipe path, ``build_evidence_from_validation`` for the theory-blind
 evidence packet, and ``action_validator.validate_agent_action`` for the action
@@ -14,21 +14,19 @@ document through the shared decision loop without launching CFD. Case
 construction and execution remain unwired, because they are not pure
 delegation: they live inline in scripts/run_nozzle_feedback.py
 (_mesh_new_case / _run_solver / _continue_case) mixed with WSL transport and
-iteration bookkeeping, and lifting them would mean rewriting Family 1's
+iteration bookkeeping, and lifting them would mean rewriting the nozzle family's
 execution path rather than delegating to it.
 
-STATUS IN THIS CLOUD WORKING COPY: UNVERIFIED.
+Nozzle case construction and execution run through
+scripts/run_nozzle_feedback.py (and scripts/run_nozzle_e2e.py for campaigns);
+they are not wired into this shared adapter, whose build_case / run_case /
+collect_evidence therefore raise NotImplementedError naming that script. Every
+import is lazy and every delegation target is named explicitly, so this file
+either works or fails with a precise message rather than silently doing
+something else.
 
-This container's copy of the repo is missing the nozzle family's own modules --
-src/pipeline/nozzle/spec.py, feedback.py, feedback_diagnostics.py,
-scripts/run_nozzle_e2e.py and src/agents/nozzle_demo_agents.py are all absent,
-so nothing below could be executed or parity-tested here. Every import is
-therefore lazy and every delegation target is named explicitly, so that on the
-full repo this file either works or fails with a precise message rather than
-silently doing something else.
-
-``self_check()`` reports exactly which delegation targets resolve. Run it first
-on the real repo; nozzle parity is meaningless until it returns ok=True.
+``self_check()`` reports exactly which delegation targets resolve; nozzle
+parity is meaningful only when it returns ok=True.
 
 As with the forward-step adapter, no CFD is reimplemented here and the frozen
 nozzle recipe is not touched.
@@ -114,7 +112,7 @@ RECIPE = FamilyRecipe(
     physics="compressible_euler",
     reference=(
         "quasi-1D isentropic compressible-flow theory for a converging-diverging "
-        "nozzle; frozen canonical case validated analytically"
+        "nozzle; frozen canonical case checked by registered quasi-1D consistency checks"
     ),
     numerics={
         "gas": "calorically perfect air",
@@ -138,7 +136,7 @@ RECIPE = FamilyRecipe(
     allowed_actions=tuple(a.value for a in _agent_actions()),
     region_vocabulary=(),
     notes=(
-        "Frozen scientific recipe. Adapter unverified in this working copy; see "
+        "Frozen scientific recipe. Delegation targets are reported by "
         "self_check(). REFINE_REGION is deliberately not offered for this family "
         "until a region vocabulary is registered for it."
     ),
@@ -180,8 +178,8 @@ class NozzleAdapter:
             "missing": missing,
             "replay_missing": replay_missing,
             "note": (
-                "adapter is UNVERIFIED while any target is missing; do not run "
-                "nozzle parity until ok is True"
+                "the adapter is incomplete while any target is missing; do "
+                "not run nozzle parity until ok is True"
             ),
         }
 
@@ -203,7 +201,7 @@ class NozzleAdapter:
             raise RuntimeError(
                 "nozzle adapter cannot run: missing delegation targets "
                 + ", ".join(missing)
-                + ". This working copy of the repo is incomplete for Family 1."
+                + ". The nozzle family's modules are incomplete in this tree."
             )
 
     # -- request handling ------------------------------------------------
@@ -271,7 +269,7 @@ class NozzleAdapter:
     def load_evidence(self, path: Path) -> Dict[str, Any]:
         """Rebuild shared-shape evidence from an archived iteration directory.
 
-        Reads only the documents Family 1 already wrote. No solver, no WSL, no
+        Reads only the documents the nozzle family already wrote. No solver, no WSL, no
         CFD. This is what makes decision-level parity possible.
         """
         import json
@@ -320,22 +318,23 @@ class NozzleAdapter:
     # -- case lifecycle --------------------------------------------------
     def build_case(self, spec: Any, destination: Path) -> Path:
         raise NotImplementedError(
-            "nozzle case construction lives in scripts/run_nozzle_feedback.py "
-            "(_mesh_new_case) and src/pipeline/nozzle/feedback.py, neither of "
-            "which is present in this working copy. Wire this on the real repo; "
-            "do not reimplement the mesh here."
+            "nozzle case construction runs through scripts/run_nozzle_feedback.py "
+            "(_mesh_new_case) and is not wired into the shared adapter; use "
+            "that script. The mesh is not reimplemented here."
         )
 
     def run_case(self, case: Path, *, append: bool = False) -> int:
         raise NotImplementedError(
-            "nozzle execution lives in scripts/run_nozzle_feedback.py "
-            "(_run_solver / _continue_case). Wire on the real repo."
+            "nozzle execution runs through scripts/run_nozzle_feedback.py "
+            "(_run_solver / _continue_case) and is not wired into the shared "
+            "adapter; use that script."
         )
 
     def collect_evidence(self, case: Path, out: Path) -> Dict[str, Any]:
         raise NotImplementedError(
-            "nozzle evidence acquisition lives in scripts/run_nozzle_feedback.py "
-            "(_acquire_feedback_evidence). Wire on the real repo."
+            "nozzle evidence acquisition runs through "
+            "scripts/run_nozzle_feedback.py (_acquire_feedback_evidence) and is "
+            "not wired into the shared adapter; use that script."
         )
 
     @staticmethod
@@ -423,7 +422,7 @@ class NozzleAdapter:
 
     # -- reasoning -------------------------------------------------------
     def diagnose(self, evidence: Dict[str, Any], spec: Any) -> Tuple[Proposal, Dict[str, Any]]:
-        """Family 1's real diagnosis API: diagnose(problem, evidence, ...)."""
+        """the nozzle family's real diagnosis API: diagnose(problem, evidence, ...)."""
         self._require("spec", "diagnose", *self.REPLAY_TARGETS)
         problem = self.to_problem_spec(spec)
         cfd_evidence = self.to_cfd_evidence(evidence)
@@ -431,7 +430,7 @@ class NozzleAdapter:
         return self._to_proposal(decision, gate), _record_dict(record)
 
     def deterministic_proposal(self, evidence: Dict[str, Any], spec: Any) -> Proposal:
-        """Delegate to Family 1's own deterministic reasoning function.
+        """Delegate to the nozzle family's own deterministic reasoning function.
 
         The recipe-baseline and no-diagnosis modes therefore preserve the
         existing Family-1 classification exactly, instead of a second
@@ -474,7 +473,7 @@ class NozzleAdapter:
     def execute_action(self, action: str, spec: Any, evidence: Dict[str, Any],
                        *, proposal: Optional[Proposal] = None,
                        **kw: Any) -> ActionRuling:
-        """Delegate to Family 1's own action validator.
+        """Delegate to the nozzle family's own action validator.
 
         Its real signature is validate_agent_action(evidence, decision), so the
         AgentDecision is reconstructed and handed over intact. This adapter does
@@ -510,7 +509,7 @@ class NozzleAdapter:
         """The AgentDecision to rule on.
 
         Prefers the ORIGINAL decision preserved in Proposal.raw, so the gate
-        sees exactly what the family produced. Falls back to Family 1's own
+        sees exactly what the family produced. Falls back to the nozzle family's own
         deterministic decision, and only rebuilds a minimal decision when the
         caller asked about a different action than the one proposed.
         """
@@ -571,7 +570,7 @@ class NozzleAdapter:
         """Family-1 semantics, not a status-string rule.
 
         A validator FAIL whose cause is incomplete convergence is a CORRECTION,
-        not a rejection: that is the behaviour Family 1 already had
+        not a rejection: that is the behaviour the nozzle family already had
         (UNCONVERGED -> CONTINUE_RUN) and mapping every FAIL to REJECT would
         destroy it.
         """

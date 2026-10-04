@@ -1,13 +1,39 @@
 #!/usr/bin/env python3
-"""Regenerate cases/ from the archived evidence that already exists.
+"""Regenerate the evidence-derived records in cases/ from the archived sessions.
 
-Every field written here is READ from the archived run, never invented: the
-status a case carries is the status its own evidence records. Re-running this
-script on unchanged evidence produces unchanged files, so `cases/` is a
-reviewable index of the campaign rather than a hand-maintained story.
+The archived session records are not in this repository: they are distributed
+in the Zenodo archive (DOI to be added on release), whose top level holds
+`demo/...` (the agent sessions) and `CFD_Verification_Package_20260929/...`
+(the verification package, including the cube run). Each catalogue entry below
+names its evidence by that archive-relative path; pass the directory where the
+archive is unpacked with --archive-root.
 
-    python3 scripts/build_case_library.py            # write cases/
-    python3 scripts/build_case_library.py --check    # fail if out of date
+What is read and what is fixed here:
+
+* nozzle and forward-step outcomes (verdict, archived status, failed checks,
+  iterations, message) are read from the archived session records
+  (acceptance.json / agent_decision.json, agent_result.json /
+  iteration_*/validation.json). The verdict is the four-way decision of the
+  paper (Sec. 2.2): a refused or unexecuted needed action maps to
+  INCONCLUSIVE, never to REJECT.
+* the cube outcome re-runs the registered stationarity gate on the committed
+  force history (cases/cube/drifting_wake/reference/force_history.json); the
+  verdict, archived status and gate registration date are fixed by this script,
+  because the gate was registered retrospectively and the archived run itself
+  carries no agent decision.
+* the airfoil outcome is read from the committed corrected diagnosis
+  (cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json); its
+  verdict and status are fixed here. This family is not part of the CFD Forge
+  paper.
+
+The builder refuses to write if any required evidence root is missing, so a
+clone without the archive cannot rewrite archived verdicts. It (re)writes
+expected_result.json; the narrative files of an existing case (README.md,
+case.yaml, reference/README.md) are curated and are only created when absent,
+or rewritten with --rewrite-narrative.
+
+    python3 scripts/build_case_library.py --archive-root /path/to/archive
+    python3 scripts/build_case_library.py --archive-root /path/to/archive --check
 """
 from __future__ import annotations
 
@@ -23,14 +49,16 @@ if str(_ROOT) not in sys.path:
 
 BUILDER_VERSION = "case-library/1.0.0"
 
-#: family -> case_id -> (original_id, evidence_root, title, purpose)
+#: family -> case_id -> metadata. "evidence" is relative to the archive root;
+#: "archived": False marks an entry whose outcome is derived only from files
+#: committed in this repository (its evidence root is then not required).
 CATALOGUE: Dict[str, Dict[str, Dict[str, Any]]] = {
     "nozzle": {
         "canonical_reference": {
             "original_id": "case_A_reference",
             "evidence": "demo/nozzle_e2e/case_A_reference",
             "title": "Canonical converging-diverging nozzle",
-            "purpose": "the validated reference case for F1",
+            "purpose": "the canonical reference case of the nozzle family",
             "config": "configs/nozzles/case_A_reference.yaml",
             "campaigns": ["demo/nozzle_feedback/case_A_reference",
                           "demo/nozzle_feedback_v2/case_A_reference",
@@ -61,7 +89,7 @@ CATALOGUE: Dict[str, Dict[str, Dict[str, Any]]] = {
             "original_id": "case_B_mach20",
             "evidence": "demo/forward_step_2d/case_B_mach20",
             "title": "Forward-facing step at Mach 2.0",
-            "purpose": "accepted reference run of the F2 family",
+            "purpose": "accepted canonical run of the 2-D forward-step family",
         },
         "mach35_variation": {
             "original_id": "case_C_mach35",
@@ -78,55 +106,65 @@ CATALOGUE: Dict[str, Dict[str, Dict[str, Any]]] = {
         "step_height_030_x060": {
             "original_id": "case_F_step030",
             "evidence": "demo/forward_step_2d/case_F_step030",
-            "title": "Step height 0.30, short horizon",
-            "purpose": ("the INADMISSIBLE variation: the run stopped safely "
-                        "instead of being accepted"),
+            "title": "Step height 0.30, step at x=0.6",
+            "purpose": ("the compression front was displaced toward the inlet "
+                        "and could not be measured; the run stopped safely "
+                        "and was rejected"),
         },
         "step_height_030_x100": {
             "original_id": "case_G_step030_x100",
             "evidence": "demo/forward_step_2d/case_G_step030_x100",
-            "title": "Step height 0.30, extended horizon",
-            "purpose": "accepted after the horizon was extended",
+            "title": "Step height 0.30, step at x=1.0",
+            "purpose": ("accepted; a separate request with a different step "
+                        "position, not a continuation of step_height_030_x060"),
         },
         "iterative_correction": {
             "original_id": "case_H_iterative_short_run",
             "evidence": "demo/forward_step_2d/case_H_iterative_short_run",
-            "title": "Bounded correction loop",
-            "purpose": "accepted after several bounded corrective iterations",
+            "title": "Correction loop completed in supervised resumed sessions",
+            "purpose": ("accepted after seven proposals over four supervised "
+                        "resumed sessions; not an unattended result"),
         },
         "mesh_sensitivity": {
             "original_id": "case_I_mesh_sensitivity",
             "evidence": "demo/forward_step_2d/case_I_mesh_sensitivity",
             "title": "Mesh-sensitivity study",
-            "purpose": ("mesh-sensitivity evidence; the loop stopped when a "
-                        "proposed action was refused"),
+            "purpose": ("REFINE_MESH was approved; ACCEPT was refused because no "
+                        "cross-grid tolerance is registered, so the decision "
+                        "is INCONCLUSIVE"),
         },
         "live_run": {
             "original_id": "live_run_01",
             "evidence": "demo/forward_step_2d/live_run_01",
-            "title": "Live end-to-end run",
-            "purpose": "a live execution that ended in a safe stop",
+            "title": "Live end-to-end run (Mach 2.5, h=0.15)",
+            "purpose": ("stopped by a false-positive fatal-error check; the "
+                        "archived decision is REJECT, and a corrected "
+                        "deterministic reanalysis returns PASS_2D_FORWARD_STEP"),
         },
     },
     "cube": {
         "drifting_wake": {
             "original_id": "family3_baseline_compact",
-            "evidence": ("handoff/CFD_Agent_Handoff_20260924_1610/"
-                         "family3_baseline_compact"),
+            "evidence": "CFD_Verification_Package_20260929/03_cube",
+            "original_path": ("handoff/CFD_Agent_Handoff_20260924_1610/"
+                              "family3_baseline_compact"),
             "title": "Surface-mounted cube with a drifting lateral wake",
-            "purpose": ("F3 headline demonstration: a 3-D turbulent run that "
-                        "executed, looked healthy, and was REJECTED on "
-                        "stationarity / development"),
+            "purpose": ("diagnostic study of a 3-D URANS (k-omega SST) "
+                        "surface-mounted cube, run outside the agent loop; the "
+                        "retrospectively registered stationarity gate returns "
+                        "STILL_DEVELOPING, so the decision is REJECT"),
         },
     },
     "airfoil": {
         "mesh_rejection": {
             "original_id": "naca0012_2DN00",
             "evidence": "outputs/airfoil_mesh",
-            "title": "NACA0012 mesh rejection (supplementary)",
-            "purpose": ("S1 supplementary: the NASA Family II grids fail the "
-                        "frozen in-plane stretching contract by three to four "
-                        "orders of magnitude, so CFD was never run"),
+            "archived": False,
+            "title": "NACA0012 mesh rejection",
+            "purpose": ("not part of the CFD Forge paper; the NASA Family II "
+                        "grids exceed this project's frozen in-plane "
+                        "stretching limit on all three levels, so CFD was not "
+                        "run"),
         },
     },
 }
@@ -154,12 +192,30 @@ def _nozzle_outcome(root: Path) -> Dict[str, Any]:
     }
 
 
+#: Archived step-session statuses recording a refused needed action or an
+#: approved action that was not executed. Per the paper's four decisions
+#: (Sec. 2.2) these are INCONCLUSIVE, never REJECT.
+_INCONCLUSIVE_STATUSES = frozenset({
+    "STOPPED_ACTION_REFUSED",
+    "STOPPED_REFINEMENT_REFUSED",
+    "STOPPED_REBUILD_REQUIRED",
+})
+
+
+def _verdict_for_status(status: Optional[str]) -> str:
+    if status == "ACCEPTED":
+        return "ACCEPT"
+    if status in _INCONCLUSIVE_STATUSES or str(status).startswith("UNEXECUTED_ACTION"):
+        return "INCONCLUSIVE"
+    return "REJECT"
+
+
 def _forward_step_outcome(root: Path) -> Dict[str, Any]:
     result = _read_json(root / "agent_result.json") or {}
     status = result.get("status")
     iterations = sorted(p.name for p in root.glob("iteration_*"))
     last = _read_json(root / iterations[-1] / "validation.json") if iterations else None
-    verdict = {"ACCEPTED": "ACCEPT"}.get(status, "REJECT")
+    verdict = _verdict_for_status(status)
     return {
         "verdict": verdict,
         "archived_status": status,
@@ -171,15 +227,27 @@ def _forward_step_outcome(root: Path) -> Dict[str, Any]:
     }
 
 
+#: Date the cube stationarity gate was registered (retrospectively, after the
+#: archived run of 2026-09-23/24). Fixed here, not read from the archive.
+CUBE_GATE_REGISTERED_ON = "2026-09-28"
+
+
 def _cube_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
-    from src.families.cube.stationarity import assess
+    """Re-run the registered gate on the committed force history.
+
+    The verdict and archived status are fixed here: the cube was run outside
+    the agent loop, so the archive holds no agent decision to read.
+    """
+    from src.families.cube import stationarity
 
     history = _read_json(case_dir / "reference" / "force_history.json") or {}
     samples = history.get("samples", [])
-    result = assess(samples).to_dict() if samples else {}
+    result = stationarity.assess(samples).to_dict() if samples else {}
     return {
         "verdict": "REJECT",
-        "archived_status": "RUNTIME_REJECTED",
+        "archived_status": "RETROSPECTIVE_GATE_STILL_DEVELOPING",
+        "gate_version": stationarity.GATE_VERSION,
+        "gate_registered_on": CUBE_GATE_REGISTERED_ON,
         "rejected_on": result.get("status"),
         "failed_checks": result.get("failures", []),
         "stationarity": result,
@@ -191,6 +259,9 @@ def _cube_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
 
 def _airfoil_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
     """Read the CORRECTED diagnosis, never the superseded raw reports.
+
+    Not part of the CFD Forge paper. The verdict and status are fixed here; the
+    failed checks and metrics are read from the committed corrected diagnosis.
 
     The raw qualification reports under outputs/airfoil_mesh/ contain converter
     and diagnostic defects (handedness, vertex permutation, the wrong face
@@ -231,15 +302,41 @@ def _airfoil_outcome(root: Path, case_dir: Path) -> Dict[str, Any]:
     }
 
 
-def build(root: Path, *, check: bool) -> List[str]:
-    from src.families import capabilities as caps
+class ArchiveMissing(RuntimeError):
+    """A required evidence root is not present under the archive root."""
+
+
+#: Files of a case that are curated by hand once they exist.
+NARRATIVE_FILES = ("reference/README.md", "case.yaml", "README.md",
+                   "reproduce.sh", "reproduce.ps1")
+
+
+def missing_evidence(archive_root: Path) -> List[str]:
+    """Archive-relative evidence roots that are required but absent."""
+    return [meta["evidence"]
+            for cases in CATALOGUE.values() for meta in cases.values()
+            if meta.get("archived", True)
+            and not (archive_root / meta["evidence"]).exists()]
+
+
+def build(root: Path, *, check: bool, archive_root: Optional[Path] = None,
+          rewrite_narrative: bool = False) -> List[str]:
+    """Return the case files that differ from the evidence (written unless check).
+
+    Raises ArchiveMissing, before anything is written, if any required evidence
+    root is absent under archive_root.
+    """
+    archive_root = archive_root or root
+    missing = missing_evidence(archive_root)
+    if missing:
+        raise ArchiveMissing(
+            f"archive missing under {archive_root}: " + ", ".join(missing))
 
     changed: List[str] = []
     for family, cases in CATALOGUE.items():
-        capability = caps.TABLE.get(family) or caps.TABLE.get("forward_step_2d")
         for case_id, meta in cases.items():
             case_dir = root / "cases" / family / case_id
-            evidence_root = root / meta["evidence"]
+            evidence_root = archive_root / meta["evidence"]
             if family == "nozzle":
                 outcome = _nozzle_outcome(evidence_root)
             elif family == "forward_step":
@@ -256,7 +353,7 @@ def build(root: Path, *, check: bool) -> List[str]:
                 "title": meta["title"],
                 "purpose": meta["purpose"],
                 "evidence_root": meta["evidence"],
-                "evidence_present": evidence_root.exists(),
+                "evidence_present": (root / meta["evidence"]).exists(),
                 "config": meta.get("config"),
                 "related_campaigns": meta.get("campaigns", []),
                 "solver": "OpenFOAM Foundation v14",
@@ -271,12 +368,9 @@ def build(root: Path, *, check: bool) -> List[str]:
                 "note": ("this is the result the archived evidence records; a "
                          "replay that disagrees with it is a regression"),
             }
-            case_dir.mkdir(parents=True, exist_ok=True)
-            reference = case_dir / "reference"
-            reference.mkdir(exist_ok=True)
 
             payloads = {
-                "reference/README.md": _reference_readme(family, case_id, meta),
+                "reference/README.md": _reference_readme(root, family, case_id, meta),
                 "case.yaml": _as_yaml(case_yaml),
                 "expected_result.json": json.dumps(expected, indent=2) + "\n",
                 "README.md": _readme(family, case_id, meta, outcome),
@@ -285,10 +379,14 @@ def build(root: Path, *, check: bool) -> List[str]:
             }
             for name, text in payloads.items():
                 path = case_dir / name
-                if path.exists() and path.read_text(encoding="utf-8") == text:
-                    continue
+                if path.exists():
+                    if name in NARRATIVE_FILES and not rewrite_narrative:
+                        continue
+                    if path.read_text(encoding="utf-8") == text:
+                        continue
                 changed.append(str(path.relative_to(root)))
                 if not check:
+                    path.parent.mkdir(parents=True, exist_ok=True)
                     path.write_text(text, encoding="utf-8")
                     if name.endswith(".sh"):
                         path.chmod(0o755)
@@ -343,8 +441,9 @@ def _readme(family: str, case_id: str, meta: Dict[str, Any],
 .\\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `{meta['evidence']}` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. {_archive_sentence(meta)}
 
 ## Archived outcome
 
@@ -358,7 +457,11 @@ that disagrees with it is a regression, not a new result.
 
 
 def _extra(family: str) -> str:
-    """Family-specific footnote appended to the generated README."""
+    """Family-specific footnote appended to the generated README.
+
+    Fixed text: the values are transcribed from reference/corrected_diagnosis.json
+    and the archived checkMesh logs, not read at build time.
+    """
     if family != "airfoil":
         return ""
     return """
@@ -366,10 +469,11 @@ def _extra(family: str) -> str:
 
 The authoritative record is `reference/corrected_diagnosis.json`, backed by
 `reference/independent_cell_geometry_audit.json`. The raw qualification reports
-under `outputs/airfoil_mesh/` are **superseded historical evidence** and carry a
-`SUPERSEDED.txt` banner.
+under `outputs/airfoil_mesh/` (not distributed) are superseded historical evidence
+and carry a `SUPERSEDED.txt` banner.
 
-**Defects that were ours, not NASA's.** The coordinate transform
+**Converter and checker defects in this project's pipeline (not properties of the
+NASA grids).** The coordinate transform
 `(x,y,z)_NASA -> (x,z,y)_OpenFOAM` reverses handedness; the corrected local
 permutation for the archived NASA ordering is `P = (3, 7, 6, 2, 0, 4, 5, 1)`;
 and the old in-plane checker used `cell[:4]`, which selects a side face rather
@@ -378,7 +482,7 @@ and orienting it correctly, all three levels show **0** nonpositive in-plane
 areas, **0** nonpositive bilinear corner Jacobians, and span-plane coordinates
 that match exactly.
 
-**Foundation-v14 checkMesh, the actual archived numbers.** The old Python
+**Foundation-v14 checkMesh, archived values.** The old Python
 skewness metric is not Foundation-v14 skewness and must not be quoted as such.
 
 | Level | non-orthogonality (≤65°) | skewness (≤2) | min weight (≥0.10) | min face-volume ratio (≥0.10) |
@@ -387,7 +491,10 @@ skewness metric is not Foundation-v14 skewness and must not be quoted as such.
 | medium | 57.8856 PASS | 0.820430 PASS | 0.157720 PASS | 0.213368 PASS |
 | fine | 31.5684 PASS | 0.727893 PASS | 0.213019 PASS | 0.301691 PASS |
 
-**The decisive genuine failure is in-plane stretching**, frozen limit 10,000:
+**The decisive check is in-plane stretching.** The maximum in-plane stretching
+exceeds this project's frozen qualification limit of 10,000 on all three levels.
+The limit is an internal acceptance criterion of this pipeline, not a statement
+about the suitability of the NASA grids for their intended solvers:
 
 | Level | max stretching | cells over the limit |
 |---|---|---|
@@ -396,22 +503,23 @@ skewness metric is not Foundation-v14 skewness and must not be quoted as such.
 | fine | 38,855,541 | 15,678 |
 
 Face-tet warnings remain unresolved at 72 / 214 / 625 faces. They are not needed
-to establish the rejection, because stretching already fails decisively.
+to establish the rejection, because stretching already exceeds the limit.
 
-**Final status: `MESH_REJECTED / CFD_NOT_RUN`.** Skewness and orientation are
-*not* genuine NASA-grid failures and must not be described as such.
+**Final status: `MESH_REJECTED / CFD_NOT_RUN`.** Skewness and orientation do not
+fail once the converter defects above are corrected.
 """
 
 
-def _reference_readme(family: str, case_id: str, meta: Dict[str, Any]) -> str:
+def _reference_readme(root: Path, family: str, case_id: str,
+                      meta: Dict[str, Any]) -> str:
     """Every case ships a reference/ directory, so a clone has the same shape.
 
     Git does not track an empty directory, so a case whose evidence lives
     elsewhere would lose its reference/ on clone and the case contract would
-    differ between the development tree and a reviewer's checkout.
+    differ between the development tree and a clone.
     """
     extracted = sorted(p.name for p in
-                       (_ROOT / "cases" / family / case_id / "reference").glob("*")
+                       (root / "cases" / family / case_id / "reference").glob("*")
                        if p.name != "README.md")
     listing = ("\n".join(f"- `{name}`" for name in extracted)
                if extracted else "- (none: this case needs no extracted series)")
@@ -422,12 +530,21 @@ from a clone:
 
 {listing}
 
-The full archived evidence for this case is `{meta['evidence']}`, which is
-gitignored because of its size; its inventory and digests are in
-`manifests/large_assets.json`. Replay does not require it: the deterministic
-record a replay re-evaluates is `../expected_result.json`, and any series it
-needs is in this directory.
+{_archive_sentence(meta)} Replay does not need them: the deterministic record a
+replay re-evaluates is `../expected_result.json`, and any series it needs is in
+this directory.
 """
+
+
+def _archive_sentence(meta: Dict[str, Any]) -> str:
+    if not meta.get("archived", True):
+        return (f"The raw records (`{meta['evidence']}`) are not distributed; "
+                "the corrected record is in this directory.")
+    original = (f" (originally `{meta['original_path']}`)"
+                if meta.get("original_path") else "")
+    return ("The archived records are in the Zenodo archive (DOI to be added on "
+            f"release) under `{meta['evidence']}`{original}; they are not in "
+            "this repository.")
 
 
 def _reproduce_sh(family: str, case_id: str) -> str:
@@ -458,10 +575,25 @@ python scripts/run_demo.py --family {family} --case {case_id} --mode $mode @extr
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--archive-root", type=Path, default=None,
+                    help=("directory holding the unpacked Zenodo archive "
+                          "(demo/..., CFD_Verification_Package_20260929/...); "
+                          "default: the repository root"))
     ap.add_argument("--check", action="store_true",
                     help="report drift without writing")
+    ap.add_argument("--rewrite-narrative", action="store_true",
+                    help=("also regenerate README.md, case.yaml, "
+                          "reference/README.md and reproduce scripts of "
+                          "existing cases (they are curated by default)"))
     args = ap.parse_args()
-    changed = build(_ROOT, check=args.check)
+    try:
+        changed = build(_ROOT, check=args.check, archive_root=args.archive_root,
+                        rewrite_narrative=args.rewrite_narrative)
+    except ArchiveMissing as exc:
+        print(f"{exc}\nNothing was {'checked' if args.check else 'written'}: "
+              "the archived evidence is in the Zenodo archive (DOI to be added "
+              "on release); pass its location with --archive-root.")
+        return 2
     if args.check and changed:
         print("cases/ is out of date:")
         for path in changed:

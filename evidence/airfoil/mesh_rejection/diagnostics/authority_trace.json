@@ -1,7 +1,7 @@
 {
   "family": "airfoil",
   "case": "mesh_rejection",
-  "started_utc": "2026-09-28T03:04:17Z",
+  "started_utc": "2026-10-04T23:43:31Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -104,7 +104,7 @@
         ]
       },
       "threshold": "max_in_plane_stretching <= 10000.0",
-      "detail": "the decisive genuine failure is in-plane stretching, measured on the correctly selected constant-span flow-plane quad. Foundation-v14 skewness PASSES on all three levels, and cell orientation and in-plane validity are clean once our own converter defects are corrected -- neither is a NASA-grid failure.",
+      "detail": "the decisive genuine failure is in-plane stretching, measured on the correctly selected constant-span flow-plane quad. Foundation-v14 skewness PASSES on all three levels, and cell orientation and in-plane validity are clean once defects in the mesh-conversion and diagnostic scripts are corrected -- neither is a NASA-grid failure.",
       "decided_by": "deterministic"
     },
     {

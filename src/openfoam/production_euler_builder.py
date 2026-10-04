@@ -1,4 +1,12 @@
-﻿from __future__ import annotations
+﻿"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype Euler case builder (Gmsh mesh export and OpenFOAM dictionaries).
+Not imported by the registered family runners or by src/pipeline; the name
+"production" is historical.
+"""
+from __future__ import annotations
 
 import json
 import math
@@ -87,7 +95,7 @@ def _physics(
     }:
 
         raise ValueError(
-            "Production Euler backend currently supports air only."
+            "Prototype Euler backend currently supports air only."
         )
 
 
@@ -101,7 +109,7 @@ def _physics(
     if regime != "compressible":
 
         raise ValueError(
-            "Production backend requires compressible flow."
+            "Prototype backend requires compressible flow."
         )
 
 
@@ -123,7 +131,7 @@ def _physics(
     ):
 
         raise ValueError(
-            "Validated Euler pipeline does not use a turbulence model."
+            "Prototype Euler pipeline does not use a turbulence model."
         )
 
 
@@ -189,7 +197,7 @@ def _physics(
     ):
 
         raise ValueError(
-            "Validated Euler pipeline requires slip walls."
+            "Prototype Euler pipeline requires slip walls."
         )
 
 
@@ -204,7 +212,7 @@ def _physics(
     ):
 
         raise ValueError(
-            "Validated Euler pipeline requires adiabatic walls."
+            "Prototype Euler pipeline requires adiabatic walls."
         )
 
 
@@ -809,14 +817,14 @@ def build_production_euler_case(
         if solver != "shockFluid":
 
             raise ValueError(
-                "Production Euler backend requires shockFluid."
+                "Prototype Euler backend requires shockFluid."
             )
 
 
         if simulation_mode != "transient":
 
             raise ValueError(
-                "Production Euler backend requires transient operation."
+                "Prototype Euler backend requires transient operation."
             )
 
 
@@ -826,7 +834,7 @@ def build_production_euler_case(
         }:
 
             raise ValueError(
-                "Production Euler backend requires laminar/no-turbulence treatment."
+                "Prototype Euler backend requires laminar/no-turbulence treatment."
             )
 
 

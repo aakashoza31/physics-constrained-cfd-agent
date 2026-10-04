@@ -2,7 +2,7 @@
 """Live execution: the only path that launches OpenFOAM.
 
 This wrapper does NOT reimplement a family's build, solve or validation. Those
-live in the validated family runners -- `scripts/run_nozzle_e2e.py` and
+live in the registered family runners -- `scripts/run_nozzle_e2e.py` and
 `scripts/run_forward_step_2d.py` -- which own the sequence that produced every
 accepted result in this repository. Live mode dispatches to them, waits, and
 then ingests the evidence they wrote back into the unified
@@ -158,7 +158,7 @@ def run_case(family: str, case: Optional[str], *, run: Any = None,
              extra_args: Optional[Sequence[str]] = None,
              timeout: float = 14400.0,
              dispatch=subprocess.run) -> LiveOutcome:
-    """Execute a registered case through its validated family runner.
+    """Execute a registered case through its registered family runner.
 
     ``dispatch`` is injectable so integration tests can prove the dispatch and
     the evidence handoff without launching a solver.
@@ -241,7 +241,10 @@ def run_case(family: str, case: Optional[str], *, run: Any = None,
           "runner": RUNNERS[canonical]["script"]}),
         ("evidence_extraction", "OK" if evidence else "NO_EVIDENCE",
          {"files": sorted(evidence)}),
-        ("llm_diagnosis", "PROPOSED", {"proposals": 0}),
+        ("llm_diagnosis", "OWNED_BY_RUNNER",
+         {"proposals": 0,
+          "note": ("the family runner makes and records its own model calls; "
+                   "this wrapper makes none")}),
         ("bounded_correction", "OWNED_BY_RUNNER",
          {"note": ("the family runner owns its own bounded correction loop; "
                    "this wrapper does not issue a second one")}),

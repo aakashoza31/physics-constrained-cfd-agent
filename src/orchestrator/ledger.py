@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Append-only provenance ledger.
 
-One JSONL record per stage, written once and never rewritten. Every experiment
-mode in src/eval reads this file and nothing else, so the ablations cannot
-quietly diverge from what the real system recorded.
+One JSONL record per stage, written once and never rewritten. decide_once and
+run_loop record their stages here, and the legacy ablation harness in src/eval
+passes one ledger per mode. The paper's controller comparison
+(paper/cfd_forge/scripts/controller_comparison.py) writes its own records and
+does not read this ledger.
 """
 from __future__ import annotations
 

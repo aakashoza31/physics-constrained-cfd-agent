@@ -1,6 +1,6 @@
-﻿# Reference Validation
+﻿# Nozzle reference refinement campaign
 
-The canonical nozzle was evaluated on four systematically refined meshes and three numerical-control cases.
+The LLM-free reference campaign of the nozzle family (`validation/canonical_reference/`, results in `validation/canonical_reference/results/`). The canonical nozzle was evaluated on four systematically refined meshes and three numerical-control cases.
 
 Finest-grid results:
 - cells: 13,200
@@ -22,4 +22,6 @@ Control sensitivities:
 - halved wedge angle: 0.01703%
 - startup-pressure perturbation: 0.03576%
 
-This benchmark is restricted to the internal axisymmetric inviscid supersonic nozzle branch. It is not an external-jet, turbulence, viscous-flow, or arbitrary-back-pressure validation.
+The campaign passed its registered criteria. The agent's canonical run (2,112 cells) is bit-identical to mesh 1 of this campaign. No formal grid-convergence index is reported, and individual agent runs remain single-mesh (`PASS_SINGLE_MESH`).
+
+This campaign is restricted to the internal axisymmetric inviscid supersonic nozzle. It is not an external-jet, turbulence, viscous-flow, or arbitrary-back-pressure validation.

@@ -2,9 +2,13 @@ case_id: "drifting_wake"
 original_id: "family3_baseline_compact"
 family: "cube"
 title: "Surface-mounted cube with a drifting lateral wake"
-purpose: "F3 headline demonstration: a 3-D turbulent run that executed, looked healthy, and was REJECTED on stationarity / development"
-evidence_root: "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact"
-evidence_present: true
+purpose: "Diagnostic study of a 3-D URANS (k-omega SST) surface-mounted cube, run outside the agent loop. The stationarity gate cube-stationarity/1.0.0 was registered retrospectively and applied to the archived force history; it returns STILL_DEVELOPING, so the decision is REJECT"
+evidence_root: "CFD_Verification_Package_20260929/03_cube"
+evidence_present: false
+archived_records: "The archived run is in the Zenodo archive (DOI to be added on release) under CFD_Verification_Package_20260929/03_cube (originally handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact); it is not in this repository."
+evidence_in_clone:
+  - "evidence/cube/drifting_wake"
+paper_ledger: "cube study (not a ledger session)"
 config: null
 related_campaigns: []
 solver: "OpenFOAM Foundation v14"

@@ -12,7 +12,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T03:03:46Z",
+    "started_utc": "2026-10-04T23:43:29Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
@@ -120,7 +120,7 @@
     "authority_trace": {
       "family": "nozzle",
       "case": "canonical_reference",
-      "started_utc": "2026-09-28T03:03:46Z",
+      "started_utc": "2026-10-04T23:43:29Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -201,7 +201,7 @@
             "failed_checks": []
           },
           "threshold": "every registered validation check must pass",
-          "detail": "",
+          "detail": "archived validator status and failed checks",
           "decided_by": "deterministic"
         },
         {
@@ -214,10 +214,12 @@
             "allowed": [
               "ACCEPT",
               "CONTINUE_RUN",
-              "REFINE_MESH",
-              "REQUEST_CLARIFICATION",
-              "REJECT_UNSUPPORTED",
-              "FAIL_SAFELY"
+              "REQUEST_DIAGNOSTIC",
+              "REFINE_THROAT",
+              "REFINE_GRADIENT_REGION",
+              "REPAIR_MESH",
+              "RESTART_CLEAN",
+              "REJECT_OUTSIDE_DOMAIN"
             ]
           },
           "threshold": "a proposed action must be in the family's registered vocabulary",
@@ -308,33 +310,35 @@
             "compressible": true,
             "turbulent": false,
             "transient": false,
-            "dimensionality": "2-D axisymmetric-equivalent planar",
-            "model": "inviscid compressible (Euler)"
+            "dimensionality": "axisymmetric 5\u00b0 wedge",
+            "model": "inviscid compressible (Euler), shockFluid"
           },
           "allowed_actions": [
             "ACCEPT",
             "CONTINUE_RUN",
-            "REFINE_MESH",
-            "REQUEST_CLARIFICATION",
-            "REJECT_UNSUPPORTED",
-            "FAIL_SAFELY"
+            "REQUEST_DIAGNOSTIC",
+            "REFINE_THROAT",
+            "REFINE_GRADIENT_REGION",
+            "REPAIR_MESH",
+            "RESTART_CLEAN",
+            "REJECT_OUTSIDE_DOMAIN"
           ],
           "characteristic_dimension": "throat_radius",
           "envelope": {
             "regime": "supersonic converging-diverging",
-            "validation": "isentropic / normal-shock analytic reference"
+            "validation": "quasi-1D isentropic consistency (registered checks)"
           },
           "cases": [
             "canonical_reference",
-            "geometry_variation",
-            "condition_variation"
+            "condition_variation",
+            "geometry_variation"
           ],
           "solver": "OpenFOAM Foundation v14",
-          "notes": "F1 headline demonstration; ACCEPTED."
+          "notes": "Registered, routable family; ACCEPTED."
         },
         "registered": true,
         "register_status": "CORE",
-        "recipe_reference": "quasi-1D isentropic compressible-flow theory for a converging-diverging nozzle; frozen canonical case validated analytically",
+        "recipe_reference": "quasi-1D isentropic compressible-flow theory for a converging-diverging nozzle; frozen canonical case checked by registered quasi-1D consistency checks",
         "unresolved_constants": [],
         "allowed_actions": [
           "ACCEPT",
@@ -348,7 +352,7 @@
         ]
       },
       "evidence_root": "demo/nozzle_e2e/case_A_reference",
-      "evidence_present": true,
+      "evidence_present": false,
       "archived_record": {
         "verdict": "ACCEPT",
         "archived_status": "PASS_SINGLE_MESH",
@@ -367,9 +371,15 @@
         "original_id": "case_A_reference",
         "family": "nozzle",
         "title": "Canonical converging-diverging nozzle",
-        "purpose": "the validated reference case for F1",
+        "purpose": "Canonical reference case (PASS_SINGLE_MESH under the registered contract), paper ledger N1: reference nozzle, p0=200 kPa, 6 ms. The related sessions N4, N5 and N6 repeat this request with a 1 ms initial horizon",
         "evidence_root": "demo/nozzle_e2e/case_A_reference",
-        "evidence_present": true,
+        "evidence_present": false,
+        "archived_records": "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/nozzle_e2e/case_A_reference; they are not in this repository.",
+        "evidence_in_clone": [
+          "evidence/nozzle/canonical_reference",
+          "demo/published_campaign/case_A_reference"
+        ],
+        "paper_ledger": "N1 (related: N4, N5, N6)",
         "config": "configs/nozzles/case_A_reference.yaml",
         "related_campaigns": [
           "demo/nozzle_feedback/case_A_reference",
@@ -476,7 +486,7 @@
         "failed_checks": []
       },
       "threshold": "every registered validation check must pass",
-      "detail": "",
+      "detail": "archived validator status and failed checks",
       "decided_by": "deterministic"
     },
     "stationarity": {
@@ -486,8 +496,6 @@
   },
   "media": {
     "plots": [
-      "physics_specific_axial_profile.png",
-      "residuals.png",
       "convergence.png"
     ],
     "contours": [
@@ -497,11 +505,24 @@
       "temperature.png",
       "velocity.png"
     ],
-    "video": null
+    "video": null,
+    "history": null,
+    "field_videos": []
   },
+  "visualization": {
+    "family": "nozzle",
+    "case": "canonical_reference",
+    "verdict": "ACCEPT",
+    "solver_invoked": false,
+    "source_kind": "archived_raw_fields",
+    "status": "VISUALIZATION_INCOMPLETE",
+    "output_files": [],
+    "reason": "No raw OpenFOAM case located; histories are not field movies."
+  },
+  "artifact_complete": false,
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T03:03:48Z",
+    "generated_utc": "2026-10-04T23:43:29Z",
     "prompt": "run the registered nozzle case canonical_reference",
     "mode": "replay",
     "family": "nozzle",
@@ -510,9 +531,9 @@
     "solver": "OpenFOAM Foundation v14",
     "evidence_root": "demo/nozzle_e2e/case_A_reference",
     "case_directory": "cases/nozzle/canonical_reference",
-    "python": "3.10.12",
-    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-    "git_commit": "NOT_AVAILABLE",
+    "python": "3.11.15",
+    "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+    "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
     "pipeline_stages": [
       "request_interpretation",
       "geometry_characterization",

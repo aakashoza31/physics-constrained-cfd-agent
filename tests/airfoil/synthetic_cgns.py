@@ -46,7 +46,9 @@ def write_cgns_hex(
     import shutil
     import tempfile
 
-    import h5py
+    import pytest
+
+    h5py = pytest.importorskip("h5py")
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

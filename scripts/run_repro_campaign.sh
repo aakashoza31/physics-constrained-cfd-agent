@@ -5,6 +5,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 
 : "${GEMINI_API_KEY:?Set GEMINI_API_KEY before running this script}"
+export GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"  # model used for the paper's text calls
 OUT="$REPO/demo/runs/nozzle_feedback"
 mkdir -p "$OUT"
 

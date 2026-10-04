@@ -219,7 +219,7 @@ def main() -> int:
     import argparse
 
     ap = argparse.ArgumentParser(
-        description="Generate a 2D forward-step case from a validated spec."
+        description="Generate a 2D forward-step case from a checked spec."
     )
     ap.add_argument("case", type=Path)
     ap.add_argument("--spec", type=Path, required=True)

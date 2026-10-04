@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""The FROZEN F3 mesh hierarchy: coarse / medium / fine.
+"""The frozen custom Gmsh airfoil mesh hierarchy: coarse / medium / fine.
+
+ARCHIVED: the active airfoil mesh source is the NASA TMR Family II hierarchy
+(src/pipeline/airfoil/family2.py). This recipe is kept as archived evidence.
+Not part of the CFD Forge paper.
 
 Every number here comes from the approved recipe. Two things are SOLVED rather
 than transcribed, because transcribing them would let a rounding error into the
@@ -61,7 +65,10 @@ class Level:
 
     @property
     def airfoil_faces(self) -> int:
-        """Airfoil faces under the ACTIVE recipe (v2): 2 (n_body + n_TE).
+        """Airfoil faces under the archived Gmsh recipe v2: 2 (n_body + n_TE).
+
+        (The active airfoil mesh source is the NASA TMR Family II hierarchy;
+        this Gmsh recipe is archived evidence.)
 
         Under v1 this was 2N. The v2 partition supersedes that count, which is
         why the number is derived from the surface plan rather than from N.

@@ -39,7 +39,7 @@ class RecordingDispatch:
         return SimpleNamespace(returncode=self.returncode, stdout="ok", stderr="")
 
 
-def test_the_runner_command_is_the_validated_family_runner():
+def test_the_runner_command_is_the_registered_family_runner():
     command = live.build_command("nozzle", "a prompt", Path("/tmp/x"))
     assert command[0] == sys.executable
     assert Path(command[1]).as_posix().endswith("scripts/run_nozzle_e2e.py")

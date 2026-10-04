@@ -42,6 +42,8 @@ from src.reasoning.forward_step_mesh_study import (
     uniform_spacing,
 )
 
+_REPO = Path(__file__).resolve().parents[2]
+
 # A deliberately coarse but entirely valid starting grid.
 COARSE = ForwardStep2DSpec(nx=60, ny=20, sensitivity_assessment_requested=True)
 
@@ -229,7 +231,7 @@ def test_3d_the_model_cannot_choose_the_mesh():
 
 
 def test_4_a_new_mesh_is_never_a_latesttime_continuation():
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     # Continuation is keyed on the case, so a newly built grid cannot inherit
     # the append flag from the iteration counter.
     assert "append = last_executed_case == case" in source
@@ -239,7 +241,7 @@ def test_4_a_new_mesh_is_never_a_latesttime_continuation():
 
 def test_4b_each_grid_gets_its_own_case_directory():
     """Previous grid evidence is never overwritten."""
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert 'f"case_L{level}" if level else "case"' in source
     assert "previous grid's case and evidence are left untouched" in source.replace(
         "\n", " "
@@ -247,7 +249,7 @@ def test_4b_each_grid_gets_its_own_case_directory():
 
 
 def test_4c_a_refined_grid_passes_the_same_mesh_gate():
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert "refined_case = self.build_and_mesh(runtime, root, code, current)" in source
     # A grid that failed its own mesh gate is not a refinement result.
     assert "if refined_case is None:" in source
@@ -475,5 +477,5 @@ def test_9c_refinement_needs_cfd_evidence_to_respond_to():
 
 
 def test_9d_a_failed_mesh_gate_on_a_refined_grid_is_a_mesh_rejection():
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert 'self.finish("MESH_REJECTED", f"level {level} failed at {failed}")' in source

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Register and verify Family 3's external assets. Never downloads anything.
+"""Register and verify the airfoil (NACA0012) family's external assets.
+
+Not part of the CFD Forge paper; development tooling for the airfoil mesh
+qualification. Never downloads anything.
 
     report    print exactly which files are required, and where to put them
     register  compute SHA256 of the present files and write the lockfile
@@ -26,7 +29,7 @@ from src.pipeline.airfoil.p3d import CONVERSION_TOOLCHAIN  # noqa: E402
 
 def cmd_report() -> int:
     root = A.asset_root()
-    print(f"Family 3 requires {len(A.REGISTER)} registered external assets.")
+    print(f"The airfoil family requires {len(A.REGISTER)} registered external assets.")
     print(f"Install them into: {root}\n")
     for n, asset in enumerate(A.REGISTER.values(), start=1):
         flag = "REQUIRED" if asset.required else "optional"
@@ -52,7 +55,6 @@ def cmd_register(force: bool) -> int:
     for key, asset in A.REGISTER.items():
         path = A.asset_path(key)
         if not path.exists():
-            (missing if asset.required else entries).__class__  # noqa: B018
             if asset.required:
                 missing.append(asset.filename)
             continue

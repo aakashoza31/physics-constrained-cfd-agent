@@ -394,7 +394,7 @@ class CaseRun:
         s.ok(
             ev.SCOPE_GATE,
             (
-                "Case is inside the declared validated envelope "
+                "Case is inside the declared registered envelope "
                 f"(area ratio {gate.measurements['area_ratio']:.4f}, "
                 f"NPR {gate.measurements['nozzle_pressure_ratio']:.3f}, "
                 f"{int(gate.measurements['cells'])} cells)."
@@ -656,7 +656,7 @@ class CaseRun:
         s.ok(
             ev.CFD_SETUP,
             (
-                f"Validated recipe written: {solver.group(1) if solver else 'shockFluid'} "
+                f"Registered recipe written: {solver.group(1) if solver else 'shockFluid'} "
                 f"via foamRun, Kurganov fluxes, Minmod reconstruction, Euler time "
                 f"integration, maxCo {spec.max_courant}, endTime {spec.end_time_s} s, "
                 "totalPressure/totalTemperature/directionMixed inlet, pressure-free "

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NASA TMR NACA0012 Numerical Analysis FAMILY II -- the ACTIVE F3 mesh path.
+"""NASA TMR NACA0012 Numerical Analysis FAMILY II -- the ACTIVE airfoil mesh path.
 
 The mesh is NASA's. This module reads it, changes exactly one thing, and proves
 that it changed nothing else.

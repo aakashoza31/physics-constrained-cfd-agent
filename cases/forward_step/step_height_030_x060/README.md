@@ -1,9 +1,9 @@
-# Step height 0.30, short horizon
+# Step height 0.30, step at x=0.6
 
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_x060` &nbsp;|&nbsp;
 **Original id:** `case_F_step030` &nbsp;|&nbsp; **Archived verdict:** `REJECT`
 
-The inadmissible variation: the run stopped safely instead of being accepted.
+Step-height variation (paper ledger S5): Mach 3, h=0.3, step at x=0.6, run to t=4. The compression front was displaced toward the inlet, to x=0.025, and no front could be measured; the model proposed `FAIL_SAFELY`, the validator returned `FAIL` (`compression_front_measurable`), and the decision is `REJECT`. The run was preserved and rejected rather than tuned.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ The inadmissible variation: the run stopped safely instead of being accepted.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/case_F_step030` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_F_step030`; they are not in this repository.
 
 ## Archived outcome
 
@@ -35,6 +36,9 @@ deterministic decision from it. It never claims a solver was executed.
   "solver_invoked_in_archive": true
 }
 ```
+
+The `message` field is the archived session's summary, written by the language
+model (its `reasoning_summary`); it is not a deterministic measurement.
 
 `expected_result.json` holds the same record in machine-readable form; a replay
 that disagrees with it is a regression, not a new result.

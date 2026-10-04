@@ -16,6 +16,13 @@ It deliberately does not soften anything.  The deterministic check outcomes are
 carried through as they are; the LLM is given the same failures the validator
 found, and the final acceptance decision is made elsewhere, by the validator,
 not by whatever the LLM concludes from this packet.
+
+Field names.  Several ``CFDEvidence`` field names do not describe what this
+adapter puts in them.  The names are part of the packet the archived nozzle
+sessions sent to the model, so they are kept unchanged; the comments at each
+assignment below state what the field actually contains.  In the
+closed-loop runner, ``src/pipeline/nozzle/feedback_diagnostics.augment_evidence``
+later overwrites the flow-feature and visual fields with measured values.
 """
 from __future__ import annotations
 
@@ -74,8 +81,13 @@ def build_evidence_from_validation(
         # collapse.  Collapse is the specific small-dt condition used by the
         # deterministic validator.
         timestep_collapse_detected=timestep_collapse,
+        # Not a field NaN scan: True when the validator's ``no_fatal`` log check
+        # failed (FOAM FATAL, a floating-point exception, or "nan" in the log).
         nan_detected=not bool(checks.get("no_fatal", True)),
+        # Not an Inf scan: True when the ``positive_finite`` check (p, T, rho
+        # positive and finite) failed.
         inf_detected=not bool(checks.get("positive_finite", True)),
+        # Same source as ``nan_detected`` (the ``no_fatal`` check).
         solver_error_detected=not bool(checks.get("no_fatal", True)),
         notes=[
             f"execution status: {execution.get('status', 'unknown')}",
@@ -103,6 +115,19 @@ def build_evidence_from_validation(
         ),
     )
 
+    # Field contents (names kept for packet compatibility; see module note):
+    #   *_range_percent : relative span (max - min) / |mean| over the last
+    #                     2 ms of the monitor, in percent.
+    #   mass_flow_range_percent : that span for the OUTLET mass flow.
+    #   mass_flow_drift_percent : the same span for the INLET mass flow (not
+    #                     a drift of the outlet mass flow).
+    #   outlet_*_drift_percent : volume-weighted relative L2 change of the
+    #                     WHOLE p / T / U field between the last saved field
+    #                     and the one about eight saves earlier, in percent; it
+    #                     is neither an outlet quantity nor a drift.
+    #   enough_samples : True whenever the validator produced a final state; it
+    #                     is not a sample-count check.
+    #   *_extrema_trend : the all-time minimum value as text, not a trend.
     stationarity = StationarityEvidence(
         enough_samples=bool(validation.get("history") is not None or final),
         passes_stationarity=bool(
@@ -121,6 +146,10 @@ def build_evidence_from_validation(
         density_extrema_trend=f"all-time minimum rho = {all_time_min[2]}",
     )
 
+    # One check (``positive_finite``) sets all three *_positive flags; they are
+    # not separate per-variable tests.  ``suspicious_local_state_detected`` is
+    # the failure of the stagnation-enthalpy check, not a localized anomaly
+    # search.
     positive = bool(checks.get("positive_finite"))
 
     admissibility = PhysicalAdmissibilityEvidence(
@@ -156,12 +185,15 @@ def build_evidence_from_validation(
         outlet_mass_flow_kg_s=final.get("outlet_mdot"),
         inlet_flow_direction_valid=inlet_ok,
         outlet_flow_direction_valid=outlet_ok,
+        # Failure of the ``inlet_subsonic_inflow`` check, which also fails
+        # for supersonic inflow; it is not a dedicated reverse-flow test.
         inlet_reverse_flow_detected=not inlet_ok,
         outlet_reverse_flow_detected=(
             None
             if final.get("outlet_normal_M_min") is None
             else float(final["outlet_normal_M_min"]) <= 0.0
         ),
+        # Failure of any of the inlet, outlet or reservoir-condition checks.
         boundary_anomaly_detected=not (inlet_ok and outlet_ok and reservoir_ok),
         notes=[
             f"minimum outward-normal outlet Mach: {final.get('outlet_normal_M_min')}",
@@ -188,6 +220,10 @@ def build_evidence_from_validation(
         notes=["checkMesh -allTopology -allGeometry"],
     )
 
+    # The *_region strings and sonic_transition_region below are fixed
+    # descriptive labels for this nozzle geometry, not measured localization.
+    # The closed-loop runner replaces the gradient regions with values measured
+    # from the axial profile (feedback_diagnostics.augment_evidence).
     flow_features = FlowFeatureEvidence(
         strongest_gradient_region="throat and diverging section",
         pressure_gradient_region="diverging section",
@@ -212,7 +248,8 @@ def build_evidence_from_validation(
         ],
     )
 
-    # No image pixels are supplied to this text reasoning stage tonight.
+    # This adapter supplies no image evidence; in the closed-loop runner the
+    # visual fields are filled later from the field observer's record.
     visuals = VisualEvidence(
         visual_anomaly_detected=None,
         visual_candidate_regions=[],

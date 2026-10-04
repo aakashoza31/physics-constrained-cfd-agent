@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Any, Dict
 
@@ -50,7 +50,7 @@ class OperatingConditions:
     def validate(self) -> None:
         if self.gas.lower() != "air":
             raise ValueError(
-                "Current validated scope supports air only."
+                "Current registered scope supports air only."
             )
 
         if self.inlet_total_pressure_pa <= 0.0:
@@ -99,12 +99,12 @@ class CFDProblemSpec:
     def validate(self) -> None:
         if self.physics_model != "compressible_euler":
             raise ValueError(
-                "Current validated scope supports compressible Euler only."
+                "Current registered scope supports compressible Euler only."
             )
 
         if self.geometry_class != "axisymmetric_converging_diverging_nozzle":
             raise ValueError(
-                "Current validated geometry class is an axisymmetric "
+                "Current registered geometry class is an axisymmetric "
                 "converging-diverging nozzle."
             )
 

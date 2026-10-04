@@ -1,6 +1,6 @@
 {
   "question": "convergence",
-  "passed": false,
+  "passed": true,
   "measured": {
     "iterations": 1
   },

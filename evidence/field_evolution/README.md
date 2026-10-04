@@ -1,10 +1,16 @@
 # Verified field-video evidence
 
 These records were produced from archived native OpenFOAM fields on 2026-09-28.
-No CFD was rerun. Full MP4s and reports are local generated artifacts under
-`outputs/field_videos/{nozzle_final,forward_step_final,cube_final}`; they are not
-embedded in Git. SHA-256 hashes in these manifests bind the movies to this audit.
+No CFD was rerun. The field-evolution MP4s (pressure, velocity, temperature or
+turbulence, Mach and summary movies) are not committed to Git; they are
+distributed through the Zenodo archive (DOI to be added on release). SHA-256
+hashes in these manifests bind the movies to this audit.
 Reproduction instructions: `docs/field_evolution_video.md`.
+
+These field movies are different files from `evidence/*/*/video/simulation.mp4`
+in this repository. Those are integral-history animations (the cube's force
+history; the step's shock-front history), not flow-field visualisations; see the
+`video_status.json` next to each (`"is_flow_field_animation": false`).
 
 | Case | Times | Frames | Verdict unchanged | Movie audit |
 |---|---|---:|---|---|
@@ -13,17 +19,14 @@ Reproduction instructions: `docs/field_evolution_video.md`.
 | Cube | 2 through 80 | 59 | REJECT | PASS |
 | Airfoil | CFD not run | 0 | REJECT | VIDEO_NOT_AVAILABLE_CFD_NOT_RUN |
 
-All actual output videos were fully decoded with FFmpeg; FFprobe verified frame
+The airfoil family is not part of the CFD Forge paper; it is listed for completeness.
+
+All output videos were fully decoded with FFmpeg; FFprobe verified frame
 counts. Per-frame LUT endpoints match their global registered rendering ranges.
-The summary and compatibility simulation.mp4 files are byte-identical. Contact
+Within each field-movie set, `summary_evolution.mp4` and its compatibility copy
+`simulation.mp4` are byte-identical. Contact
 sheets were decoded from the actual summary movies. First, intermediate and final
 field images were visually inspected; no scientific verdict was inferred from them.
-
-Tests: 560 passed, 10 skipped, 17 subtests passed. The relevant suites covered
-consolidated reporting/orchestration, architecture, nozzle, and both step modules.
-The Windows-only path separator assertion was corrected without changing its test
-meaning. One new symlink-shadow unit test is skipped on Windows; the actual WSL
-renderer exercised that path, including the step's t=0 named-dimension translation.
 
 The cube's global native spanwise-velocity range includes its strong near-body
 crossflow. Weak late antisymmetric-mode growth is better assessed with the retained

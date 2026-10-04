@@ -4,6 +4,7 @@ code="$(cd "$(dirname "$0")" && pwd)"
 root="$(realpath "${1:?Supply the archived cases directory}")"
 for name in mesh1 mesh2 mesh3 mesh4 time_half angle_half startup_perturbed; do
  python3 "$code/validate.py" "$root/$name" > "$root/$name/log.revalidation"
- printf '%s: PASS_SINGLE_MESH\n' "$name"
+ status="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$root/$name/validation.json")"
+ printf '%s: %s\n' "$name" "$status"
 done
 python3 "$code/validate.py" --study "$root"

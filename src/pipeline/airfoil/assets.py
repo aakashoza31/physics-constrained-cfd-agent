@@ -73,7 +73,7 @@ class Asset:
 
 
 # ----------------------------------------------------------------------
-# The register. Filenames and expectations are as specified by the reviewer;
+# The register. Filenames and expectations are as frozen in the asset register;
 # digests are deliberately absent (see the module docstring).
 # ----------------------------------------------------------------------
 #: Current TMR location. The collection migrated off the old
@@ -320,12 +320,9 @@ REGISTER: Dict[str, Asset] = {
     ),
 }
 
-#: OPTIONAL SUPPORTING INFRASTRUCTURE as of the Gmsh hierarchy decision. The
-#: NASA exact-mesh reproduction and the CGNS topology authority are no longer
-#: execution assets for the active F3 family: the canonical meshes are generated
-#: by the preregistered Gmsh hierarchy. Nothing is deleted and all provenance
-#: code remains; these simply no longer block F3 readiness.
-#: The ACTIVE canonical mesh hierarchy, coarse -> fine.
+#: The ACTIVE canonical mesh hierarchy, coarse -> fine: the NASA TMR Family II
+#: CGNS levels. The custom Gmsh hierarchy is archived evidence and is not a mesh
+#: source; the Family II Plot3D files below are cross-checks only.
 FAMILY2_KEYS = (FAMILY2_COARSE, FAMILY2_MEDIUM, FAMILY2_FINE)
 FAMILY2_CROSSCHECK_KEYS = (FAMILY2_COARSE_P2D, FAMILY2_MEDIUM_P2D,
                            FAMILY2_FINE_P2D)

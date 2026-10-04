@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""F3: the surface-mounted cube must stay REJECTED, and stay reproducible."""
+"""The surface-mounted cube study must stay REJECTED, and stay reproducible.
+
+The cube was run outside the agent loop; its stationarity gate was registered
+retrospectively (cube-stationarity/1.0.0, 28 Sep 2026).
+"""
 from __future__ import annotations
 
 import json
@@ -42,6 +46,21 @@ def test_the_run_is_rejected_on_development_not_on_drag(samples):
     assert result.measured["lateral_relative_magnitude"] < gate.LATERAL_RELATIVE_MAX
 
 
+def test_the_registered_gate_quantities_match_the_paper(samples):
+    assert gate.GATE_VERSION == "cube-stationarity/1.0.0"
+    result = gate.assess(samples)
+    measured = result.measured
+    assert result.window["start"] == pytest.approx(59.98, abs=0.01)
+    assert result.window["end"] == pytest.approx(79.98, abs=0.01)
+    # half-window mean|Fz| ratio 2.10 against the registered limit 1.25
+    assert measured["lateral_growth_ratio"] == pytest.approx(2.10, abs=0.005)
+    assert measured["lateral_growth_ratio"] > gate.LATERAL_GROWTH_RATIO_MAX
+    # drag drift 0.075 %, mean lateral force 0.063 % of the drag
+    assert measured["drift_fraction"]["fx"] == pytest.approx(0.00075, abs=0.00001)
+    assert measured["lateral_relative_magnitude"] == pytest.approx(0.00063, abs=0.00001)
+    assert result.status == gate.STILL_DEVELOPING
+
+
 def test_the_rejection_is_not_knife_edge(samples):
     """It would still fail for any growth limit below 2.0."""
     ratio = gate.assess(samples).measured["lateral_growth_ratio"]
@@ -65,19 +84,56 @@ def test_a_short_history_is_unresolved_not_accepted():
     assert gate.assess([]).status == gate.INSUFFICIENT_HISTORY
 
 
-def test_the_lateral_mode_is_a_growing_oscillation():
+def test_the_lateral_force_is_a_periodic_mode_still_growing_at_the_end():
     mode = json.loads((CASE / "reference" / "lateral_mode.json").read_text())
-    assert mode["amplitude_growth_factor"] > 50
-    assert mode["exponential_growth_rate_per_time"] > 0.05
     assert 8.0 < mode["period"] < 13.0
     assert mode["zero_crossings"] >= 10
+    assert mode["last_peak"]["abs_fz"] > mode["first_peak"]["abs_fz"]
 
 
 def test_the_registered_expectation_is_a_rejection():
     expected = json.loads((CASE / "expected_result.json").read_text())["expected"]
     assert expected["verdict"] == "REJECT"
-    assert expected["archived_status"] == "RUNTIME_REJECTED"
+    assert expected["archived_status"] == "RETROSPECTIVE_GATE_STILL_DEVELOPING"
+    assert expected["rejected_on"] == "STILL_DEVELOPING"
+    assert expected["stationarity"]["gate_version"] == "cube-stationarity/1.0.0"
     assert expected["solver_invoked_in_archive"] is True
+
+
+@pytest.fixture(scope="module")
+def replayed():
+    from src.agent.pipeline import REPLAY, run_pipeline
+    return run_pipeline("replay cube", mode=REPLAY, family="cube",
+                        case="drifting_wake")
+
+
+def test_the_replay_carries_the_three_model_records_and_none_accepts(replayed):
+    assert replayed.decision.verdict == "REJECT"
+    records = replayed.artifacts["llm_diagnosis"]["records"]
+    assert len(records) == 3
+    assert all(r["model"] == "gemini-3.5-flash-lite" for r in records)
+    assert [r["action"] for r in records] == [
+        "CONTINUE_RUN", "FAIL_SAFELY", "CONTINUE_RUN"]
+    assert [r["diagnosis"] for r in records] == [
+        "STILL_DEVELOPING", "NUMERICALLY_UNHEALTHY", "STILL_DEVELOPING"]
+    assert all(r["approved"] is True for r in records)
+    assert not any(r["action"] == "ACCEPT" for r in records)
+    assert not any(r["executed"] for r in records)
+
+
+def test_the_replay_text_uses_the_registered_quantities_only(replayed, tmp_path):
+    from src.reporting import report_builder
+
+    paths = report_builder.build(replayed, tmp_path / "report", make_media=False)
+    texts = [replayed.decision.reason,
+             Path(paths.report_md).read_text(encoding="utf-8")]
+    texts += [str(g) for g in replayed.trace.gates]
+    for text in texts:
+        lowered = text.lower()
+        assert "68x" not in lowered and "68 x" not in lowered
+        assert "exponential" not in lowered
+        assert "e-folding" not in lowered
+    assert "2.10" in replayed.decision.reason
 
 
 def test_the_case_is_never_described_as_validated():

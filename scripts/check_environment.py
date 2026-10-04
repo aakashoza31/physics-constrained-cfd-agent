@@ -1,10 +1,24 @@
+#!/usr/bin/env python3
+"""Check the Python packages, OpenFOAM runtime and Gemini settings CFD Forge uses.
+
+    python scripts/check_environment.py
+
+Exit code 0 when every required item is present, 2 otherwise. The API key is
+reported as configured or not; its value is never printed.
+"""
 from __future__ import annotations
 
 import importlib
 import os
 import sys
+from pathlib import Path
 
-from src.pipeline.foam_runtime import FoamRuntime
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
+from src.agents.llm_provenance import gemini_model_name  # noqa: E402
+from src.pipeline.foam_runtime import FoamRuntime  # noqa: E402
 
 
 def status(name: str, ok: bool, details: str = "") -> bool:
@@ -17,7 +31,7 @@ def status(name: str, ok: bool, details: str = "") -> bool:
 def main() -> int:
     print()
     print("=" * 70)
-    print("PHYSICS-CONSTRAINED CFD AGENT - ENVIRONMENT CHECK")
+    print("CFD FORGE - ENVIRONMENT CHECK")
     print("=" * 70)
     print()
 
@@ -37,11 +51,10 @@ def main() -> int:
         "Matplotlib": "matplotlib",
     }
 
-    # These are retained research dependencies, but the validated blockMesh
-    # nozzle path does not require them for every run.
+    # Optional: the registered blockMesh nozzle and step paths do not need them.
     optional_modules = {
-        "Gmsh (optional for current blockMesh path)": "gmsh",
-        "PyVista (optional for current feedback path)": "pyvista",
+        "Gmsh (optional; not used by the blockMesh paths)": "gmsh",
+        "PyVista (optional; field rendering)": "pyvista",
     }
 
     for label, module in modules.items():
@@ -84,8 +97,8 @@ def main() -> int:
         "configured" if api_key else "not configured",
     )
 
-    model = os.getenv("GEMINI_MODEL", "<code default>")
-    status("GEMINI_MODEL", True, model)
+    source = "GEMINI_MODEL" if os.getenv("GEMINI_MODEL") else "code default"
+    status("Gemini model", True, f"{gemini_model_name()} ({source})")
 
     print()
     print("The API key check never prints the key itself.")

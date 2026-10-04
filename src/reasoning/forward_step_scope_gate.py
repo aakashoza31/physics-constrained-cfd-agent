@@ -5,7 +5,7 @@ PROVENANCE
 ----------
 Same shape as ``src/reasoning/nozzle_scope_gate.py``: the LLM interprets the
 request, this gate decides without the LLM whether the resulting specification
-lies inside the registered, validated family. A rejection here is final and the
+lies inside the registered family. A rejection here is final and the
 model cannot overrule it.
 
 REGISTERED FAMILY
@@ -21,6 +21,7 @@ verified is refused rather than quietly simulated.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
@@ -81,12 +82,30 @@ class ScopeResult:
         }
 
 
+def _phrase_pattern(phrase: str) -> "re.Pattern[str]":
+    """Whole-word pattern for a screened phrase.
+
+    Plain substring matching produced false hits ("rans" inside "transient",
+    "les" inside "variables"). A phrase matches only when it is not preceded
+    by a letter, digit, underscore or decimal point and not followed by a
+    letter, digit or underscore, so "2D" does not match "3d" and "0.3d" is not
+    read as a 3D request.
+    """
+    return re.compile(r"(?<![\w.])" + re.escape(phrase) + r"(?!\w)")
+
+
+_TOPIC_PATTERNS: Dict[str, List[tuple]] = {
+    topic: [(p, _phrase_pattern(p)) for p in phrases]
+    for topic, phrases in UNSUPPORTED_TOPICS.items()
+}
+
+
 def screen_request_text(text: str) -> Dict[str, List[str]]:
-    """Flag topics the registered family does not implement."""
+    """Flag topics the registered family does not implement (whole-word match)."""
     lowered = (text or "").lower()
     hits: Dict[str, List[str]] = {}
-    for topic, phrases in UNSUPPORTED_TOPICS.items():
-        found = [p for p in phrases if p in lowered]
+    for topic, patterns in _TOPIC_PATTERNS.items():
+        found = [p for p, pattern in patterns if pattern.search(lowered)]
         if found:
             hits[topic] = found
     return hits
@@ -104,7 +123,7 @@ def _bounded(
     checks[f"{name}_in_range"] = ok
     if not ok:
         reasons.append(
-            f"{label} = {value:g} is outside the validated transfer envelope "
+            f"{label} = {value:g} is outside the registered transfer envelope "
             f"[{low:g}, {high:g}] for this family."
         )
 

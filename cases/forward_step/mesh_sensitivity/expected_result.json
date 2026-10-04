@@ -3,7 +3,7 @@
   "family": "forward_step",
   "original_id": "case_I_mesh_sensitivity",
   "expected": {
-    "verdict": "REJECT",
+    "verdict": "INCONCLUSIVE",
     "archived_status": "STOPPED_ACTION_REFUSED",
     "validation_status": null,
     "iterations": 2,

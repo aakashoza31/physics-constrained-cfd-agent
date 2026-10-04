@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Where the F3 mesh hierarchy's reports live, and what they say.
+"""Where the airfoil mesh hierarchy's reports live, and what they say.
+
+Not part of the CFD Forge paper (the airfoil family is planned; no CFD was run).
 
 This module is the single deterministic answer to "has the frozen coarse /
 medium / fine hierarchy been generated and qualified?". It reads the reports
-that ``scripts/generate_airfoil_meshes.py`` writes; it never generates, never
+that ``scripts/qualify_family2_meshes.py`` writes; it never generates, never
 qualifies and never edits a report.
 
 Two rules it exists to enforce:
@@ -22,10 +24,9 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-#: The ACTIVE surface-distribution recipe. v1 is archived under .../v1 and its
-#: reports are preserved unchanged; only the active version gates readiness.
 #: The ACTIVE canonical mesh path: the NASA TMR Family II hierarchy. The custom
-#: Gmsh generator's v1 and v2 runs are archived evidence and gate nothing.
+#: Gmsh generator's v1 and v2 runs are archived under .../v1 and .../v2, their
+#: reports are preserved unchanged, and they gate nothing.
 ACTIVE_RECIPE_VERSION = "nasa_familyII"
 
 #: Report layout, relative to the repository root. Versioned, so an archived

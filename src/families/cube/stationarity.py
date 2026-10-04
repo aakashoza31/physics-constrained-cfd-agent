@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """Deterministic stationarity / development gate for the surface-mounted cube.
 
-The point of this gate is the case it rejects. In the archived run the
-streamwise force settles beautifully -- over the final window its mean is 0.7061
-and its trend is -7.9e-6 per unit time -- while a periodic LATERAL mode grows
-exponentially: its amplitude rises 68x, at 0.091 per time unit (e-folding in 11),
-and has not saturated when the run ends. A convergence test that watched only the drag would have
-accepted a run whose flow field was still developing. This gate watches all three
-components and the direction of growth.
+The point of this gate is the case it rejects. The cube was run outside the
+agent loop (2026-09-23/24); this gate was registered retrospectively on
+2026-09-28. Over the assessment window t* = 59.98-79.98 of the archived run the
+streamwise force is nearly constant (drift 0.075% of its mean; mean lateral
+force 0.063% of the drag), while the mean |lateral force| over the second half
+of the window is 2.10 times that over the first half, against a registered
+limit of 1.25. A supplementary complete-cycle audit agrees: successive
+complete-cycle lateral amplitudes grow by 209%, 137% and 113% (the growth rate
+is declining but has not saturated), and between the t* = 60-70 and 70-80
+blocks the mean drag changes by 0.04% while the RMS lateral force rises by
+110%. A convergence test that watched only the drag would have accepted a run
+whose flow field was still developing. This gate watches all three components
+and the direction of growth.
 
 THRESHOLDS ARE REGISTERED HERE, NOT TUNED TO THE DATA
 -----------------------------------------------------

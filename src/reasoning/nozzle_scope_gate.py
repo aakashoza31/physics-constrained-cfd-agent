@@ -1,7 +1,7 @@
 """Deterministic scope gate for the parameterized nozzle pipeline.
 
 The LLM interprets the engineering request. This gate decides, without the LLM,
-whether the resulting case specification lies inside the declared validated
+whether the resulting case specification lies inside the declared registered
 envelope. A rejection here is final: the orchestrator does not run CFD on a
 specification this gate refuses, and the LLM cannot overrule it.
 
@@ -16,7 +16,7 @@ configs/nozzles/README.md:
   - ambient pressure is external metadata and is never imposed at the outlet
 
 The geometric and operating bounds below are transfer limits around the
-validated anchor, not physical laws. They exist so that a request far outside
+registered anchor, not physical laws. They exist so that a request far outside
 what was actually verified is refused rather than quietly simulated.
 """
 from __future__ import annotations
@@ -77,7 +77,7 @@ def _bounded(
 
     if not ok:
         reasons.append(
-            f"{label or name} = {value:g} is outside the declared validated "
+            f"{label or name} = {value:g} is outside the declared registered "
             f"transfer envelope [{low:g}, {high:g}]."
         )
 
@@ -94,7 +94,7 @@ def evaluate_scope(spec: NozzleCaseSpec) -> ScopeGateResult:
         checks["specification_valid"] = False
         reasons.append(str(exc))
 
-    # 2. Physics envelope.
+    # 2. Physics envelope.  (The check key keeps its archived name.)
     checks["gas_is_validated_air"] = (
         spec.gamma == VALIDATED_GAMMA
         and spec.gas_constant_j_per_kg_k == VALIDATED_R
@@ -102,7 +102,7 @@ def evaluate_scope(spec: NozzleCaseSpec) -> ScopeGateResult:
 
     if not checks["gas_is_validated_air"]:
         reasons.append(
-            "Validated envelope is calorically perfect air with gamma = 1.4 and "
+            "Registered envelope is calorically perfect air with gamma = 1.4 and "
             "R = 287 J/(kg K)."
         )
 
@@ -112,8 +112,8 @@ def evaluate_scope(spec: NozzleCaseSpec) -> ScopeGateResult:
 
     if spec.ambient_imposed_at_exit:
         reasons.append(
-            "The validated outlet is pressure-free. Imposing the ambient static "
-            "pressure at the computational outlet changes the validated "
+            "The registered outlet is pressure-free. Imposing the ambient static "
+            "pressure at the computational outlet changes the registered "
             "boundary-condition philosophy."
         )
 

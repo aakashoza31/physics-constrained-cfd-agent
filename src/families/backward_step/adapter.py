@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """2D turbulent backward-facing step adapter skeleton.
 
+Not part of the CFD Forge paper (planned family; recipe unregistered, no CFD run).
+
 Every hook the shared orchestrator calls exists and is wired to the shared
 decision machinery, so the family is already exercised by the architecture
 tests. Nothing that requires a scientific constant will run: those hooks raise

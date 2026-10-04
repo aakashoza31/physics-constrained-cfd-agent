@@ -2,9 +2,23 @@
   "actions": [
     {
       "activity": "propose_bounded_action",
-      "content": "CONTINUE_RUN to let the lateral mode settle",
-      "model": "archived diagnosis",
-      "accepted_by_authority": false,
+      "content": "CONTINUE_RUN",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "FAIL_SAFELY",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
+      "binding": false
+    },
+    {
+      "activity": "propose_bounded_action",
+      "content": "CONTINUE_RUN",
+      "model": "gemini:gemini-3.5-flash-lite",
+      "accepted_by_authority": true,
       "binding": false
     }
   ],

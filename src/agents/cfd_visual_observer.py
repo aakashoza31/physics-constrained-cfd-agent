@@ -1,4 +1,17 @@
-﻿from __future__ import annotations
+"""Multimodal field observer: qualitative observations of rendered CFD fields.
+
+``observe_cfd_images`` sends the standardized PNG renderings to Gemini and
+returns a qualitative observation record.  It never decides acceptance.
+
+The model identifier is read at request time from
+``llm_provenance.gemini_model_name()`` (``GEMINI_MODEL`` or the shared
+default).  When a request is made, the returned record includes ``model`` (the
+identifier requested) and, when the SDK reports it, ``model_version``.  Before
+this change the module had its own default (``gemini-3.6-flash``), which is
+the model the archived step sessions' observer used when ``GEMINI_MODEL`` was
+unset; those archived records do not contain a ``model`` field.
+"""
+from __future__ import annotations
 
 import json
 import os
@@ -9,11 +22,7 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
-
-MODEL_NAME = os.getenv(
-    "GEMINI_MODEL",
-    "gemini-3.6-flash",
-)
+from src.agents.llm_provenance import gemini_model_name
 
 
 class VisualObservationSchema(
@@ -175,6 +184,8 @@ def observe_cfd_images(
         )
 
 
+    model_name = gemini_model_name()
+
     try:
 
         client = genai.Client(
@@ -183,7 +194,7 @@ def observe_cfd_images(
 
         response = (
             client.models.generate_content(
-                model=MODEL_NAME,
+                model=model_name,
                 contents=contents,
                 config=(
                     types.GenerateContentConfig(
@@ -236,6 +247,23 @@ def observe_cfd_images(
             in usable
         ]
 
+        result[
+            "model"
+        ] = model_name
+
+        model_version = getattr(
+            response,
+            "model_version",
+            None,
+        )
+
+        if model_version:
+            result[
+                "model_version"
+            ] = str(
+                model_version
+            )
+
         return result
 
 
@@ -260,4 +288,5 @@ def observe_cfd_images(
                 for _, path
                 in usable
             ],
+            "model": model_name,
         }

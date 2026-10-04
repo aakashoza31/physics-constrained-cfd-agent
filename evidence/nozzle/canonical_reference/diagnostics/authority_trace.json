@@ -1,7 +1,7 @@
 {
   "family": "nozzle",
   "case": "canonical_reference",
-  "started_utc": "2026-09-28T03:03:46Z",
+  "started_utc": "2026-10-04T23:43:29Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -82,7 +82,7 @@
         "failed_checks": []
       },
       "threshold": "every registered validation check must pass",
-      "detail": "",
+      "detail": "archived validator status and failed checks",
       "decided_by": "deterministic"
     },
     {
@@ -95,10 +95,12 @@
         "allowed": [
           "ACCEPT",
           "CONTINUE_RUN",
-          "REFINE_MESH",
-          "REQUEST_CLARIFICATION",
-          "REJECT_UNSUPPORTED",
-          "FAIL_SAFELY"
+          "REQUEST_DIAGNOSTIC",
+          "REFINE_THROAT",
+          "REFINE_GRADIENT_REGION",
+          "REPAIR_MESH",
+          "RESTART_CLEAN",
+          "REJECT_OUTSIDE_DOMAIN"
         ]
       },
       "threshold": "a proposed action must be in the family's registered vocabulary",

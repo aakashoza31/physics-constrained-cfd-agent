@@ -29,7 +29,11 @@
    "engineering_summary": 1,
    "forward_step_reference_blind_diagnosis": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_B_mach20/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S2",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "forward_step_2d/case_C_mach35",
@@ -61,7 +65,11 @@
    "forward_step_case_spec_interpretation": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_C_mach35/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S3",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "forward_step_2d/case_E_step010",
@@ -93,7 +101,11 @@
    "forward_step_reference_blind_diagnosis": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_E_step010/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S4",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "forward_step_2d/case_F_step030",
@@ -125,7 +137,11 @@
    "forward_step_case_spec_interpretation": 1,
    "forward_step_reference_blind_diagnosis": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_F_step030/agent_result.json",
+  "validation_status": "FAIL",
+  "ledger_id": "S5",
+  "paper_decision": "REJECT"
  },
  {
   "session": "forward_step_2d/case_G_step030_x100",
@@ -157,7 +173,11 @@
    "forward_step_case_spec_interpretation": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_G_step030_x100/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S6",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "forward_step_2d/case_H_iterative_short_run",
@@ -223,7 +243,11 @@
    "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z": {
     "forward_step_reference_blind_diagnosis": 1
    }
-  }
+  },
+  "status_source": "forward_step_2d/case_H_iterative_short_run/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S7",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T210551Z",
@@ -250,7 +274,11 @@
    "forward_step_reference_blind_diagnosis": 2,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T210551Z/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S7 (earlier session)",
+  "paper_decision": "not terminal (run resumed in a later session)"
  },
  {
   "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212431Z",
@@ -275,7 +303,11 @@
    "engineering_summary": 1,
    "forward_step_reference_blind_diagnosis": 2
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212431Z/agent_result.json",
+  "validation_status": "FAIL",
+  "ledger_id": "S7 (earlier session)",
+  "paper_decision": "not terminal (run resumed in a later session)"
  },
  {
   "session": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z",
@@ -300,7 +332,11 @@
    "forward_step_reference_blind_diagnosis": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_H_iterative_short_run/history/pre_resume_20260922T212609Z/agent_result.json",
+  "validation_status": "CURRENT_STATE_HEALTHY_TARGET_NOT_REACHED",
+  "ledger_id": "S7 (earlier session)",
+  "paper_decision": "not terminal (run resumed in a later session)"
  },
  {
   "session": "forward_step_2d/case_I_mesh_sensitivity",
@@ -336,7 +372,11 @@
    "forward_step_case_spec_interpretation": 1,
    "forward_step_reference_blind_diagnosis": 2
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/case_I_mesh_sensitivity/agent_result.json",
+  "validation_status": "PASS_2D_FORWARD_STEP",
+  "ledger_id": "S8",
+  "paper_decision": "INCONCLUSIVE"
  },
  {
   "session": "forward_step_2d/live_run_01",
@@ -368,7 +408,11 @@
    "engineering_summary": 1,
    "forward_step_case_spec_interpretation": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "forward_step_2d/live_run_01/agent_result.json",
+  "validation_status": "FAIL",
+  "ledger_id": "S1",
+  "paper_decision": "REJECT"
  },
  {
   "session": "nozzle_e2e/case_A_reference",
@@ -402,7 +446,11 @@
    "theory_blind_diagnosis": 1,
    "case_spec_interpretation": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_e2e/case_A_reference/case_result.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N1",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "nozzle_e2e/case_B_geometry",
@@ -436,7 +484,11 @@
    "engineering_summary": 1,
    "mesh_evidence_review": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_e2e/case_B_geometry/case_result.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N2",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "nozzle_e2e/case_C_conditions",
@@ -470,7 +522,11 @@
    "theory_blind_diagnosis": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_e2e/case_C_conditions/case_result.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N3",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "nozzle_feedback/case_A_reference",
@@ -491,16 +547,16 @@
   "proposals": [
    [
     "UNCONVERGED",
-    "REQUEST_DIAGNOSTIC"
+    "CONTINUE_RUN"
    ],
    [
     "UNCONVERGED",
-    "CONTINUE_RUN"
+    "REQUEST_DIAGNOSTIC"
    ]
   ],
   "visual_files": 0,
   "multimodal_events": 0,
-  "status": "REJECTED_BY_VALIDATOR",
+  "status": "UNEXECUTED_ACTION_REQUEST_DIAGNOSTIC",
   "n_json_calls_all_records": 5,
   "by_stage_all_records": {
    "theory_blind_diagnosis": 2,
@@ -508,7 +564,11 @@
    "case_spec_interpretation": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_feedback/case_A_reference/feedback_summary.json",
+  "validation_status": "FAIL",
+  "ledger_id": "N4",
+  "paper_decision": "not accepted"
  },
  {
   "session": "nozzle_feedback_final/case_B_geometry",
@@ -546,7 +606,11 @@
    "case_spec_interpretation": 1,
    "mesh_evidence_review": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_feedback_final/case_B_geometry/feedback_summary.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N7",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "nozzle_feedback_final/case_C_conditions",
@@ -584,7 +648,11 @@
    "engineering_summary": 2,
    "case_spec_interpretation": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_feedback_final/case_C_conditions/feedback_summary.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N8",
+  "paper_decision": "ACCEPT"
  },
  {
   "session": "nozzle_feedback_v2/case_A_reference",
@@ -610,7 +678,7 @@
   ],
   "visual_files": 1,
   "multimodal_events": 0,
-  "status": "REJECTED_BY_VALIDATOR",
+  "status": "ERROR",
   "n_json_calls_all_records": 4,
   "by_stage_all_records": {
    "theory_blind_diagnosis": 1,
@@ -618,7 +686,11 @@
    "case_spec_interpretation": 1,
    "engineering_summary": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_feedback_v2/FEEDBACK_CAMPAIGN_SUMMARY.json",
+  "validation_status": "FAIL",
+  "ledger_id": "N5",
+  "paper_decision": "not accepted"
  },
  {
   "session": "nozzle_feedback_v2_hotfix/case_A_reference",
@@ -638,21 +710,21 @@
   "non_llm": [],
   "proposals": [
    [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ],
+   [
+    "UNCONVERGED",
+    "CONTINUE_RUN"
+   ],
+   [
     "ACCEPTABLE",
     "ACCEPT"
-   ],
-   [
-    "UNCONVERGED",
-    "CONTINUE_RUN"
-   ],
-   [
-    "UNCONVERGED",
-    "CONTINUE_RUN"
    ]
   ],
   "visual_files": 3,
   "multimodal_events": 0,
-  "status": "REJECTED_BY_VALIDATOR",
+  "status": "ACCEPTED",
   "n_json_calls_all_records": 7,
   "by_stage_all_records": {
    "theory_blind_diagnosis": 3,
@@ -660,6 +732,10 @@
    "engineering_summary": 2,
    "mesh_evidence_review": 1
   },
-  "duplicates_of_earlier_sessions": {}
+  "duplicates_of_earlier_sessions": {},
+  "status_source": "nozzle_feedback_v2_hotfix/case_A_reference/feedback_summary.json",
+  "validation_status": "PASS_SINGLE_MESH",
+  "ledger_id": "N6",
+  "paper_decision": "ACCEPT"
  }
 ]

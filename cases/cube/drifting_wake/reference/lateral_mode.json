@@ -1,5 +1,6 @@
 {
- "description": "the lateral force is not a slow one-way drift: it is a periodic lateral mode whose amplitude grows exponentially and has not saturated by the end of the run",
+ "description": "the lateral force is a periodic lateral mode, not a slow one-way drift; its peak amplitude is larger at the end of the run than at the start and has not saturated by the end of the run",
+ "note": "not used by the registered gate; the paper reports the half-window ratio and complete-cycle amplitudes",
  "period": 10.144000000000005,
  "zero_crossings": 16,
  "first_peak": {
@@ -13,5 +14,5 @@
  "amplitude_growth_factor": 68.40449651439921,
  "exponential_growth_rate_per_time": 0.09090874700908845,
  "e_folding_time": 11.000041612057712,
- "method": "peaks are local maxima of |Fz| above 1e-4; the rate is the log slope between the first and last peak"
+ "method": "peaks are local maxima of |Fz| above 1e-4; exponential_growth_rate_per_time and e_folding_time are a two-point log-slope fit between the first and last peak, kept as computed and not a claim that the growth is exponential"
 }

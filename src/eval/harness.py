@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Evaluation harness: every paper experiment as a mode on the one architecture.
+"""Legacy ablation harness: experiment modes on the shared decision core.
+
+This is a separate legacy ablation harness, not the paper's controller
+comparison. The paper's comparison (arms A/B/B'/C) was run by
+paper/cfd_forge/scripts/controller_comparison.py: arms A, B and B' call
+src.orchestrator.loop.decide_once, and arm C is implemented in that script.
 
 Nothing here reimplements the system. Each experiment calls
 src.orchestrator.loop.decide_once with a different mode, or the router with a
-different corpus, and reads the shared ledger. That is what makes the ablations
-ablations of THIS system rather than of a parallel one.
+different corpus, and records to a ledger, so the ablations exercise the same
+decision code as the system.
 
 All experiments here are evidence-level and run without CFD.
 """
@@ -165,7 +170,7 @@ def gates_off_comparison(
     *,
     llm_proposal: Optional[Callable[[Dict[str, Any]], Any]] = None,
 ) -> Report:
-    """The headline experiment: what the gates catch that an unchecked verdict does not.
+    """The central experiment of this legacy harness: what the gates catch that an unchecked verdict does not.
 
     With gates authoritative, each seeded fault must be refused. With
     gates_off, the decision is taken from the proposal instead, and any ACCEPT

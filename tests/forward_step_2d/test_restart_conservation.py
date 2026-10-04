@@ -30,6 +30,7 @@ to have continued the same state.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -45,6 +46,8 @@ from src.pipeline.forward_step_2d.diagnostics import (
 )
 from src.pipeline.forward_step_2d.validate import STATUS_PASS, validate
 from tests.forward_step_2d.synthetic import make_case
+
+_REPO = Path(__file__).resolve().parents[2]
 
 FLAT = {"bottom": None, "top": None, "obstacle": None}
 
@@ -365,7 +368,5 @@ def test_the_classification_labels_are_distinct():
 
 def test_the_conservation_threshold_is_untouched():
     """The fix must not weaken the bound it was accused of tripping."""
-    from pathlib import Path
-
-    source = Path("src/pipeline/forward_step_2d/validate.py").read_text()
+    source = (_REPO / "src" / "pipeline" / "forward_step_2d" / "validate.py").read_text()
     assert 'd["mass"]["relative_residual_max"] < 1e-6' in source

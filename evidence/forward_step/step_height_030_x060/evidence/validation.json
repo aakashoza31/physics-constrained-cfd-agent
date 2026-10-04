@@ -8,6 +8,6 @@
     ]
   },
   "threshold": "every registered validation check must pass",
-  "detail": "Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upstream to the inlet boundary. Consequently, no valid measurable compression structure remains inside the domain.",
+  "detail": "archived validator status and failed checks; the archived message is the model's non-binding summary: Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upstream to the inlet boundary. Consequently, no valid measurable compression structure remains inside the domain.",
   "decided_by": "deterministic"
 }

@@ -1,3 +1,11 @@
+"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype CAD geometry generator. Imported only by the legacy agent
+src/agents/nozzle_design_agent.py; not by the registered family runners or by
+src/pipeline.
+"""
 from __future__ import annotations
 
 import argparse
@@ -558,7 +566,7 @@ def create_exact_conical_fluid_volume(spec: NozzleSpec) -> int:
         + diverging conical frustum
         + outlet cylinder
 
-    This is the key fix for the previous BSpline-wall bug.
+    Straight-segment walls are used deliberately instead of a BSpline wall.
     """
 
     p = section_positions(spec)

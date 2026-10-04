@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Build a machine-independent A/B/C campaign summary from feedback outputs."""
+"""Build a machine-independent A/B/C campaign summary from feedback outputs.
+
+clean_case() keeps an explicit allow-list of fields, so runtime paths and the
+model/provider labels of the session records are not written to the summary.
+The model identities remain in the full session records (Zenodo archive, DOI
+to be added on release).
+"""
 from __future__ import annotations
 
 import argparse

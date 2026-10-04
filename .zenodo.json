@@ -1,7 +1,7 @@
 {
   "title": "CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD (code)",
   "upload_type": "software",
-  "description": "Source code, family recipes, validators, prompts, response schemas, controller-comparison evidence and paper scripts for the CFD Forge preprint. Archived agent session records and case files are deposited as a separate Zenodo dataset.",
+  "description": "Source code for the CFD Forge preprint (\"CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD\"; arXiv identifier to be added): an OpenFOAM-based agentic framework in which a language model interprets requests, diagnoses simulation evidence and proposes corrective actions from a closed set, while deterministic, family-specific validators decide acceptance. Includes the registered nozzle (axisymmetric 5-degree wedge) and two-dimensional forward-facing-step families, validators, prompts and response schemas, the controller-comparison evidence, and the scripts that produce the paper figures. Archived agent session records, case files and solver logs are deposited as a separate Zenodo dataset.",
   "creators": [
     {
       "name": "Oza, Aakash Shailesh",

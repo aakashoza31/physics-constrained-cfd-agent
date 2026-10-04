@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """STEP/CAD reader abstraction. It refuses cleanly rather than pretending.
 
-There is no STEP-to-mesh path in this system. This module exists so that a STEP
+There is no user-STEP-to-mesh path in this system. This module exists so that a STEP
 file entering the public CLI is handled the way every other unsupported input is
 handled: classified, refused, and reported as UNSUPPORTED -- before any mesh is
 built and before any solver is launched.

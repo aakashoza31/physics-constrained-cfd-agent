@@ -28,6 +28,13 @@ and a key):
     $env:GEMINI_API_KEY="..."; $env:GEMINI_MODEL="gemini-3.5-flash-lite"
     python paper/cfd_forge/scripts/controller_comparison.py --dry-run
     python paper/cfd_forge/scripts/controller_comparison.py --repeats 5 --fault-repeats 3
+
+Inputs from the session archive on Zenodo (DOI to be added on release):
+  --demo-root  (or CFD_FORGE_DEMO)       the archive's demo/ directory;
+  --cube-logs  (or CFD_FORGE_CUBE_LOGS)  CFD_Verification_Package_20260929/03_cube/logs,
+                                         read by the cube point through
+                                         cube_llm_diagnosis.py.
+The archived run is evidence/controller_comparison/20261001T213031Z/.
 """
 from __future__ import annotations
 
@@ -55,7 +62,11 @@ from pydantic import BaseModel  # noqa: E402
 from src.families.base import ACCEPT, CORRECT_AND_RERUN, INCONCLUSIVE, REJECT, Proposal  # noqa: E402
 from src.orchestrator.loop import decide_once  # noqa: E402
 
-DEFAULT_DEMO = REPO.parent / "physics-constrained-cfd-agent-e2e" / "demo"
+# Archived agent sessions: demo/ of the session archive on Zenodo (DOI to be added
+# on release). Set with --demo-root or CFD_FORGE_DEMO; the default is the location
+# used for the archived run (a sibling checkout holding demo/).
+DEFAULT_DEMO = Path(os.environ.get(
+    "CFD_FORGE_DEMO", REPO.parent / "physics-constrained-cfd-agent-e2e" / "demo"))
 OUT_ROOT = REPO / "evidence" / "controller_comparison"
 NOT_ACCEPT = "NOT_ACCEPT"   # truth for points where any non-ACCEPT decision is correct
 
@@ -449,13 +460,20 @@ def markdown(summary: Dict[str, Any]) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--demo-root", type=Path, default=DEFAULT_DEMO)
+    ap.add_argument("--demo-root", type=Path, default=DEFAULT_DEMO,
+                    help="demo/ of the session archive (Zenodo); default: $CFD_FORGE_DEMO or "
+                         "../physics-constrained-cfd-agent-e2e/demo")
+    ap.add_argument("--cube-logs", type=Path, default=None,
+                    help="CFD_Verification_Package_20260929/03_cube/logs (session archive, Zenodo); "
+                         "sets CFD_FORGE_CUBE_LOGS for cube_llm_diagnosis.py")
     ap.add_argument("--repeats", type=int, default=5)
     ap.add_argument("--fault-repeats", type=int, default=3)
     ap.add_argument("--dry-run", action="store_true",
                     help="no API calls: arm B uses the recipe proposal, arm C a stub ACCEPT")
     ap.add_argument("--only", default="", help="comma-separated point ids, e.g. S1,N4,CUBE")
     args = ap.parse_args()
+    if args.cube_logs is not None:
+        os.environ["CFD_FORGE_CUBE_LOGS"] = str(args.cube_logs)
 
     model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
     if not args.dry_run:

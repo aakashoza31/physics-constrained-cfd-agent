@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Forward-step (Family 2) adapter.
+"""Forward-step (2-D) family adapter.
 
 Pure delegation. Every CFD decision stays in src/pipeline/forward_step_2d and
 src/reasoning/forward_step_*. This file only translates between those existing
@@ -213,7 +213,7 @@ class ForwardStep2DAdapter:
             },
             "conservation": diagnostics.get("mass", {}),
             "stationarity": {
-                "note": "transient family: stationarity is not a acceptance axis",
+                "note": "transient family: stationarity is not an acceptance axis",
                 "minima_every_step": diagnostics.get("minima_every_step", {}),
             },
             "quantitative": {
@@ -232,8 +232,16 @@ class ForwardStep2DAdapter:
 
     # -- reasoning -------------------------------------------------------
     def diagnose(
-        self, evidence: Dict[str, Any], spec: ForwardStep2DSpec
+        self, evidence: Dict[str, Any], spec: ForwardStep2DSpec, *,
+        iterations_used: int = 1, max_iterations: int = 4,
     ) -> Tuple[Proposal, Dict[str, Any]]:
+        """LLM diagnosis through the family's own reasoning stack.
+
+        ``iterations_used`` / ``max_iterations`` are passed to the diagnosis
+        payload. Their defaults (1, 4) are the values this method always used;
+        src.orchestrator.loop.decide_once does not pass them, so its behaviour
+        is unchanged.
+        """
         from src.reasoning.forward_step_diagnosis import diagnose as fs_diagnose
 
         diagnostics = evidence["raw_diagnostics"]
@@ -243,8 +251,8 @@ class ForwardStep2DAdapter:
             diagnostics,
             validation,
             max_end_time=BOUNDS["end_time"][1],
-            iterations_used=1,
-            max_iterations=4,
+            iterations_used=iterations_used,
+            max_iterations=max_iterations,
         )
         proposal = Proposal(
             diagnosis=str(getattr(decision, "diagnosis", "")),

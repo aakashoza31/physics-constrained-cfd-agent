@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Explicit build/run/analyze commands for the forward-step family (Linux/WSL)."""
+"""Explicit build/run/analyze commands for the 3-D forward-step prototype (Linux/WSL).
+
+Not part of the CFD Forge paper; the paper's step family is the 2-D runner
+scripts/run_forward_step_2d.py.
+"""
 from pathlib import Path
 import argparse,json,sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))

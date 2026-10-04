@@ -3,7 +3,7 @@
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `mach35_variation` &nbsp;|&nbsp;
 **Original id:** `case_C_mach35` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Accepted mach-number variation.
+Mach-number variation (paper ledger S3): Mach 3.5, h=0.2; `PASS_2D_FORWARD_STEP` -> `ACCEPT` in one iteration.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Accepted mach-number variation.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/case_C_mach35` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_C_mach35`; they are not in this repository.
 
 ## Archived outcome
 

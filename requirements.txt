@@ -1,14 +1,26 @@
-# Minimum versions a reviewer needs. The exact versions this work was developed
-# against are in requirements.txt.pinned; they are recorded for provenance, not
-# imposed, because several are newer than what a default Python ships with.
+# Minimum versions. The versions this work was developed against are recorded
+# in requirements.txt.pinned for provenance, not imposed.
+
+# Core: replay, deterministic checks, reporting, paper figures, tests.
 numpy>=1.24
 PyYAML>=6.0
 matplotlib>=3.6
 scipy>=1.10
 pydantic>=2.0
 
-# Optional, per capability:
-#   h5py>=3.0          reading the NASA CGNS grids (supplementary S1 only)
-#   gmsh>=4.11         the archived Gmsh mesh generator (historical)
-#   google-genai       the --agent-backend gemini path (needs GEMINI_API_KEY)
-#   imageio-ffmpeg      MP4 history encoder when ffmpeg is not on the host PATH
+# Required to reproduce the paper's agent runs (scripts/run_nozzle_e2e.py,
+# scripts/run_nozzle_feedback.py, scripts/run_forward_step_2d.py), the
+# controller comparison and the cube diagnosis. Needs GEMINI_API_KEY.
+# Not needed for replay or the deterministic demo backend.
+google-genai
+
+# Optional, per capability (install as needed):
+#   h5py>=3.0          reading the NASA CGNS grids (airfoil mesh study only;
+#                      not part of the paper)
+#   gmsh>=4.11         CAD->Gmsh prototype stack and airfoil meshing (not part
+#                      of the paper)
+#   pillow             CAD->Gmsh prototype visualization and case-A media
+#                      scripts (scripts/make_case_a_*_media.py)
+#   pyvista            CAD->Gmsh prototype visualization and results packaging
+#   imageio-ffmpeg     MP4 history encoder when ffmpeg is not on the host PATH
+#   pytest             running the test suite

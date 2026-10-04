@@ -13,9 +13,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, Mapping, Tuple
 
+# The action vocabularies are taken from the enums the agent paths validate
+# against, so the declaration cannot drift from the code. Neither module imports
+# src.families, so there is no import cycle.
+from src.contracts.agent_decision import AgentAction
+from src.reasoning.forward_step_actions import ForwardStepAction
+
 #: Lifecycle status of a family in the frozen scope.
-ACCEPTED = "ACCEPTED"                 # validated, routable, headline demonstration
-RUNTIME_REJECTED = "RUNTIME_REJECTED"  # executed, deterministically rejected, headline
+ACCEPTED = "ACCEPTED"                 # registered, routable
+RUNTIME_REJECTED = "RUNTIME_REJECTED"  # executed, deterministically rejected
 SUPPLEMENTARY = "SUPPLEMENTARY"       # preserved evidence only, never routable
 NOT_IMPLEMENTED = "NOT_IMPLEMENTED"   # declared for completeness, no implementation
 
@@ -101,17 +107,15 @@ TABLE: Dict[str, FamilyCapabilities] = {
         status=ACCEPTED,
         geometry_inputs=GeometryInputs(parametric=True, step=False, step_note=_NO_STEP),
         physics=Physics(compressible=True, turbulent=False, transient=False,
-                        dimensionality="2-D axisymmetric-equivalent planar",
-                        model="inviscid compressible (Euler)"),
-        allowed_actions=("ACCEPT", "CONTINUE_RUN", "REFINE_MESH",
-                         "REQUEST_CLARIFICATION", "REJECT_UNSUPPORTED",
-                         "FAIL_SAFELY"),
+                        dimensionality="axisymmetric 5° wedge",
+                        model="inviscid compressible (Euler), shockFluid"),
+        allowed_actions=tuple(a.value for a in AgentAction),
         characteristic_dimension="throat_radius",
         envelope={"regime": "supersonic converging-diverging",
-                  "validation": "isentropic / normal-shock analytic reference"},
-        cases=("canonical_reference", "geometry_variation", "condition_variation"),
+                  "validation": "quasi-1D isentropic consistency (registered checks)"},
+        cases=("canonical_reference", "condition_variation", "geometry_variation"),
         solver="OpenFOAM Foundation v14",
-        notes="F1 headline demonstration; ACCEPTED.",
+        notes="Registered, routable family; ACCEPTED.",
     ),
     "forward_step_2d": FamilyCapabilities(
         name="forward_step_2d",
@@ -120,18 +124,17 @@ TABLE: Dict[str, FamilyCapabilities] = {
         physics=Physics(compressible=True, turbulent=False, transient=True,
                         dimensionality="2-D planar",
                         model="inviscid compressible (Euler), shockFluid"),
-        allowed_actions=("ACCEPT", "CONTINUE_RUN", "REFINE_MESH",
-                         "REQUEST_CLARIFICATION", "REJECT_UNSUPPORTED",
-                         "FAIL_SAFELY"),
+        allowed_actions=tuple(a.value for a in ForwardStepAction),
         characteristic_dimension="step_height",
         envelope={"regime": "supersonic forward-facing step",
-                  "validation": "Woodward & Colella shock structure"},
-        cases=("canonical_mach3", "mach20_variation", "mach35_variation",
-               "step_height_010", "step_height_030", "step_height_030_long",
-               "iterative_short_run", "mesh_sensitivity",
-               "inadmissible_subsonic"),
+                  "validation": "registered numerical checks and directional "
+                                "compression diagnostics; no reference-field "
+                                "comparison"},
+        cases=("mach20_canonical", "mach35_variation", "step_height_010",
+               "step_height_030_x060", "step_height_030_x100",
+               "iterative_correction", "mesh_sensitivity", "live_run"),
         solver="OpenFOAM Foundation v14",
-        notes="F2 headline demonstration; ACCEPTED.",
+        notes="Registered, routable family; ACCEPTED.",
     ),
     "cube": FamilyCapabilities(
         name="cube",
@@ -139,7 +142,8 @@ TABLE: Dict[str, FamilyCapabilities] = {
         geometry_inputs=GeometryInputs(parametric=True, step=False, step_note=_NO_STEP),
         physics=Physics(compressible=False, turbulent=True, transient=True,
                         dimensionality="3-D",
-                        model="incompressible RANS, surface-mounted cube"),
+                        model="incompressible URANS, k-omega SST, "
+                              "surface-mounted cube"),
         allowed_actions=("CONTINUE_RUN", "FAIL_SAFELY", "REJECT_UNSUPPORTED"),
         characteristic_dimension="cube_height",
         envelope={"regime": "3-D turbulent flow over a wall-mounted cube",
@@ -147,9 +151,11 @@ TABLE: Dict[str, FamilyCapabilities] = {
                                 "the stationarity/development criterion"},
         cases=("drifting_wake",),
         solver="OpenFOAM Foundation v14",
-        notes=("Exploratory 3-D turbulent stationarity/development study. The "
-               "archived run is preserved for provenance, is not a validated "
-               "benchmark result, and is not routable for acceptance."),
+        notes=("Exploratory 3-D turbulent stationarity/development study, run "
+               "outside the agent loop; the stationarity gate was registered "
+               "retrospectively. The archived run is preserved for provenance, "
+               "is not a validated benchmark result, and is not routable for "
+               "acceptance."),
     ),
     "airfoil": FamilyCapabilities(
         name="airfoil",
@@ -164,9 +170,11 @@ TABLE: Dict[str, FamilyCapabilities] = {
                   "validation": "NOT REACHED: CFD_NOT_RUN"},
         cases=("mesh_rejection",),
         solver="not executed",
-        notes=("S1 supplementary MESH-REJECTION case. No CFD was ever run for "
-               "this family: every candidate mesh failed the frozen quality "
-               "contract, so the family never became routable."),
+        notes=("Not part of the CFD Forge paper. Supplementary mesh-rejection "
+               "case. No CFD was ever run for this family: every candidate mesh "
+               "failed the frozen quality contract, so the family is not "
+               "routable (register status CORE-PENDING: inspectable, not "
+               "executable)."),
     ),
     "backward_step": FamilyCapabilities(
         name="backward_step",
@@ -179,7 +187,10 @@ TABLE: Dict[str, FamilyCapabilities] = {
         characteristic_dimension="step_height",
         envelope={},
         cases=(),
-        notes="Declared in the register for completeness; deliberately not built.",
+        notes=("Not part of the CFD Forge paper. Adapter skeleton only: the "
+               "scientific recipe is unregistered and no CFD has been run, so "
+               "the family is not routable (register status CORE-PENDING: "
+               "inspectable, not executable)."),
     ),
 }
 

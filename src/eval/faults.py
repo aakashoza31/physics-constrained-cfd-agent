@@ -186,7 +186,7 @@ FORWARD_STEP_FAULTS: List[Fault] = [
     Fault("restart_seam_discontinuous", "transient_mass_closure", "REJECT",
           "a restart did not continue the same state", _f_restart_seam_discontinuous),
     Fault("subsonic_inlet", "supersonic_inlet", "REJECT",
-          "the realized inflow is not supersonic, outside the validated family",
+          "the realized inflow is not supersonic, outside the registered family envelope",
           _f_subsonic_inlet),
     Fault("initial_state_drift", "initial_state_as_specified", "REJECT",
           "the imposed initial state is not what the spec requested",

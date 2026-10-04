@@ -3,29 +3,48 @@
 **Family:** `cube` &nbsp;|&nbsp; **Case:** `drifting_wake` &nbsp;|&nbsp;
 **Original id:** `family3_baseline_compact` &nbsp;|&nbsp; **Archived verdict:** `REJECT`
 
-F3 headline demonstration: a 3-d turbulent run that executed, looked healthy, and was rejected on stationarity / development.
+Diagnostic study of a 3-D URANS (k-omega SST) surface-mounted cube, run outside the agent loop. The stationarity gate `cube-stationarity/1.0.0` was registered retrospectively and applied to the archived force history; it returns `STILL_DEVELOPING`, so the decision is `REJECT`.
+
+## What this case is
+
+- The run was executed outside the agent loop (23-24 September 2026). No model
+  proposed or executed an action during the run.
+- The gate `cube-stationarity/1.0.0` was registered retrospectively, on
+  28 September 2026, and applied to the archived force history over the window
+  t* = 59.98-79.98.
+- Drag drift over the window is 0.075 % and the mean lateral force is 0.063 % of
+  the drag, but the half-window ratio of mean |Fz| is 2.10 against a limit of
+  1.25, so the gate returns `STILL_DEVELOPING` and the decision is `REJECT`.
+- Over complete cycles of the lateral oscillation the amplitude grew by 209 %,
+  137 % and 113 %: the growth rate is declining but the amplitude has not
+  saturated. Between the block means for t* = 60-70 and 70-80 the drag changes by
+  0.04 % while the RMS lateral force rises by 110 %.
+- A separate model diagnosis of this evidence (1 October 2026, three calls) is in
+  `evidence/cube/drifting_wake/llm_diagnosis/`. The validator approved all three
+  proposals (`CONTINUE_RUN`, `FAIL_SAFELY`, `CONTINUE_RUN`); none was `ACCEPT`.
 
 ## Reproduce
 
 ```bash
 ./reproduce.sh              # replay the archived evidence, no solver
-./reproduce.sh --live       # re-execute with OpenFOAM Foundation v14
 ```
 
 ```powershell
 .\reproduce.ps1             # replay
-.\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Live execution is refused for this family; only replay is available.
+
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived run is in the Zenodo archive (DOI to be added on release) under `CFD_Verification_Package_20260929/03_cube` (originally `handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact`); it is not in this repository.
 
 ## Archived outcome
 
 ```json
 {
   "verdict": "REJECT",
-  "archived_status": "RUNTIME_REJECTED",
+  "archived_status": "RETROSPECTIVE_GATE_STILL_DEVELOPING",
   "rejected_on": "STILL_DEVELOPING",
   "failed_checks": [
     "lateral_force_growth"

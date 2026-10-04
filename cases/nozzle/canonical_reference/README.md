@@ -3,7 +3,7 @@
 **Family:** `nozzle` &nbsp;|&nbsp; **Case:** `canonical_reference` &nbsp;|&nbsp;
 **Original id:** `case_A_reference` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-The validated reference case for f1.
+Canonical reference case (`PASS_SINGLE_MESH` under the registered contract), paper ledger N1: reference nozzle, p0=200 kPa, 6 ms. The related sessions N4, N5 and N6 repeat this request with a 1 ms initial horizon.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ The validated reference case for f1.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/nozzle_e2e/case_A_reference` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/nozzle_e2e/case_A_reference`; they are not in this repository.
 
 ## Archived outcome
 

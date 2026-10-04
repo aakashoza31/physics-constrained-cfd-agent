@@ -12,7 +12,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-09-28T03:03:48Z",
+    "started_utc": "2026-10-04T23:43:30Z",
     "prompt": "run the registered forward_step case mach20_canonical",
     "mode": "replay",
     "family": "forward_step_2d",
@@ -97,10 +97,11 @@
       },
       {
         "stage": "llm_diagnosis",
-        "status": "PROPOSED",
+        "status": "SKIPPED",
         "decided_by": "deterministic",
         "detail": {
-          "proposals": 0
+          "proposals": 0,
+          "note": "no model call recorded for this case"
         }
       },
       {
@@ -116,7 +117,7 @@
     "authority_trace": {
       "family": "forward_step_2d",
       "case": "mach20_canonical",
-      "started_utc": "2026-09-28T03:03:48Z",
+      "started_utc": "2026-10-04T23:43:30Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -197,7 +198,7 @@
             "failed_checks": []
           },
           "threshold": "every registered validation check must pass",
-          "detail": "PASS_2D_FORWARD_STEP",
+          "detail": "archived validator status and failed checks; the archived message is the model's non-binding summary: PASS_2D_FORWARD_STEP",
           "decided_by": "deterministic"
         },
         {
@@ -208,7 +209,10 @@
             "allowed": [
               "ACCEPT",
               "CONTINUE_RUN",
+              "EXTEND_END_TIME",
+              "REDUCE_MAX_CO",
               "REFINE_MESH",
+              "REBUILD_FROM_VALIDATED_SPEC",
               "REQUEST_CLARIFICATION",
               "REJECT_UNSUPPORTED",
               "FAIL_SAFELY"
@@ -290,7 +294,10 @@
           "allowed_actions": [
             "ACCEPT",
             "CONTINUE_RUN",
+            "EXTEND_END_TIME",
+            "REDUCE_MAX_CO",
             "REFINE_MESH",
+            "REBUILD_FROM_VALIDATED_SPEC",
             "REQUEST_CLARIFICATION",
             "REJECT_UNSUPPORTED",
             "FAIL_SAFELY"
@@ -298,21 +305,20 @@
           "characteristic_dimension": "step_height",
           "envelope": {
             "regime": "supersonic forward-facing step",
-            "validation": "Woodward & Colella shock structure"
+            "validation": "registered numerical checks and directional compression diagnostics; no reference-field comparison"
           },
           "cases": [
-            "canonical_mach3",
-            "mach20_variation",
+            "mach20_canonical",
             "mach35_variation",
             "step_height_010",
-            "step_height_030",
-            "step_height_030_long",
-            "iterative_short_run",
+            "step_height_030_x060",
+            "step_height_030_x100",
+            "iterative_correction",
             "mesh_sensitivity",
-            "inadmissible_subsonic"
+            "live_run"
           ],
           "solver": "OpenFOAM Foundation v14",
-          "notes": "F2 headline demonstration; ACCEPTED."
+          "notes": "Registered, routable family; ACCEPTED."
         },
         "registered": true,
         "register_status": "CORE",
@@ -332,7 +338,7 @@
         ]
       },
       "evidence_root": "demo/forward_step_2d/case_B_mach20",
-      "evidence_present": true,
+      "evidence_present": false,
       "archived_record": {
         "verdict": "ACCEPT",
         "archived_status": "ACCEPTED",
@@ -350,9 +356,14 @@
         "original_id": "case_B_mach20",
         "family": "forward_step",
         "title": "Forward-facing step at Mach 2.0",
-        "purpose": "accepted reference run of the F2 family",
+        "purpose": "Canonical Mach-2 run of the registered 2-D forward-step family (paper ledger S2): Mach 2, h=0.2, step at x=0.6; PASS_2D_FORWARD_STEP -> ACCEPT in one iteration",
         "evidence_root": "demo/forward_step_2d/case_B_mach20",
-        "evidence_present": true,
+        "evidence_present": false,
+        "archived_records": "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_B_mach20; they are not in this repository.",
+        "evidence_in_clone": [
+          "evidence/forward_step/mach20_canonical"
+        ],
+        "paper_ledger": "S2",
         "config": null,
         "related_campaigns": [],
         "solver": "OpenFOAM Foundation v14",
@@ -449,19 +460,12 @@
         "failed_checks": []
       },
       "threshold": "every registered validation check must pass",
-      "detail": "PASS_2D_FORWARD_STEP",
+      "detail": "archived validator status and failed checks; the archived message is the model's non-binding summary: PASS_2D_FORWARD_STEP",
       "decided_by": "deterministic"
-    },
-    "stationarity": {
-      "status": "NOT_AVAILABLE",
-      "reason": "the stationarity gate was not evaluated in this run (mode: replay)"
     }
   },
   "media": {
     "plots": [
-      "physics_specific_shock_front.png",
-      "conservation.png",
-      "residuals.png",
       "convergence.png"
     ],
     "contours": [
@@ -475,11 +479,24 @@
       "transient_conservation.png",
       "velocity.png"
     ],
-    "video": "simulation.mp4"
+    "video": null,
+    "history": "history_evolution.mp4",
+    "field_videos": []
   },
+  "visualization": {
+    "family": "forward_step_2d",
+    "case": "mach20_canonical",
+    "verdict": "ACCEPT",
+    "solver_invoked": false,
+    "source_kind": "archived_raw_fields",
+    "status": "VISUALIZATION_INCOMPLETE",
+    "output_files": [],
+    "reason": "No raw OpenFOAM case located; histories are not field movies."
+  },
+  "artifact_complete": false,
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-09-28T03:03:54Z",
+    "generated_utc": "2026-10-04T23:43:30Z",
     "prompt": "run the registered forward_step case mach20_canonical",
     "mode": "replay",
     "family": "forward_step_2d",
@@ -488,9 +505,9 @@
     "solver": "OpenFOAM Foundation v14",
     "evidence_root": "demo/forward_step_2d/case_B_mach20",
     "case_directory": "cases/forward_step/mach20_canonical",
-    "python": "3.10.12",
-    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-    "git_commit": "NOT_AVAILABLE",
+    "python": "3.11.15",
+    "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+    "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
     "pipeline_stages": [
       "request_interpretation",
       "geometry_characterization",

@@ -20,3 +20,19 @@ keywords:
   - large language models
   - scientific agents
   - verification
+preferred-citation:
+  type: article
+  title: "CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD"
+  authors:
+    - family-names: Oza
+      given-names: Aakash Shailesh
+      affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+    - family-names: Johnson
+      given-names: Ryan F.
+      affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+    - family-names: Barati Farimani
+      given-names: Amir
+      affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
+  year: 2026
+  status: preprint
+  notes: "Preprint; arXiv identifier to be added."

@@ -30,7 +30,7 @@ GEOMETRY_VERSION = "naca0012-tmr-sharp-te/1.0.0"
 #: Frozen polynomial coefficients of the corrected TMR definition.
 A0, A1, A2, A3, A4 = 0.2969, -0.1260, -0.3516, 0.2843, -0.1015
 
-#: The reviewer's rounded root, used only to verify the numerical solve.
+#: The frozen rounded root, used only to verify the numerical solve.
 XI_T_REFERENCE = 1.008930411365
 
 #: Analytic boundary error budget, as a fraction of chord.

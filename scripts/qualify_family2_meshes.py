@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Convert and qualify the NASA TMR Family II F3 mesh hierarchy. NO CFD, EVER.
+"""Convert and qualify the NASA TMR Family II NACA0012 mesh hierarchy. NO CFD, EVER.
+
+Not part of the CFD Forge paper; the grids were not qualified for this pipeline
+(see cases/airfoil/mesh_rejection).
 
     python scripts/qualify_family2_meshes.py
     python scripts/qualify_family2_meshes.py --with-openfoam

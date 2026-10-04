@@ -1,4 +1,13 @@
-﻿from __future__ import annotations
+﻿"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+WSL/OpenFOAM command runner of the prototype. Not imported by the registered
+family runners (scripts/run_nozzle_feedback.py, scripts/run_nozzle_e2e.py,
+scripts/run_forward_step_2d.py) or by src/pipeline; only the other prototype
+modules in src/openfoam use it.
+"""
+from __future__ import annotations
 
 import json
 import os

@@ -41,6 +41,15 @@ LIVE_REQUEST = (
     "step is resolved and whether the result is trustworthy."
 )
 
+#: The walkthrough request of the paper (Mach-2 canonical case).
+PAPER_WALKTHROUGH_REQUEST = (
+    "Simulate a 2D forward-facing step in the validated supersonic channel "
+    "family with inlet Mach number 2.0, step height 0.20 channel heights, and "
+    "step location x = 0.6. Run the CFD, inspect the transient "
+    "shock/compression structure, and determine whether the final result "
+    "passes deterministic scientific validation."
+)
+
 REPORTING_ASKS = [
     "Report whether the compression structure ahead of the step is resolved.",
     "Tell me whether the result is trustworthy.",
@@ -122,3 +131,14 @@ def test_genuinely_unsupported_physics_is_still_caught():
         "Add species transport and combustion.",
     ]:
         assert screen_request_text(text), text
+
+
+def test_the_paper_walkthrough_request_is_in_scope():
+    """Nothing in the walkthrough is turbulence or other out-of-family physics."""
+    assert screen_request_text(PAPER_WALKTHROUGH_REQUEST) == {}
+    spec = ForwardStep2DSpec(mach=2.0, step_height=0.2, step_x=0.6)
+    result = evaluate_scope(spec, PAPER_WALKTHROUGH_REQUEST)
+    assert result.approved, result.reasons
+    assert result.decision == "IN_SCOPE"
+    assert result.checks["request_text_in_family"] is True
+    assert not result.clarification_needed

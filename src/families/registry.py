@@ -36,7 +36,7 @@ class FamilyRecord:
     retained_as: str = ""
     #: Repository-relative path to tracked evidence, or None when none exists.
     #: Never an absolute path: a register entry must mean the same thing in a
-    #: reviewer's clone as it does on the machine that wrote it.
+    #: fresh clone as it does on the machine that wrote it.
     evidence_root: Optional[str] = None
     notes: str = ""
 
@@ -173,15 +173,16 @@ def install_standing_register() -> None:
             status=CORE,
             physics="compressible_euler",
             description=(
-                "3D compressible inviscid converging-diverging nozzle, validated "
-                "against quasi-1D isentropic compressible-flow theory."
+                "Compressible inviscid converging-diverging nozzle on an "
+                "axisymmetric 5-degree wedge; registered checks include "
+                "quasi-1D isentropic consistency."
             ),
             keywords=(
                 "nozzle", "converging-diverging", "convergent-divergent",
                 "throat", "de laval", "expansion ratio", "area ratio",
             ),
             factory=_nozzle_adapter,
-            notes="Frozen recipe. Scientific definition unchanged by this refactor.",
+            notes="Frozen recipe.",
         )
     )
     register(
@@ -198,7 +199,7 @@ def install_standing_register() -> None:
                 "step", "shock", "supersonic channel", "compression",
             ),
             factory=_forward_step_adapter,
-            notes="Frozen recipe. Scientific definition unchanged by this refactor.",
+            notes="Frozen recipe.",
         )
     )
     register(
@@ -207,13 +208,15 @@ def install_standing_register() -> None:
             status=CORE_PENDING,
             physics="incompressible_or_low_mach_rans",
             description=(
-                "2D turbulent NACA0012 airfoil, steady RANS with SST; validated "
-                "against an authoritative TMR-type reference."
+                "2D turbulent NACA0012 airfoil, steady RANS with SST. Planned "
+                "only: CFD not run, not validated."
             ),
             keywords=("airfoil", "aerofoil", "naca", "naca0012", "lift", "drag",
                       "angle of attack", "aoa", "wing section"),
             factory=_airfoil_adapter,
-            notes="Scientific recipe TODO. Cannot ACCEPT until constants registered.",
+            notes=("Not part of the CFD Forge paper. Scientific recipe TODO; no "
+                   "CFD has been run (every candidate mesh was rejected). Cannot "
+                   "ACCEPT until constants are registered."),
         )
     )
     register(
@@ -222,13 +225,15 @@ def install_standing_register() -> None:
             status=CORE_PENDING,
             physics="incompressible_rans",
             description=(
-                "2D turbulent backward-facing step, steady RANS with SST; "
-                "separation and reattachment benchmark."
+                "2D turbulent backward-facing step, steady RANS with SST. "
+                "Planned only: adapter skeleton, CFD not run, not validated."
             ),
             keywords=("backward step", "backward-facing step", "backward facing step",
                       "back step", "sudden expansion", "reattachment", "separation bubble"),
             factory=_backward_step_adapter,
-            notes="Scientific recipe TODO. Cannot ACCEPT until constants registered.",
+            notes=("Not part of the CFD Forge paper. Scientific recipe TODO; no "
+                   "CFD has been run. Cannot ACCEPT until constants are "
+                   "registered."),
         )
     )
     register(
@@ -253,10 +258,7 @@ def install_standing_register() -> None:
             #: never imported, so there is no path to point at and none is
             #: invented. Its conclusion is recorded in `retained_as` above.
             evidence_root=None,
-            notes=(
-                "Validation protocol was not the problem: the original McConkey run "
-                "passes our residual and forcing-stationarity gates. Preserved, not deleted."
-            ),
+            notes="Not part of the CFD Forge paper. Preserved, not deleted.",
         )
     )
     register(

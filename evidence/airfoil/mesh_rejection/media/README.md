@@ -1,10 +1,13 @@
 # Media for this case
 
-The rendered media live in the standard artifact directories beside this one:
+Not part of the CFD Forge paper. CFD was not run for this case: the meshes were
+rejected by the mesh-qualification check before any solver was launched, so no
+solver output, field image or animation exists.
 
-- `../plots/` — series and gate figures drawn from archived solver output
-- `../contours/` — field images (see `contours_status.json` for their provenance)
-- `../video/` — animation (see `video_status.json` for what the time axis means)
+- `../plots/convergence.png` — a summary of the deterministic gate outcomes, not a
+  convergence history (`plots_status.json` records that no force series or solver
+  log exists)
+- `../contours/contours_status.json` — records that no field contours exist
+- `../video/video_status.json` — records that no animation exists
 
-Each of those directories carries a `*_status.json` recording what was produced,
-what was not, and why. Nothing here is synthesised.
+Nothing here is synthesised.

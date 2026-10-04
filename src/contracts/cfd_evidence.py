@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, List, Optional
 
 

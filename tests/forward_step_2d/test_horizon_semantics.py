@@ -29,6 +29,7 @@ able to advance, and it must not be able to accept early.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -47,6 +48,8 @@ from src.pipeline.forward_step_2d.validate import (
     validate,
 )
 from src.reasoning.forward_step_actions import validate_action
+
+_REPO = Path(__file__).resolve().parents[2]
 
 # The Case H specification, exactly as the corrected interpreter builds it.
 CASE_H = ForwardStep2DSpec(mach=3.0, step_height=0.2, step_x=0.6, end_time=0.5)
@@ -335,9 +338,7 @@ def test_7_continue_run_resumes_from_the_existing_solution_time():
 
 def test_7b_the_orchestrator_sets_startfrom_latesttime_for_every_continuation():
     """The resume path must never emit startFrom startTime."""
-    from pathlib import Path
-
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert "startFrom       latestTime;" in source
     assert "startFrom       startTime;" not in source
     # A continuation is tied to the CASE, not to the iteration number: an
@@ -351,17 +352,13 @@ def test_7b_the_orchestrator_sets_startfrom_latesttime_for_every_continuation():
 
 def test_7c_resume_skips_the_first_execution_entirely():
     """A resumed loop re-reads the existing fields before doing any solving."""
-    from pathlib import Path
-
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert "skip_execution = resumed" in source
     assert "no solver execution" in source
 
 
 def test_7d_resume_preserves_prior_iteration_numbering():
-    from pathlib import Path
-
-    source = Path("scripts/run_forward_step_2d.py").read_text()
+    source = (_REPO / "scripts" / "run_forward_step_2d.py").read_text()
     assert "iteration = self.iteration_offset" in source
     assert "limit = self.iteration_offset + args.max_iterations" in source
 

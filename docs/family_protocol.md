@@ -19,11 +19,12 @@ physics:
   turbulent: false
   transient: false
   dimensionality: "2-D planar"
-  model: "inviscid compressible (Euler)"
+  model: "inviscid compressible (Euler), shockFluid"
 
-allowed_actions: [ACCEPT, CONTINUE_RUN, REFINE_MESH, REQUEST_CLARIFICATION,
-                  REJECT_UNSUPPORTED, FAIL_SAFELY]
-characteristic_dimension: throat_radius
+allowed_actions: [ACCEPT, CONTINUE_RUN, EXTEND_END_TIME, REDUCE_MAX_CO,
+                  REFINE_MESH, REBUILD_FROM_VALIDATED_SPEC,
+                  REQUEST_CLARIFICATION, REJECT_UNSUPPORTED, FAIL_SAFELY]
+characteristic_dimension: step_height
 status: ACCEPTED          # ACCEPTED | SUPPLEMENTARY | NOT_IMPLEMENTED
 ```
 
@@ -41,21 +42,25 @@ status: ACCEPTED          # ACCEPTED | SUPPLEMENTARY | NOT_IMPLEMENTED
 
 | Status | Routable | Meaning |
 |---|---|---|
-| `ACCEPTED` | yes | validated, may execute and may be accepted |
+| `ACCEPTED` | yes | registered: may execute, and a run may be accepted when it passes the registered checks |
 | `SUPPLEMENTARY` | no | preserved evidence only; never executed for acceptance |
 | `NOT_IMPLEMENTED` | no | declared for completeness, deliberately not built |
 
-Only `ACCEPTED` families can reach a solver through the agent. Supplementary
-studies remain reproducible without being presented as validated families.
+Only `ACCEPTED` (registered) families can reach a solver through the agent.
+Supplementary studies remain reproducible without being presented as registered
+families. Registration is not a claim of physical validation.
 
-## Registered families
+## Families in the register
 
 | Family | Status | Physics | STEP | Cases |
 |---|---|---|---|---|
-| `nozzle` | ACCEPTED | compressible Euler, 2-D | no | 3 |
-| `forward_step_2d` | ACCEPTED | compressible Euler, 2-D transient | no | 8 |
-| `cube` | SUPPLEMENTARY | incompressible RANS, 3-D transient | no | 1 |
-| `airfoil` | SUPPLEMENTARY | incompressible RANS, 2-D | no | 1 (mesh rejection, CFD_NOT_RUN) |
-| `backward_step` | NOT_IMPLEMENTED | — | no | 0 |
+| `nozzle` | ACCEPTED (registered) | inviscid compressible, axisymmetric 5° wedge | no | 3 |
+| `forward_step_2d` | ACCEPTED (registered) | inviscid compressible, 2-D planar, transient | no | 8 |
+| `cube` | SUPPLEMENTARY (diagnostic study, not part of the agent loop) | URANS k-ω SST, 3-D transient | no | 1 |
+| `airfoil` | SUPPLEMENTARY (not part of the paper) | incompressible RANS, 2-D | no | 1 (mesh rejection, CFD_NOT_RUN) |
+| `backward_step` | NOT_IMPLEMENTED (not part of the paper) | — | no | 0 |
+
+The action vocabularies of the two registered families are listed in
+`docs/architecture_detail.md`.
 
 See `docs/adding_a_family.md` for the step-by-step.

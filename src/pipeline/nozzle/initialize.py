@@ -10,8 +10,8 @@ state, a wall-tangent radial startup component, strict read-back verification,
 and no use of the obsolete setFieldsDict syntax that Foundation v14 silently
 ignored.
 
-ONE DELIBERATE CHANGE, as requested
------------------------------------
+ONE DELIBERATE CHANGE
+---------------------
 The canonical sanity assertion
 
     assert v[:,0].min() < 60000 and v[:,0].max() > 190000
@@ -24,7 +24,7 @@ initialized field must span the quasi-1D range it is constructed from, reaching
 down to the supersonic exit static pressure and up to the subsonic inlet static
 pressure, within a tolerance that accommodates the declared startup
 perturbation.  For the canonical case the replacement is STRICTER on the lower
-bound (55.2 kPa versus 60 kPa).  See NozzleCaseSpec.expected_initial_pressure_bounds.
+bound (54.68 kPa versus 60 kPa).  See NozzleCaseSpec.expected_initial_pressure_bounds.
 
 No CFD acceptance threshold is touched by this file.
 """

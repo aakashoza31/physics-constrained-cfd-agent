@@ -1,64 +1,72 @@
-# Family register — active
+# Family register
 
-The frozen scope. This page is the single source of truth for what each family
-is allowed to do; the machine-readable form is `src/families/capabilities.py`
-and the two must agree (a test enforces it).
+The frozen scope. This page summarises what each family is allowed to do; the
+machine-readable form is `src/families/capabilities.py`, and the two must agree.
 
-| Family | Status | Routable | Physics | STEP | Cases | Solver run |
-|---|---|---|---|---|---|---|
-| `nozzle` | **ACCEPTED** | yes | compressible Euler, 2-D | no | 3 | yes |
-| `forward_step_2d` | **ACCEPTED** | yes | compressible Euler, 2-D transient | no | 8 | yes |
-| `cube` | **SUPPLEMENTARY** | no | incompressible RANS, 3-D transient | no | 1 | yes |
-| `airfoil` | **SUPPLEMENTARY** | no | incompressible RANS, 2-D | no | 1 | **no** |
-| `backward_step` | **NOT_IMPLEMENTED** | no | — | no | 0 | no |
+| Family | Register status | Routable | Physics | STEP | Cases | Solver run | In the paper |
+|---|---|---|---|---|---|---|---|
+| `nozzle` | `ACCEPTED` (registered) | yes | inviscid compressible (`shockFluid`), axisymmetric 5° wedge | no | 3 | yes | registered family |
+| `forward_step_2d` | `ACCEPTED` (registered) | yes | inviscid compressible (`shockFluid`), 2-D planar, transient | no | 8 | yes | registered family |
+| `cube` | `SUPPLEMENTARY` | no | URANS k-ω SST (`incompressibleFluid`), 3-D transient | no | 1 | yes, outside the agent loop | diagnostic study, not a family |
+| `airfoil` | `SUPPLEMENTARY` | no | incompressible RANS, 2-D | no | 1 | **no** | not part of the paper |
+| `backward_step` | `NOT_IMPLEMENTED` | no | — | no | 0 | no | not part of the paper |
 
 ## Status semantics
 
-- **ACCEPTED** — validated, routable, may execute and may be accepted.
-- **SUPPLEMENTARY** — preserved evidence or development studies. Not routable for acceptance.
-- **NOT_IMPLEMENTED** — declared for completeness, deliberately not built.
+- **`ACCEPTED`** (code identifier) — a registered, routable family: it may
+  execute, and its runs may be accepted when they pass the family's registered
+  checks. Registration is not physical validation.
+- **`SUPPLEMENTARY`** — preserved evidence or a development study. Not routable
+  for acceptance.
+- **`NOT_IMPLEMENTED`** — declared for completeness, deliberately not built.
 
-Only **ACCEPTED** families can reach a solver through the agent. `live.py`
-refuses the others before any process starts, and the refusal is tested.
+Only registered (`ACCEPTED`) families can reach a solver through the agent.
+`src/orchestration/live.py` refuses the others before any process starts, and the
+refusal is tested.
 
-## Experimental 3-D cube study — supplementary
+## Cube diagnostic study
 
-A 3-D turbulent run executed to t = 80 and reported no numerical failure.
-The streamwise load settled to 0.08% of its mean over the assessment window
-while a periodic lateral mode of period ≈ 10.1 grew 68× in amplitude
-(1.01e-4 → 6.91e-3, e-folding 11.0) without saturating. Under the registered
-stationarity/development criterion, the case was therefore not certified as a
-validated benchmark result.
+The cube calculation was run outside the agent loop (23-24 September 2026) and
+completed its bounded extension to t* = 80 without numerical failure. Its
+stationarity gate, `cube-stationarity/1.0.0` (`src/families/cube/stationarity.py`),
+was registered retrospectively on 28 September 2026, after the data existed.
+Over the gate window t* = 59.98-79.98 the drag drift is 0.075% of the mean
+(limit 2%) and the mean lateral force is 0.063% of the drag (limit 5%), but the
+half-window mean |Fz| ratio is 2.10 against the limit of 1.25. The gate returns
+`STILL_DEVELOPING` and the result is REJECT. A separate complete-cycle audit
+(not part of the gate) finds successive amplitude growth of 209%, 137% and 113%:
+the growth rate is declining, but the lateral mode has not saturated.
 
 Evidence: `cases/cube/drifting_wake/` (force history, statistics, lateral-mode
-characterisation) and `evidence/cube/drifting_wake/`. Replay:
+characterisation), `evidence/cube/drifting_wake/`, and the three LLM diagnosis
+calls of 1 October 2026 in `evidence/cube/drifting_wake/llm_diagnosis/`. Replay:
 `python scripts/run_demo.py --family cube --case drifting_wake --mode replay`.
 
-This is retained as an **exploratory development study**, not as a validated
-cube benchmark. The archived machine-readable decision remains preserved for
-provenance.
+The cube is a diagnostic study, not a validated benchmark and not a routable
+family. The archived machine-readable decision is preserved for provenance.
 
-## S1 — `airfoil`, SUPPLEMENTARY, `CFD_NOT_RUN`
+## `airfoil` (not part of the paper, `CFD_NOT_RUN`)
 
-Three mesh generations, all rejected; no solver was ever launched. The decisive
-genuine failure is **in-plane stretching** (3.17e7 / 3.63e7 / 3.89e7 against a
-frozen limit of 10,000, on 974 / 3,924 / 15,678 cells).
+Not part of the CFD Forge paper. Three mesh generations, all rejected; no solver
+was ever launched. The decisive genuine failure is **in-plane stretching**
+(3.17e7 / 3.63e7 / 3.89e7 against a frozen limit of 10,000, on 974 / 3,924 /
+15,678 cells).
 
 Foundation-v14 `checkMesh` skewness is 0.857 / 0.820 / 0.728 — passing — and the
-orientation and in-plane defects in the first diagnosis were artefacts of our own
-converter, not of the NASA grids. The corrected record is
-`cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json`; the
-development history is archived under `docs/archive/airfoil_mesh_development/`.
+orientation and in-plane defects in the first diagnosis were artefacts of the
+repository's own converter, not of the NASA grids. The corrected record is
+`cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json`; see also
+`docs/results.md`.
 
-## `backward_step`
+## `backward_step` (not part of the paper)
 
-Declared in the register and deliberately not built. Its adapter and recipe
-construct so the register is inspectable, and the recipe carries unresolved
-acceptance constants, so nothing it produced could ever be accepted.
+Not part of the CFD Forge paper. Declared in the register and deliberately not
+built. Its adapter and recipe construct so the register is inspectable, and the
+recipe carries unresolved acceptance constants, so nothing it produced could be
+accepted.
 
 ## Superseded terminology
 
 The status `CORE-PENDING` no longer appears in the active register. It survives
 inside `src/families/` and `src/router/` as the mechanism that makes an
-unregistered family non-executable, and in the legacy register preserved at
-`docs/archive/airfoil_mesh_development/FAMILY_REGISTER_legacy.md`.
+unregistered family non-executable.

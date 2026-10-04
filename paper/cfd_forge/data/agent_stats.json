@@ -1,46 +1,46 @@
 {
-  "note": "Recount 2026-10-01 from every LLM call record in the archived nozzle and step campaigns (llm_calls.json, provenance.json, agent_decision.json, initial_e2e_agent_decision.json, llm_mesh_review.json, final_report_llm_call.json, and per-iteration copies), deduplicated per run by (stage, latency). Field-observation calls counted from per-iteration visual_observation.json records. Supersedes the events.jsonl-only count (82 calls, 23 proposals), which missed the feedback-loop iterations of the nozzle campaign.",
-  "n_sessions": 19,
-  "n_runs": 16,
-  "n_distinct_requests": 11,
-  "sessions": {
-    "nozzle": 8,
-    "step": 11
-  },
-  "model_calls_by_stage": {
-    "interpretation": 16,
-    "mesh review": 8,
-    "diagnosis": 28,
-    "field observation": 23,
-    "field observation (failed)": 5,
-    "summary": 22
-  },
-  "text_calls_first_attempt_success": "74/74",
-  "field_observation_failures": "5/23, all HTTP 503 UNAVAILABLE from the provider; no retry",
-  "latency_median_s_by_stage": {
-    "interpretation": 4.92,
-    "diagnosis": 2.9,
-    "summary": 2.81,
-    "mesh review": 1.94
-  },
-  "proposals_by_action": {
-    "ACCEPT": 14,
-    "CONTINUE_RUN": 5,
-    "EXTEND_END_TIME": 4,
-    "FAIL_SAFELY": 3,
-    "REFINE_MESH": 1,
-    "REQUEST_DIAGNOSTIC": 1
-  },
-  "rulings": {
-    "ACCEPT|APPROVED": 13,
-    "ACCEPT|REJECTED": 1,
-    "CONTINUE_RUN|APPROVED": 4,
-    "CONTINUE_RUN|REJECTED": 1,
-    "EXTEND_END_TIME|APPROVED": 3,
-    "EXTEND_END_TIME|REJECTED": 1,
-    "FAIL_SAFELY|APPROVED": 3,
-    "REFINE_MESH|APPROVED": 1,
-    "REQUEST_DIAGNOSTIC|APPROVED": 1
-  },
-  "model": "gemini-3.5-flash-lite (all recorded text calls); field observer reads the same GEMINI_MODEL variable but does not record it"
+ "note": "Recount 2026-10-01 from every LLM call record in the archived nozzle and step campaigns (llm_calls.json, provenance.json, agent_decision.json, initial_e2e_agent_decision.json, llm_mesh_review.json, final_report_llm_call.json, and per-iteration copies), deduplicated per run by (stage, latency). Field-observation calls counted from per-iteration visual_observation.json records. Supersedes the events.jsonl-only count (82 calls, 23 proposals), which missed the feedback-loop iterations of the nozzle campaign.",
+ "n_sessions": 19,
+ "n_runs": 16,
+ "n_distinct_requests": 11,
+ "sessions": {
+  "nozzle": 8,
+  "step": 11
+ },
+ "model_calls_by_stage": {
+  "interpretation": 16,
+  "mesh review": 8,
+  "diagnosis": 28,
+  "field observation": 23,
+  "field observation (failed)": 5,
+  "summary": 22
+ },
+ "text_calls_first_attempt_success": "74/74",
+ "field_observation_failures": "5/23, all HTTP 503 UNAVAILABLE from the provider; no retry",
+ "latency_median_s_by_stage": {
+  "interpretation": 4.92,
+  "diagnosis": 2.9,
+  "summary": 2.81,
+  "mesh review": 1.94
+ },
+ "proposals_by_action": {
+  "ACCEPT": 14,
+  "CONTINUE_RUN": 5,
+  "EXTEND_END_TIME": 4,
+  "FAIL_SAFELY": 3,
+  "REFINE_MESH": 1,
+  "REQUEST_DIAGNOSTIC": 1
+ },
+ "rulings": {
+  "ACCEPT|APPROVED": 13,
+  "ACCEPT|REJECTED": 1,
+  "CONTINUE_RUN|APPROVED": 4,
+  "CONTINUE_RUN|REJECTED": 1,
+  "EXTEND_END_TIME|APPROVED": 3,
+  "EXTEND_END_TIME|REJECTED": 1,
+  "FAIL_SAFELY|APPROVED": 3,
+  "REFINE_MESH|APPROVED": 1,
+  "REQUEST_DIAGNOSTIC|APPROVED": 1
+ },
+ "model": "gemini-3.5-flash-lite (all recorded text calls); the field observer did not record its model in these runs: provider usage records show gemini-3.6-flash for its 15 step-session calls and gemini-3.5-flash-lite for its 8 nozzle-session calls"
 }

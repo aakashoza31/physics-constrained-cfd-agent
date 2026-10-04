@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Experiment modes.
+"""Experiment modes of the shared decision core.
 
-Every paper experiment is a switch on the ONE orchestrator, never a separate
-script. That is the point: an ablation that ran different code would not be an
-ablation of this system.
+Each mode is a switch on the one orchestrator, so an ablation runs the same
+decision code as the system itself. The paper's controller comparison
+(paper/cfd_forge/scripts/controller_comparison.py) uses three of these modes
+through decide_once: arm A = RECIPE_BASELINE, arm B = FULL, arm B' = GATES_OFF.
+Its arm C (model-only verdict on a filtered packet) is implemented in that
+script, not here. NO_DIAGNOSIS belongs to the separate legacy ablation harness
+(src/eval/harness.py).
 """
 from __future__ import annotations
 

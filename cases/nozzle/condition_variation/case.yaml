@@ -2,9 +2,13 @@ case_id: "condition_variation"
 original_id: "case_C_conditions"
 family: "nozzle"
 title: "Operating-condition variation"
-purpose: "same geometry, altered operating conditions"
+purpose: "Same geometry, altered operating conditions (paper ledger N3: p0=220 kPa; repeated as N8)"
 evidence_root: "demo/nozzle_e2e/case_C_conditions"
-evidence_present: true
+evidence_present: false
+archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/nozzle_e2e/case_C_conditions; they are not in this repository."
+evidence_in_clone:
+  - "demo/published_campaign/case_C_conditions"
+paper_ledger: "N3 (related: N8)"
 config: "configs/nozzles/case_C_conditions.yaml"
 related_campaigns:
   - "demo/nozzle_feedback_final/case_C_conditions"

@@ -10,8 +10,9 @@ is only hard when it has a scientifically justified pass condition.
 IMPORTANT DIFFERENCE FROM THE NOZZLE FAMILY
 -------------------------------------------
 The nozzle validator requires stationarity: it integrates to a steady state and
-refuses anything still evolving. The canonical forward-step solution is still
-evolving at t = 4, so a steady-state criterion would be scientifically wrong
+refuses anything still evolving. The forward-step solution of the Mach-3
+tutorial specification (``spec.is_canonical``; not the paper's Mach-2 canonical
+agent run) is still evolving at t = 4, so a steady-state criterion would be scientifically wrong
 here and is deliberately absent. "Has the transient run far enough" is not
 decided by a stationarity threshold; it is decided by whether the requested
 horizon was reached, which the spec declares.
@@ -233,6 +234,8 @@ def validate(d: Dict[str, Any]) -> Dict[str, Any]:
         "reference_comparison": d.get(
             "reference_comparison", {"status": "PENDING_NO_REFERENCE_PACKAGE"}
         ),
+        # True only for the Mach-3 tutorial specification, not the paper's
+        # Mach-2 canonical agent run.
         "canonical_case": spec.is_canonical,
         # ---------------- explicit open items -------------------------
         "unresolved": [

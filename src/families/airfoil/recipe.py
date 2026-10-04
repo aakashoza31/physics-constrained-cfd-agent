@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Family 3 recipe: frozen, reviewed, and transcribed -- not authored here.
+"""Airfoil recipe: frozen, reviewed, and transcribed -- not authored here.
+
+Not part of the CFD Forge paper (planned family; no CFD was run).
 
 Every numerical value below was supplied by the scientific review that froze
 this family, or is a NATIVE OpenFOAM Foundation v14 default restated for
@@ -263,13 +265,10 @@ RECIPE = FamilyRecipe(
             "projected, optimised or remeshed. The ONLY modification is the "
             "spanwise separation, set to b = 0.01 c with one spanwise cell. The "
             "custom Gmsh generator (v1 and v2) is ARCHIVED EVIDENCE and is not a "
-            "mesh source. ARCHIVED DESCRIPTION FOLLOWS: "
-            "preregistered Gmsh hierarchy only (coarse/medium/fine), generated from "
-            "the corrected TMR analytic sharp-trailing-edge NACA0012 section by one "
-            "deterministic pipeline; identical farfield on every level; exactly one "
-            "spanwise cell; no domain truncation and no ad-hoc remeshing. The NASA "
-            "Plot3D grids and the CGNS hex mesh are an OPTIONAL supporting "
-            "topology-authority branch and are not run levels."
+            "mesh source (it generated a coarse/medium/fine hierarchy from the "
+            "corrected TMR analytic sharp-trailing-edge NACA0012 section). The "
+            "NASA 2DN00 Plot3D grids and the single-level CGNS hex mesh are an "
+            "optional supporting topology-authority branch and are not run levels."
         ),
     },
     bounds={

@@ -29,6 +29,15 @@ Usage
     python scripts/run_forward_step_2d.py --request "..."
     python scripts/run_forward_step_2d.py --request-file request.txt
     python scripts/run_forward_step_2d.py --request "..." --plan-only
+    python scripts/run_forward_step_2d.py --resume-case <runtime case> --out <dir>
+
+Iteration budget and resumption
+-------------------------------
+--max-iterations bounds the iterations of ONE invocation (one session window).
+A run started with --resume-case numbers its iterations after those already on
+record and may take up to --max-iterations further iterations, so the total
+across resumed sessions can exceed --max-iterations. The archived case_H
+session (paper ledger S7) was supervised and resumed in this way.
 """
 from __future__ import annotations
 
@@ -846,7 +855,7 @@ class ForwardStepRun:
                     ev.SCIENTIFIC_VALIDATOR,
                     f"Numerical sensitivity: {sensitivity['status']} "
                     f"({sensitivity['grids']} grid(s)). {sensitivity['reason']}",
-                    status="PASS" if sensitivity["satisfied"] else "....",
+                    status="PASS" if sensitivity["satisfied"] else "INFO",
                     data={"latest_comparison": sensitivity["latest_comparison"]},
                 )
 
@@ -1125,6 +1134,10 @@ class ForwardStepRun:
             ),
         }
         try:
+            # allow_fallback=True: if the model summary call fails, a
+            # deterministic template summary is written instead and its record
+            # is labelled as a fallback. The summary is a report, not a
+            # decision; the paper states this behaviour.
             summary, record = summarize_case(payload, allow_fallback=True)
             self.note_llm(record)
             (self.out / "SCIENTIFIC_SUMMARY.md").write_text(summary + "\n", encoding="utf-8")
@@ -1166,7 +1179,16 @@ def main() -> int:
     )
 
     ap.add_argument("--out", default=str(_REPO_ROOT / "demo/forward_step_2d"))
-    ap.add_argument("--max-iterations", type=int, default=4)
+    ap.add_argument(
+        "--max-iterations",
+        type=int,
+        default=4,
+        help=(
+            "Iteration budget of this invocation (one session window). With "
+            "--resume-case it applies afresh to the resumed session, counted "
+            "after the iterations already on record."
+        ),
+    )
     ap.add_argument("--max-end-time", type=float, default=12.0)
     ap.add_argument(
         "--sensitivity-tolerance",

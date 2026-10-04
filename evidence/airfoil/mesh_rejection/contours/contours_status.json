@@ -4,7 +4,7 @@
   "field_time_directories": [],
   "renderer": "NOT_AVAILABLE",
   "script": "src/reporting/paraview_contours.py",
-  "reason": "the archived evidence carries post-processed series and logs but no reconstructed field time directories, so there is nothing to contour. Re-run the case live to produce fields.",
-  "what_exists_instead": "time-resolved integral series (forces, probes, fluxes) and the solver logs; those are plotted and animated, and they are not flow-field visualisations",
-  "not_done": "no flow field was synthesised, interpolated or stood in for the missing time directories"
+  "reason": "CFD was not run for this case: the meshes were rejected before any solver was launched, so no field exists to contour. Live execution is refused for this family.",
+  "what_exists_instead": "the mesh-qualification record (cases/airfoil/mesh_rejection/reference/corrected_diagnosis.json) and a summary of the deterministic gates (plots/convergence.png); there are no solver logs, integral series or animations",
+  "not_done": "no flow field was synthesised or stood in for the missing solution"
 }

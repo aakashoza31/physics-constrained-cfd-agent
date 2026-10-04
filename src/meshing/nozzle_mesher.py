@@ -1,3 +1,10 @@
+"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype Gmsh mesher. Not imported by the registered family runners or by
+src/pipeline.
+"""
 from __future__ import annotations
 
 import json
@@ -128,7 +135,7 @@ def _validate_constraints(
     constraints: dict[str, Any],
 ) -> dict[str, int | float | None]:
     """
-    Preserve Prompt-2 constraints exactly.
+    Preserve the user-supplied mesh constraints exactly.
 
     Missing constraints remain None. No hidden defaults are inserted.
     """

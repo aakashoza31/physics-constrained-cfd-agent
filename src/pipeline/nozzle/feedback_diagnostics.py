@@ -254,7 +254,7 @@ def fulfill_diagnostic_request(
         }
 
     if any(word in text for word in ("visual", "image", "contour", "field")):
-        focused["visual"] = visual_observation
+        focused["visual"] = _without_provenance(visual_observation)
 
     if not focused:
         focused["standard_bundle"] = {
@@ -272,7 +272,7 @@ def fulfill_diagnostic_request(
                 "max_transient_continuity_pct": validation.get("max_transient_continuity_pct"),
             },
             "mesh_and_gradients": profile_diagnostics,
-            "visual": visual_observation,
+            "visual": _without_provenance(visual_observation),
         }
 
     return {
@@ -362,3 +362,13 @@ def augment_evidence(
     if safe_diagnostic is not None:
         evidence.engineering.measured_outputs["fulfilled_diagnostic_request"] = safe_diagnostic
     return evidence
+
+
+def _without_provenance(observation):
+    """Drop observer provenance keys (model, model_version) before the
+    observation is placed in evidence the model sees, so the packet keeps the
+    shape used in the archived runs."""
+    if not isinstance(observation, dict):
+        return observation
+    return {k: v for k, v in observation.items()
+            if k not in ("model", "model_version")}

@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Evaluation metrics for the ablation study. Nothing here fabricates a number.
+"""Evaluation metrics for the legacy ablation harness. Nothing here fabricates a number.
+
+This module is a separate legacy ablation harness. The paper's controller
+comparison (arms A fixed rule, B CFD Forge, B' gates off, C model-only) was run
+by paper/cfd_forge/scripts/controller_comparison.py: arms A, B and B' call
+src.orchestrator.loop.decide_once, and arm C is implemented in that script.
+The arms defined below are not those arms.
 
 Every metric is defined as a function of runs that ACTUALLY HAPPENED. A metric
 computed over zero runs returns `NOT_RUN`, never 0.0 -- a false-acceptance rate
@@ -19,7 +25,8 @@ METRICS_VERSION = "evaluation-metrics/1.0.0"
 
 NOT_RUN = "NOT_RUN"
 
-#: The four configurations the paper compares.
+#: The four configurations of this legacy ablation harness (not the paper's
+#: controller-comparison arms; see the module docstring).
 ARM_FULL = "full_agent"
 ARM_RECIPE = "fixed_recipe_fixed_rules"
 ARM_NO_GATES = "agent_without_deterministic_gates"

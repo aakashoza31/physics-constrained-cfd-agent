@@ -16,7 +16,18 @@ Derived quantities computed here (and only here):
     the archived gate/audit outputs and are cross-checked against the raw force
     history.
 
-Usage:  python3 scripts/make_figures.py   (from the paper directory)
+Outputs (figures/, PDF and PNG):
+  * fig3_nozzle         nozzle axial profiles against quasi-1-D theory, stationarity
+                        metrics of the continuation run (paper figure "Nozzle results");
+  * fig4_step           Mach-2 forward-facing step: Mach and density at t = 4,
+                        front position, storage-aware mass closure;
+  * fig5_cube           turbulent cube diagnostic study: |U| at t* = 80, drag
+                        history, lateral force with complete cycles, cycle amplitude;
+  * fig2_configurations computational configurations of the three studies. Not
+                        used in the paper; kept because it is generated here.
+The paper includes the PDFs.
+
+Usage:  python3 scripts/make_figures.py   (from paper/cfd_forge/; needs numpy, matplotlib)
 """
 from __future__ import annotations
 
@@ -115,7 +126,7 @@ def quasi1d_profile(x, spec_r_throat=0.0326):
 
 
 # --------------------------------------------------------------------------
-# Figure 2: computational configurations
+# Computational configurations (fig2_configurations; not used in the paper)
 # --------------------------------------------------------------------------
 def fig2():
     fig = plt.figure(figsize=(TEXTWIDTH, 6.1))
@@ -202,7 +213,7 @@ def fig2():
 
 
 # --------------------------------------------------------------------------
-# Figure 3: nozzle profiles, theory comparison and continuation evidence
+# Nozzle profiles, theory comparison and continuation evidence (fig3_nozzle)
 # --------------------------------------------------------------------------
 def fig3():
     prof = np.loadtxt(DATA / "nozzle/axial_profile.csv", delimiter=",", skiprows=1)
@@ -259,7 +270,7 @@ def fig3():
 
 
 # --------------------------------------------------------------------------
-# Figure 4: forward-facing step
+# Forward-facing step (fig4_step)
 # --------------------------------------------------------------------------
 def crop_image(path, box):
     img = plt.imread(path)
@@ -326,7 +337,7 @@ def fig4():
 
 
 # --------------------------------------------------------------------------
-# Figure 5: cube diagnostic stress test
+# Cube diagnostic study (fig5_cube)
 # --------------------------------------------------------------------------
 def fig5():
     f = np.loadtxt(DATA / "cube/forces_merged.csv", delimiter=",", skiprows=1)

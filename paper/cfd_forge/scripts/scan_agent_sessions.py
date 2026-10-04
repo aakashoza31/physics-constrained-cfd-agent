@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Count model calls, proposals and validator rulings in archived agent sessions.
+"""SUPERSEDED: event-stream count of model calls, proposals and validator rulings.
 
-Reads every events.jsonl under the e2e demo tree (excluding re-analysis copies)
-and the per-call latency records, and writes data/agent_stats.json.
-Usage: python3 scan_agent_sessions.py <demo_dir> <out_json>
+Superseded by scripts/recount_agent_calls.py, which produces the counts in
+data/agent_stats.json and in the paper. This script counts only the events
+written to events.jsonl, so it misses the feedback-loop iterations of the nozzle
+campaign and gives the older totals (82 model calls, 23 proposals) instead of
+97 calls and 28 proposals. It is kept for reference only.
+
+Reads every events.jsonl under the archive demo/ tree (excluding re-analysis
+copies) and the per-call latency records, and writes <out_json>. It refuses to
+overwrite paper/cfd_forge/data/agent_stats.json unless --force is given.
+Usage: python3 scan_agent_sessions.py <demo_dir> <out_json> [--force]
 """
 import collections
 import glob
@@ -13,7 +20,14 @@ import statistics
 import sys
 from pathlib import Path
 
-demo, out = Path(sys.argv[1]), Path(sys.argv[2])
+args = [a for a in sys.argv[1:] if a != "--force"]
+if len(args) != 2:
+    raise SystemExit("usage: scan_agent_sessions.py <demo_dir> <out_json> [--force]")
+demo, out = Path(args[0]), Path(args[1])
+PAPER_STATS = Path(__file__).resolve().parents[1] / "data" / "agent_stats.json"
+if out.resolve() == PAPER_STATS and "--force" not in sys.argv[1:]:
+    raise SystemExit(f"refusing to overwrite {PAPER_STATS}: this superseded event count differs "
+                     "from the paper's recount (scripts/recount_agent_calls.py); pass --force to override")
 files = sorted(f for f in glob.glob(str(demo / "**/events.jsonl"), recursive=True)
                if "reanalysis_full" not in f)
 stage = collections.Counter()

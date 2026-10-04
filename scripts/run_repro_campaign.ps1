@@ -6,6 +6,7 @@ Set-Location $Repo
 if (-not $env:GEMINI_API_KEY) {
     throw "GEMINI_API_KEY is not configured in this PowerShell session."
 }
+if (-not $env:GEMINI_MODEL) { $env:GEMINI_MODEL = "gemini-3.5-flash-lite" }  # model used for the paper's text calls
 
 $Out = Join-Path $Repo "demo\runs\nozzle_feedback"
 New-Item -ItemType Directory -Force -Path $Out | Out-Null

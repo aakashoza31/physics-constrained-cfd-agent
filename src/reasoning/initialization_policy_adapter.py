@@ -1,4 +1,17 @@
-﻿from __future__ import annotations
+"""Legacy: initialization-mode policy for re-runs (unused).
+
+Not part of the CFD Forge paper; not imported by the registered families'
+runners (``scripts/run_nozzle_feedback.py``, ``scripts/run_nozzle_e2e.py``,
+``scripts/run_forward_step_2d.py``) or by ``src/pipeline``.  Kept for
+reference only.
+
+``select_initialization_mode`` chooses between a clean start, continuing on
+the same mesh, and ``mapFields`` from a previous solution, given whether the
+geometry or mesh changed and whether the source solution is trusted.  Mapping
+is permitted only when explicitly enabled and the source is explicitly
+trusted; otherwise a changed mesh starts clean.
+"""
+from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from enum import Enum

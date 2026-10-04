@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -95,15 +96,67 @@ def test_an_unroutable_prompt_is_refused_without_simulating():
     assert run.artifacts["solver_invoked"] is False
 
 
+def test_the_mesh_sensitivity_request_is_inconclusive_not_rejected():
+    """S8: ACCEPT was refused for want of a registered cross-grid tolerance."""
+    expected = json.loads((CASES / "forward_step" / "mesh_sensitivity"
+                           / "expected_result.json").read_text())["expected"]
+    assert expected["verdict"] == "INCONCLUSIVE"
+    assert expected["archived_status"] == "STOPPED_ACTION_REFUSED"
+    run = run_pipeline("replay forward_step", mode=REPLAY, family="forward_step",
+                       case="mesh_sensitivity")
+    assert run.decision.verdict == "INCONCLUSIVE"
+
+
+def _case_library_builder():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "build_case_library", _ROOT / "scripts" / "build_case_library.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.parametrize("status,verdict", [
+    ("ACCEPTED", "ACCEPT"),
+    ("STOPPED_ACTION_REFUSED", "INCONCLUSIVE"),
+    ("STOPPED_REFINEMENT_REFUSED", "INCONCLUSIVE"),
+    ("STOPPED_REBUILD_REQUIRED", "INCONCLUSIVE"),
+    ("UNEXECUTED_ACTION_REQUEST_DIAGNOSTIC", "INCONCLUSIVE"),
+    ("STOPPED_FAIL_SAFELY", "REJECT"),
+])
+def test_the_case_library_maps_archived_statuses_to_the_four_decisions(status, verdict):
+    assert _case_library_builder()._verdict_for_status(status) == verdict
+
+
+def test_the_case_library_refuses_without_the_archive(tmp_path):
+    """A clone without the Zenodo archive must not rewrite archived verdicts."""
+    import subprocess
+    import sys
+    before = {p: p.read_bytes() for p in CASES.rglob("expected_result.json")}
+    for flag in ([], ["--check"]):
+        out = subprocess.run(
+            [sys.executable, str(_ROOT / "scripts" / "build_case_library.py"),
+             "--archive-root", str(tmp_path), *flag],
+            cwd=_ROOT, capture_output=True, text=True, timeout=300)
+        assert out.returncode == 2, out.stdout + out.stderr
+        assert "archive missing" in out.stdout
+        assert "out of date" not in out.stdout
+    assert before == {p: p.read_bytes() for p in CASES.rglob("expected_result.json")}
+
+
+_ARCHIVE = os.environ.get("CFD_FORGE_ARCHIVE")
+
+
 @pytest.mark.skipif(
-    not (_ROOT / "demo" / "nozzle_e2e").is_dir()
-    or not (_ROOT / "handoff").is_dir(),
-    reason=("the large archived evidence is gitignored; this check runs where "
-            "it is present. See manifests/large_assets.json."))
+    not _ARCHIVE or not (Path(_ARCHIVE) / "demo" / "nozzle_e2e").is_dir(),
+    reason=("the archived session records are in the Zenodo archive (DOI to be "
+            "added on release); set CFD_FORGE_ARCHIVE to its unpacked location"))
 def test_the_case_library_is_up_to_date_with_its_evidence():
     import subprocess
     import sys
     out = subprocess.run(
-        [sys.executable, "scripts/build_case_library.py", "--check"],
+        [sys.executable, str(_ROOT / "scripts" / "build_case_library.py"),
+         "--archive-root", _ARCHIVE, "--check"],
         cwd=_ROOT, capture_output=True, text=True, timeout=300)
     assert out.returncode == 0, f"cases/ is stale:\n{out.stdout}"

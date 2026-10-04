@@ -1,9 +1,9 @@
-# Step height 0.30, extended horizon
+# Step height 0.30, step at x=1.0
 
 **Family:** `forward_step` &nbsp;|&nbsp; **Case:** `step_height_030_x100` &nbsp;|&nbsp;
 **Original id:** `case_G_step030_x100` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Accepted after the horizon was extended.
+Step-position variation (paper ledger S6): Mach 3, h=0.3 with the step at x=1.0. The front had not reached the inlet at t=4 and the run passed its contract: `PASS_2D_FORWARD_STEP` -> `ACCEPT` in one iteration. This is a separate request with a different step position, not a continuation of `step_height_030_x060`.
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Accepted after the horizon was extended.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/forward_step_2d/case_G_step030_x100` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_G_step030_x100`; they are not in this repository.
 
 ## Archived outcome
 

@@ -1,3 +1,11 @@
+"""Legacy (CAD->Gmsh prototype, see paper Appendix C 'Prototype'); not used by the registered families.
+
+Not part of the CFD Forge paper's registered nozzle or forward-step runs; kept
+for reference.  Parses a free-text CFD request into a structured ``CFDRequest`` with Gemini.
+The model identifier is read at request time from
+``src.agents.llm_provenance.gemini_model_name()``.  The deterministic fallback
+is opt-in (``allow_fallback=False`` by default).
+"""
 from __future__ import annotations
 
 import json
@@ -9,11 +17,9 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
+from src.agents.llm_provenance import gemini_model_name
 
-MODEL_NAME = os.getenv(
-    "GEMINI_MODEL",
-    "gemini-3.6-flash",
-)
+
 
 
 # ============================================================
@@ -363,9 +369,8 @@ def deterministic_fallback(
         )
 
 
-    # LEVEL1_CANONICAL_BC_ALIAS_FIX
-    # Accept physically equivalent terminology used by the canonical
-    # Level-1 engineering prompt and normalize pressure units to Pa.
+    # Accept physically equivalent boundary-condition terminology and
+    # normalize pressure units to Pa.
 
     def _pressure_value_pa(pattern: str):
         quantity_match = re.search(
@@ -527,10 +532,10 @@ def deterministic_fallback(
 
 def parse_cfd_request(
     user_prompt: str,
-    allow_fallback: bool = True,
+    allow_fallback: bool = False,
 ) -> tuple[CFDRequest, str]:
     """
-    Convert Prompt 2 into a structured CFD request.
+    Convert a free-text CFD request into a structured CFD request.
 
     Returns:
         request
@@ -559,7 +564,7 @@ def parse_cfd_request(
 
         response = (
             client.models.generate_content(
-                model=MODEL_NAME,
+                model=gemini_model_name(),
                 contents=user_prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=(

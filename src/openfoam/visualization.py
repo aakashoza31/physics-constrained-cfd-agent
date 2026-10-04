@@ -1,4 +1,11 @@
-﻿from __future__ import annotations
+﻿"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype post-processing (foamToVTK export and PyVista plots). Not imported
+by the registered family runners, by src/pipeline or by src/reporting.
+"""
+from __future__ import annotations
 
 import json
 import math
@@ -692,7 +699,7 @@ def prepare_openfoam_visualization(
     Post-process an already-computed OpenFOAM case.
 
     The case is staged into a clean WSL path because OpenFOAM v14
-    rejects the user's Windows project path when it contains spaces.
+    rejects a Windows project path that contains spaces.
 
     This function:
       1. stages the completed case into WSL,

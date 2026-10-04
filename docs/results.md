@@ -1,86 +1,148 @@
 # Results
 
-Two validated headline families and two supplementary development studies. Every
-row is read from archived evidence in this repository; nothing here is projected
-or expected.
+The two registered families (nozzle, 2-D forward-facing step), the turbulent-cube
+diagnostic study, and the controller comparison, as reported in the CFD Forge
+paper. A supplementary airfoil mesh study, which is not part of the paper, is
+recorded at the end. Every row is read from archived evidence in this repository
+or the session archive (Zenodo, DOI to be added on release); nothing here is
+projected or expected. All archived agent sessions are development cases, not a
+held-out evaluation.
 
 ## Status table
 
-| # | Family | Case | Physics | Outcome | What it demonstrates |
+| Family or study | Case(s) | Physics | Outcome | What it demonstrates |
+|---|---|---|---|---|
+| `nozzle` (registered) | `canonical_reference`, `geometry_variation`, `condition_variation` | inviscid compressible, axisymmetric 5° wedge | **ACCEPT** (3/3 requests) | acceptance, continuation and new cases built from text requests |
+| `forward_step_2d` (registered) | 8 cases | inviscid compressible, 2-D transient | 5 **ACCEPT**, 1 **REJECT**, 1 **INCONCLUSIVE**, 1 archived **REJECT** from a false-positive check | new cases, a safe stop, a refused `ACCEPT` |
+| `cube` (diagnostic study, not a family) | `drifting_wake` | URANS k-ω SST (`incompressibleFluid`), 3-D | **REJECT** (`STILL_DEVELOPING`, retrospectively registered gate) | solver completion and a settled drag do not establish a developed flow |
+
+## Nozzle
+
+| Case | Original id | Request | Archived status | Decision |
+|---|---|---|---|---|
+| `canonical_reference` | `case_A_reference` | reference, r_e = 35.4 mm, p0 = 200 kPa | `PASS_SINGLE_MESH` | ACCEPT |
+| `geometry_variation` | `case_B_geometry` | exit radius 37.0 mm | `PASS_SINGLE_MESH` | ACCEPT |
+| `condition_variation` | `case_C_conditions` | p0 = 220 kPa | `PASS_SINGLE_MESH` | ACCEPT |
+
+These are the canonical runs (N1-N3 in the paper's session ledger). The
+requests were repeated while the feedback loop was developed (N4-N8). A separate
+continuation run of the reference request (N6, `nozzle_feedback_v2_hotfix`) was
+executed first to 1 ms, failed the steady mass-balance and stationarity checks
+(`FAIL`), and was accepted after `CONTINUE_RUN`, `CONTINUE_RUN`, `ACCEPT`
+(`PASS_SINGLE_MESH` at 6 ms). N4 and N5 ended before an approved action was
+carried out and are recorded as not accepted. The session records are in the
+Zenodo session archive (`demo/nozzle_e2e/`, `demo/nozzle_feedback*/`).
+
+## Forward-facing step
+
+| Ledger | Case | Original id | Request (M, h, x) | Archived status | Decision |
 |---|---|---|---|---|---|
-| F1 | `nozzle` | `canonical_reference`, `geometry_variation`, `condition_variation` | compressible Euler, 2-D | **ACCEPTED** (3/3) | validated acceptance, continuation and correction behaviour |
-| F2 | `forward_step_2d` | 8 cases | compressible Euler, 2-D transient | **ACCEPTED** (5) + **safe stop** (3) | accepted variations, mesh sensitivity, and an inadmissible variation refused |
-| X1 | `cube` | `drifting_wake` | incompressible RANS, 3-D transient | **SUPPLEMENTARY / NOT VALIDATED** | exploratory 3-D execution and stationarity/development assessment |
-| S1 | `airfoil` | `mesh_rejection` | incompressible RANS, 2-D | **MESH REJECTED, `CFD_NOT_RUN`** | the mesh contract refusing every candidate mesh; no solver ever launched |
+| S2 | `mach20_canonical` | `case_B_mach20` | 2.0, 0.20, 0.6 | `PASS_2D_FORWARD_STEP` | ACCEPT |
+| S3 | `mach35_variation` | `case_C_mach35` | 3.5, 0.20, 0.6 | `PASS_2D_FORWARD_STEP` | ACCEPT |
+| S4 | `step_height_010` | `case_E_step010` | 3.0, 0.10, 0.6 | `PASS_2D_FORWARD_STEP` | ACCEPT |
+| S6 | `step_height_030_x100` | `case_G_step030_x100` | 3.0, 0.30, 1.0 | `PASS_2D_FORWARD_STEP` | ACCEPT |
+| S7 | `iterative_correction` | `case_H_iterative_short_run` | 3.0, 0.20, 0.6, staged horizon | `PASS_2D_FORWARD_STEP` after 7 proposals over 4 resumed sessions | ACCEPT after supervised resumption and a restart-seam mass-closure fix (not an unattended result) |
+| S5 | `step_height_030_x060` | `case_F_step030` | 3.0, 0.30, 0.6 | `FAIL` (no measurable compression front; `STOPPED_FAIL_SAFELY`) | REJECT |
+| S8 | `mesh_sensitivity` | `case_I_mesh_sensitivity` | 3.0, 0.20, 0.6, sensitivity request | `STOPPED_ACTION_REFUSED` | INCONCLUSIVE |
+| S1 | `live_run` | `live_run_01` | 2.5, 0.15, 0.6 | `FAIL` from a false-positive fatal-error check (`STOPPED_FAIL_SAFELY`) | archived REJECT; `PASS_2D_FORWARD_STEP` on corrected deterministic reanalysis |
 
-## F1 — compressible nozzle (ACCEPTED)
+`step_height_030_x060` (S5): the solver completed and the fields were sane, but
+the compression front was displaced to x = 0.025 and could not be measured, so
+the model proposed `FAIL_SAFELY`, which was approved, and the run was preserved
+and rejected rather than tuned. `step_height_030_x100` (S6) moves the same step
+(h = 0.3) to x = 1.0; both runs went to t = 4. At x = 1.0 the front had not yet
+reached the inlet at t = 4 and the run passed its contract, which for this
+transient family includes no stationarity criterion.
 
-| Case | Original id | Archived status | Verdict |
+`mesh_sensitivity` (S8): the model proposed `REFINE_MESH`, which was approved
+(4,032 to 16,128 cells, fresh solve); both grids passed their hard checks, and
+the model's subsequent `ACCEPT` was refused by the action validator because no
+cross-grid tolerance is registered for the step family. Both solutions were
+healthy, but the requested sensitivity assessment could not be certified, so the
+decision is INCONCLUSIVE. The replay trace of `scripts/run_demo.py` has no
+mapping for a refused action and records this case as REJECT
+(`cases/forward_step/mesh_sensitivity/expected_result.json`).
+
+`live_run` (S1): the archived validator matched the OpenFOAM start-up line that
+enables floating-point trapping as a fatal error. The archived verdict remains
+REJECT; a deterministic reanalysis of the unchanged run after the detector was
+corrected returns `PASS_2D_FORWARD_STEP` without a new solve.
+
+## Cube diagnostic study
+
+The cube calculation was run outside the agent loop (23-24 September 2026). Its
+stationarity gate, `cube-stationarity/1.0.0` (`src/families/cube/stationarity.py`),
+was registered retrospectively on 28 September 2026, after the data existed. The
+calculation completed its bounded extension to t* = 80 without numerical failure.
+
+| Quantity (window t* = 59.98-79.98) | Measured | Registered limit | Result |
 |---|---|---|---|
-| `canonical_reference` | `case_A_reference` | `PASS_SINGLE_MESH` | ACCEPT |
-| `geometry_variation` | `case_B_geometry` | `PASS_SINGLE_MESH` | ACCEPT |
-| `condition_variation` | `case_C_conditions` | `PASS_SINGLE_MESH` | ACCEPT |
+| Drag drift over the window | 0.075% of mean | ≤ 2% | PASS |
+| Mean lateral force / mean drag | 0.063% | ≤ 5% | PASS |
+| **Half-window mean \|Fz\| ratio** | **2.10** | **≤ 1.25** | **FAIL** |
 
-Correction behaviour is preserved in the feedback campaigns under
-`demo/nozzle_feedback*`, and the published campaign under
-`demo/published_campaign` carries the closed-loop demonstration.
-
-## F2 — forward-facing step (ACCEPTED, with a refusal)
-
-| Case | Original id | Archived status | Verdict |
-|---|---|---|---|
-| `mach20_canonical` | `case_B_mach20` | `ACCEPTED` / `PASS_2D_FORWARD_STEP` | ACCEPT |
-| `mach35_variation` | `case_C_mach35` | `ACCEPTED` | ACCEPT |
-| `step_height_010` | `case_E_step010` | `ACCEPTED` | ACCEPT |
-| `step_height_030_x100` | `case_G_step030_x100` | `ACCEPTED` | ACCEPT |
-| `iterative_correction` | `case_H_iterative_short_run` | `ACCEPTED` after 7 iterations | ACCEPT |
-| `step_height_030_x060` | `case_F_step030` | `STOPPED_FAIL_SAFELY` | REJECT |
-| `mesh_sensitivity` | `case_I_mesh_sensitivity` | `STOPPED_ACTION_REFUSED` | REJECT |
-| `live_run` | `live_run_01` | `STOPPED_FAIL_SAFELY` | REJECT |
-
-`step_height_030_x060` is the inadmissible variation: the solver
-completed and the fields were sane, but the registered compression-front check
-was not measurable within the requested horizon, so the run stopped safely
-instead of being accepted. `step_height_030_x100` is the same geometry with
-the horizon extended, and it is accepted.
-
-## X1 — surface-mounted cube (supplementary exploratory study)
-
-A 3-D turbulent run executed to t = 80 and reported no numerical failure.
-
-| Quantity | Measured | Registered limit | Result |
-|---|---|---|---|
-| Streamwise force drift over the final window | 0.08% of mean | ≤ 2% | PASS |
-| Vertical force drift | 0.05% of mean | ≤ 2% | PASS |
-| Mean lateral force / mean drag | 6.3e-4 | ≤ 0.05 | PASS |
-| **Lateral force growth across the window** | **2.10×** | **≤ 1.25×** | **FAIL** |
-
-The lateral force is a periodic mode of period ≈ 10.1 time units whose amplitude
-grew from 1.01e-4 to 6.91e-3 — a factor of 68 — at an exponential rate of 0.091
-per time unit (e-folding 11.0), and had not saturated when the run ended.
-
-**Every conventional convergence indicator passed.** The drag was settled to
-0.08%, but the registered lateral-growth criterion was not satisfied. The case
-is therefore retained as a supplementary stationarity/development study rather
-than a validated cube benchmark. The archived assessment is reproducible with
+The gate returns `STILL_DEVELOPING` and the result is REJECT. The lateral force
+oscillates with a period of about 10.1 time units while its envelope grows. A
+separate read-only complete-cycle audit, which is not part of the gate, finds
+successive complete-cycle amplitude growth of 209%, 137% and 113%: the growth
+rate is declining, but the mode has not saturated. Between the t* = 60-70 and
+70-80 block averages the mean drag changes by 0.04% while the RMS lateral force
+increases by 110%. No reference comparison is claimed. The archived assessment is
+reproduced with
 `python scripts/run_demo.py --family cube --case drifting_wake --mode replay`.
 
-No reference comparison was performed because the flow had not reached the
-registered development criterion. The raw machine-readable historical outcome is
-preserved in the case evidence for provenance.
+**LLM diagnosis of the cube evidence.** On 1 October 2026 the agent's diagnosis
+stage was applied three times to the archived cube evidence
+(`paper/cfd_forge/scripts/cube_llm_diagnosis.py`, `gemini-3.5-flash-lite`,
+temperature 0, identical packet without the gate verdict or threshold). Records:
+`evidence/cube/drifting_wake/llm_diagnosis/`.
 
-## S1 — NACA0012 (supplementary, `CFD_NOT_RUN`)
+| Call | Diagnosis | Proposed action | Validator |
+|---|---|---|---|
+| 1 | `STILL_DEVELOPING` | `CONTINUE_RUN` | approved |
+| 2 | `NUMERICALLY_UNHEALTHY` | `FAIL_SAFELY` | approved |
+| 3 | `STILL_DEVELOPING` | `CONTINUE_RUN` | approved |
+
+No call proposed `ACCEPT`, and no action was executed. Identical inputs at
+temperature 0 produced two different diagnoses.
+
+## Controller comparison
+
+Four controllers were compared on archived decision points with
+`gemini-3.5-flash-lite` at temperature 0 and the current validators: (A) fixed
+rule, (B) CFD Forge, (B') gates off, (C) model only on a filtered packet without
+the deterministic check results. Script:
+`paper/cfd_forge/scripts/controller_comparison.py`; evidence:
+`evidence/controller_comparison/20261001T213031Z/`.
+
+| Controller | Archived (16 points) | Planted faults (18) | Defects (2) |
+|---|---|---|---|
+| A: fixed rule | 16/16 (0) | 18/18 (0) | 0/2 (0) |
+| B: CFD Forge | 79/79 (0) | 53/53 (0) | 0/10 (0) |
+| B': gates off | 74/79 (0) | 53/53 (0) | 0/10 (0) |
+| C: model only | 72/79 (7) | 3/53 (50) | 5/10 (0) |
+
+Entries are correct decisions / decisions, false accepts in parentheses. 288
+model calls were attempted, 284 succeeded and 4 failed (`429 RESOURCE_EXHAUSTED`);
+1,099,390 tokens; median latency 1.27 s. Rerunning it requires the Zenodo session
+archive (`--demo-root`) and a `GEMINI_API_KEY`; model outputs are not
+reproducible exactly. The older harness `scripts/run_evaluation.py` is a
+separate legacy replay harness, not this comparison (`evaluation/README.md`).
+
+## NACA0012 airfoil mesh study (not part of the paper, `CFD_NOT_RUN`)
+
+Not part of the CFD Forge paper; a mesh-development record in which no flow solver was run.
 
 Three mesh generations were attempted and all were rejected. The record below is
 the **corrected** one, from an independent cell-geometry audit; the raw
-qualification reports under `outputs/airfoil_mesh/` are superseded historical
+qualification reports under `outputs/airfoil_mesh/` (development archive, not in this repository) are superseded historical
 evidence and carry a `SUPERSEDED.txt` banner.
 
-### Defects that were ours, not NASA's
+### Defects in the earlier diagnosis, not in the NASA grids
 
 The earlier diagnosis blamed the NASA grids for cell orientation, in-plane
-validity and skewness. The audit showed all three were artefacts of our own
-representation:
+validity and skewness. The audit showed all three were artefacts of the
+repository's own representation:
 
 * the coordinate transform `(x,y,z)_NASA -> (x,z,y)_OpenFOAM` reverses handedness;
 * the corrected local vertex permutation for the archived NASA ordering is
@@ -123,20 +185,14 @@ Face-tet warnings remain unresolved at 72 / 214 / 625 faces. They are not needed
 to establish the rejection, because stretching already fails decisively.
 
 **Final status: `MESH_REJECTED / CFD_NOT_RUN`.** No flow solver was ever launched
-for this family. Its value in the paper is as a negative result — and as an
-honest account of a diagnosis that was wrong until it was independently audited.
+for this study. It is retained as a negative result and as a record of a
+diagnosis that was wrong until it was independently audited.
 
-## Registered-case safety regression (replay consistency)
+## Registered-case replay consistency
 
-Replaying all 13 registered cases through the pipeline reproduces every archived
-verdict: **false acceptance 0.0, correct rejection 1.0** over 13 runs.
-
-This is a **safety regression / replay-consistency test**, not the paper's
-evaluation. It shows that the deterministic gates still reach the same verdicts
-on fixed archived evidence. It says nothing about model generalisation, because
-no model decides anything in a replay and no new case is attempted.
-
-## Evaluation
-
-The ablation study (full agent vs fixed recipe vs gates-off vs no-diagnosis) is
-`NOT_RUN`. See `docs/reproducibility.md` and `evaluation/README.md`.
+Replaying the registered cases through `scripts/run_demo.py --mode replay`
+reproduces every archived verdict stored in `cases/*/*/expected_result.json`.
+This is a replay-consistency check, not an evaluation: no model decides anything
+in a replay and no new case is attempted. The replay trace reports three
+terminal verdicts (ACCEPT, REJECT, INCONCLUSIVE), so it records the S8
+refused-action case as REJECT where the paper's decision is INCONCLUSIVE.

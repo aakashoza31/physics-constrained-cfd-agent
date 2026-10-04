@@ -3,7 +3,7 @@
 **Family:** `nozzle` &nbsp;|&nbsp; **Case:** `condition_variation` &nbsp;|&nbsp;
 **Original id:** `case_C_conditions` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Same geometry, altered operating conditions.
+Same geometry, altered operating conditions (paper ledger N3: p0=220 kPa; repeated as N8).
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Same geometry, altered operating conditions.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/nozzle_e2e/case_C_conditions` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/nozzle_e2e/case_C_conditions`; they are not in this repository.
 
 ## Archived outcome
 

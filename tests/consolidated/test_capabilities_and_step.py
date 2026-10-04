@@ -149,3 +149,43 @@ def test_parametric_geometry_is_normalised_by_the_characteristic_dimension():
 def test_an_unknown_family_is_refused():
     features = geom.from_parameters({"x": 1.0}, characteristic_name="x")
     assert matching.admissible("plasma", features).status == matching.NO_FAMILY
+
+
+def test_declared_action_vocabularies_are_the_paper_enums():
+    """The capability table advertises exactly the actions the validators know."""
+    from src.contracts.agent_decision import AgentAction
+    from src.reasoning.forward_step_actions import ForwardStepAction
+
+    assert caps.TABLE["nozzle"].allowed_actions == tuple(a.value for a in AgentAction)
+    assert caps.TABLE["forward_step_2d"].allowed_actions == tuple(
+        a.value for a in ForwardStepAction)
+    assert set(caps.TABLE["nozzle"].allowed_actions) == {
+        "ACCEPT", "CONTINUE_RUN", "REQUEST_DIAGNOSTIC", "REFINE_THROAT",
+        "REFINE_GRADIENT_REGION", "REPAIR_MESH", "RESTART_CLEAN",
+        "REJECT_OUTSIDE_DOMAIN"}
+    assert set(caps.TABLE["forward_step_2d"].allowed_actions) == {
+        "ACCEPT", "CONTINUE_RUN", "EXTEND_END_TIME", "REDUCE_MAX_CO",
+        "REFINE_MESH", "REBUILD_FROM_VALIDATED_SPEC", "REQUEST_CLARIFICATION",
+        "REJECT_UNSUPPORTED", "FAIL_SAFELY"}
+
+
+MODEL_CALLERS = ("src.agents.cfd_visual_observer",
+                 "src.reasoning.forward_step_diagnosis",
+                 "src.reasoning.nozzle_diagnosis")
+
+
+@pytest.mark.parametrize("module_name", MODEL_CALLERS)
+def test_observer_and_diagnosis_share_one_model_default(module_name, monkeypatch):
+    import importlib
+
+    from src.agents import llm_provenance
+
+    module = importlib.import_module(module_name)
+    assert module.gemini_model_name is llm_provenance.gemini_model_name
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    assert module.gemini_model_name() == "gemini-3.5-flash-lite"
+    assert llm_provenance.DEFAULT_GEMINI_MODEL == "gemini-3.5-flash-lite"
+    monkeypatch.setenv("GEMINI_MODEL", "some-other-model")
+    assert module.gemini_model_name() == "some-other-model"
+    source = Path(module.__file__).read_text(encoding="utf-8")
+    assert 'getenv("GEMINI_MODEL"' not in source

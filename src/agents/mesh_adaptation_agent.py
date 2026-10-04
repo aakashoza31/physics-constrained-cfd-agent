@@ -1,3 +1,11 @@
+"""Legacy (CAD->Gmsh prototype, see paper Appendix C 'Prototype'); not used by the registered families.
+
+Not part of the CFD Forge paper's registered nozzle or forward-step runs; kept
+for reference.  Proposes Gmsh mesh-adaptation steps with Gemini.
+The model identifier is read at request time from
+``src.agents.llm_provenance.gemini_model_name()``.  The deterministic fallback
+is opt-in (``allow_fallback=False`` by default).
+"""
 from __future__ import annotations
 
 import hashlib
@@ -9,13 +17,14 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from src.agents.llm_provenance import gemini_model_name
+
 from google import genai
 from google.genai import types
 
 from src.agents.mesh_planner_agent import MeshStrategy
 
 
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
 
 # ============================================================
@@ -247,8 +256,7 @@ def load_gemini() -> genai.Client:
 
     if not api_key:
         raise RuntimeError(
-            "GEMINI_API_KEY is not set. In PowerShell, run:\n"
-            '$env:GEMINI_API_KEY="your-real-api-key"'
+            "GEMINI_API_KEY is not set."
         )
 
     return genai.Client(api_key=api_key)
@@ -265,7 +273,7 @@ def propose_mesh_adaptation(
     current_strategy: MeshStrategy,
     mesh_result: dict[str, Any],
     history: list[dict[str, Any]] | None = None,
-    allow_fallback: bool = True,
+    allow_fallback: bool = False,
     response_cache_path: Path | None = None,
 ) -> tuple[MeshAdaptationProposal, str]:
     """
@@ -364,7 +372,7 @@ def propose_mesh_adaptation(
             client = load_gemini()
 
             response = client.models.generate_content(
-                model=MODEL_NAME,
+                model=gemini_model_name(),
                 contents=json.dumps(payload, indent=2),
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
@@ -393,7 +401,7 @@ def propose_mesh_adaptation(
                 response_cache_path.write_text(
                     json.dumps(
                         {
-                            "model": MODEL_NAME,
+                            "model": gemini_model_name(),
                             "payload_sha256": payload_sha256,
                             "payload": payload,
                             "response_text": response_text,

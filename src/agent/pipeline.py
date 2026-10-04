@@ -25,6 +25,13 @@ Modes
   live     execute OpenFOAM. Requires Foundation v14 and an explicit opt-in.
   replay   read archived evidence for a registered case. Never claims a solver ran.
   dry-run  stop after admissibility and the family contract. Touches nothing.
+
+Scope note: this generic pipeline, and its ``gemini`` backend in particular, is
+a simplified demonstration path. It is not the path used for the paper's runs,
+which go through the family runners (``scripts/run_nozzle_feedback.py``,
+``scripts/run_nozzle_e2e.py``, ``scripts/run_forward_step_2d.py``). Action
+vocabularies come from ``src/families/capabilities.py``; a proposed action is
+permitted only if it is an exact member of the family's vocabulary.
 """
 from __future__ import annotations
 
@@ -270,8 +277,8 @@ def run_pipeline(prompt: str, *, mode: str = DRY_RUN,
                                    accepted_by_authority=call.action_in_vocabulary)
         run.trace.gate(
             "permitted_actions",
-            all(any(str(a).startswith(act) for act in allowed)
-                for a in proposed_actions) if proposed_actions else True,
+            all(str(a) in allowed for a in proposed_actions)
+            if proposed_actions else True,
             measured={"proposed": proposed_actions, "allowed": allowed},
             threshold="a proposed action must be in the family's registered "
                       "vocabulary",

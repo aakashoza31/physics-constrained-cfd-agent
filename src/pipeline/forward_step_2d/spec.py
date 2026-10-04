@@ -15,6 +15,13 @@ the cyclic span boundary condition are removed: this family is physically 2D and
 the span is a single empty layer, which is a property of the family rather than
 a free parameter.
 
+"CANONICAL" IN THIS MODULE
+--------------------------
+``CANONICAL_*``, ``CANONICAL_SPEC`` and ``is_canonical`` refer to the Mach-3
+OpenFOAM tutorial specification reproduced by the default spec. They do not
+refer to the paper's canonical agent run, which is the Mach-2 case
+(cases/forward_step/mach20_canonical).
+
 SCOPE
 -----
 Supersonic inviscid compressible Euler over a forward-facing step, normalized
@@ -40,7 +47,7 @@ R_SPECIFIC = 8314.46261815324 / 11640.3
 CP = 2.5
 GAMMA = CP / (CP - R_SPECIFIC)
 
-# Canonical tutorial resolution. nx counts cells across the full channel length
+# Tutorial-specification (Mach 3) resolution. nx counts cells across the full channel length
 # at the upper level; ny counts cells across the full channel height.
 CANONICAL_NX = 240
 CANONICAL_NY = 80
@@ -175,11 +182,11 @@ class ForwardStep2DSpec:
 
         if self.mach <= 1:
             raise ValueError(
-                "This family is validated for supersonic inflow only (Mach > 1)"
+                "This family is registered for supersonic inflow only (Mach > 1)"
             )
         if self.max_co > 0.2:
             raise ValueError(
-                "max_co above the trusted 0.2 recipe is outside the validated family"
+                "max_co above the trusted 0.2 recipe is outside the registered family"
             )
         if self.write_interval > self.end_time:
             raise ValueError("write_interval must not exceed end_time")
@@ -263,7 +270,10 @@ class ForwardStep2DSpec:
 
     @property
     def is_canonical(self) -> bool:
-        """True when this spec reproduces the trusted tutorial case exactly."""
+        """True when this spec reproduces the Mach-3 tutorial specification exactly.
+
+        This is not the paper's canonical agent run (Mach 2).
+        """
         return self.to_dict() == ForwardStep2DSpec().to_dict()
 
     # ------------------------------------------------------------------
@@ -296,7 +306,7 @@ class ForwardStep2DSpec:
         return cls.from_dict(data)
 
     def with_changes(self, **changes: Any) -> "ForwardStep2DSpec":
-        """A new validated spec. Used by approved bounded actions."""
+        """A new spec, re-checked on construction. Used by approved bounded actions."""
         return ForwardStep2DSpec.from_dict({**self.to_dict(), **changes})
 
 

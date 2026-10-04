@@ -1,7 +1,7 @@
 """Deterministic action execution helpers for the nozzle feedback loop.
 
 The LLM selects an action. These helpers define the only permitted mechanical
-realizations of those actions inside the validated nozzle domain. The model does
+realizations of those actions inside the registered nozzle domain. The model does
 not edit OpenFOAM dictionaries or invent mesh counts directly.
 """
 from __future__ import annotations

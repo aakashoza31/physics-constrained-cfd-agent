@@ -2,7 +2,10 @@
 """Agent-loop architecture diagram for the CFD Forge paper.
 
 Stage call counts and proposal rulings are read from data/agent_stats.json
-(scripts/scan_agent_sessions.py); nothing else in the figure is data.
+(produced by the recount in scripts/recount_agent_calls.py); nothing else in the
+figure is data. Output: figures/fig_agent_loop.pdf and .png.
+
+Usage:  python3 scripts/make_agent_loop_figure.py   (from paper/cfd_forge/)
 """
 import json
 from pathlib import Path

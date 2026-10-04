@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Closed-loop LLM CFD agent for the validated internal-nozzle domain.
+"""Closed-loop LLM CFD agent for the registered internal-nozzle family.
 
 Loop:
   solve -> deterministic diagnostics -> native-field images -> LLM reasoning
@@ -948,7 +948,7 @@ def run_case(args: argparse.Namespace, case: Optional[str]) -> Dict[str, Any]:
             gate = evaluate_scope(current_spec)
             if not gate.approved:
                 raise RuntimeError(
-                    "continuation left validated scope: " + "; ".join(gate.reasons)
+                    "continuation left registered scope: " + "; ".join(gate.reasons)
                 )
             emit(
                 "ACTION EXECUTOR",
@@ -983,7 +983,7 @@ def run_case(args: argparse.Namespace, case: Optional[str]) -> Dict[str, Any]:
             gate = evaluate_scope(current_spec)
             if not gate.approved:
                 raise RuntimeError(
-                    "refined case left validated scope: " + "; ".join(gate.reasons)
+                    "refined case left registered scope: " + "; ".join(gate.reasons)
                 )
             save_json(
                 case_out / f"refinement_iteration_{iteration:02d}.json", refinement
@@ -1010,7 +1010,7 @@ def run_case(args: argparse.Namespace, case: Optional[str]) -> Dict[str, Any]:
 
         elif previous_action == AgentAction.REPAIR_MESH.value:
             # Invalid topology/geometry is intentionally not auto-repaired in
-            # this validated domain.  The mesh gate fails closed before CFD.
+            # this registered family.  The mesh gate fails closed before CFD.
             summary = {
                 "label": label,
                 "status": "MESH_REPAIR_OUTSIDE_AUTOMATED_SCOPE",
@@ -1086,7 +1086,7 @@ def main() -> int:
     if args.max_diagnostic_requests < 0 or args.max_diagnostic_requests > 3:
         raise SystemExit("--max-diagnostic-requests must be between 0 and 3")
     if not (0.001 <= args.end_time <= 0.02):
-        raise SystemExit("--end-time must remain inside the validated [0.001, 0.02] s envelope")
+        raise SystemExit("--end-time must remain inside the registered [0.001, 0.02] s envelope")
     if not (args.end_time <= args.max_end_time <= 0.02):
         raise SystemExit("--max-end-time must be >= --end-time and <= 0.02 s")
     if args.feedback_increment <= 0:

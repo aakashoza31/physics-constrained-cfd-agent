@@ -1,6 +1,6 @@
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-09-28T03:04:19Z",
+  "generated_utc": "2026-10-04T23:43:31Z",
   "prompt": "run the registered airfoil case mesh_rejection",
   "mode": "replay",
   "family": "airfoil",
@@ -9,9 +9,9 @@
   "solver": "not executed",
   "evidence_root": "outputs/airfoil_mesh",
   "case_directory": "cases/airfoil/mesh_rejection",
-  "python": "3.10.12",
-  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-  "git_commit": "NOT_AVAILABLE",
+  "python": "3.11.15",
+  "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+  "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",

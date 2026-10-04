@@ -41,6 +41,8 @@ from src.reasoning.forward_step_diagnosis import build_evidence_payload  # noqa:
 from src.reasoning.forward_step_scope_gate import evaluate_scope  # noqa: E402
 from tests.forward_step_2d.synthetic import make_case  # noqa: E402
 
+# CANONICAL_SPEC is the OpenFOAM Mach-3 forward-step tutorial recipe (the
+# spec's defaults). The paper's canonical case is Mach 2 on the same grid.
 NONCANONICAL = ForwardStep2DSpec(mach=2.5, step_height=0.15)
 
 

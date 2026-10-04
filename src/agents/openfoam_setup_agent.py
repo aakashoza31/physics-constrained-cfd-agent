@@ -1,3 +1,11 @@
+"""Legacy (CAD->Gmsh prototype, see paper Appendix C 'Prototype'); not used by the registered families.
+
+Not part of the CFD Forge paper's registered nozzle or forward-step runs; kept
+for reference.  Chooses the OpenFOAM setup for an approved Gmsh mesh with Gemini.
+The model identifier is read at request time from
+``src.agents.llm_provenance.gemini_model_name()``.  The deterministic fallback
+is opt-in (``allow_fallback=False`` by default).
+"""
 from __future__ import annotations
 
 import json
@@ -10,11 +18,9 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
+from src.agents.llm_provenance import gemini_model_name
 
-MODEL_NAME = os.getenv(
-    "GEMINI_MODEL",
-    "gemini-3.6-flash",
-)
+
 
 
 # ============================================================
@@ -345,7 +351,7 @@ def plan_openfoam_setup(
     geometry_analysis: dict[str, Any],
     cfd_request: dict[str, Any],
     best_mesh_metrics: dict[str, Any],
-    allow_fallback: bool = True,
+    allow_fallback: bool = False,
 ) -> tuple[OpenFOAMSetupPlan, str]:
     """
     Ask Gemini to choose the unspecified OpenFOAM engineering
@@ -390,7 +396,7 @@ def plan_openfoam_setup(
         client = load_gemini()
 
         response = client.models.generate_content(
-            model=MODEL_NAME,
+            model=gemini_model_name(),
             contents=json.dumps(
                 payload,
                 indent=2,

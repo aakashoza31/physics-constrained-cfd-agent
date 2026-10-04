@@ -60,10 +60,9 @@ RESOLUTION_UNRELATED_FAILURES = {
     "no_fatal_error",
 }
 
-# Bounded refinement policy. The factor and the level cap now live in
+# Bounded action policy. The mesh-refinement factor and the level cap live in
 # src/reasoning/forward_step_mesh_study.py, which owns the one registered
-# mesh operation; REFINE_FACTOR is kept only so existing imports resolve.
-REFINE_FACTOR = 1.5
+# mesh operation.
 MAX_CO_FLOOR = 0.05
 MAX_EXTEND_FACTOR = 3.0
 

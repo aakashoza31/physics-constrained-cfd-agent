@@ -1,10 +1,17 @@
-# Agent Architecture
+# Agent architecture: nozzle feedback loop
+
+This page details the nozzle family's agent loop (`scripts/run_nozzle_feedback.py`,
+`scripts/run_nozzle_e2e.py`). The forward-facing-step loop
+(`scripts/run_forward_step_2d.py`) follows the same pattern with its own scope
+gate, evidence packet, action vocabulary and validators; both vocabularies are
+listed under [Feedback actions](#feedback-actions). The system-level view is in
+`docs/architecture.md`.
 
 ## Design principle
 
 The architecture separates **reasoning** from **scientific authority**.
 
-The LLM is the orchestration and diagnostic brain. It interprets the user's engineering request, reviews mesh evidence, examines numerical and visual CFD evidence, forms competing hypotheses, and proposes a high-level action.
+The LLM drives the workflow by proposing what to do. It interprets the user's engineering request, reviews mesh evidence, examines numerical and visual CFD evidence, forms competing hypotheses, and proposes a high-level action.
 
 Deterministic software remains authoritative for geometry bounds, mesh validity, numerical execution, physical admissibility, conservation, stationarity, action permissions, and final acceptance.
 
@@ -94,7 +101,17 @@ Visual evidence is explicitly supporting evidence. Numerical diagnostics outrank
 
 ## Feedback actions
 
-The action vocabulary is defined in `src/contracts/agent_decision.py`.
+Actions come from closed, family-specific vocabularies:
+
+| Family | Vocabulary | Defined in |
+|---|---|---|
+| nozzle | `ACCEPT`, `CONTINUE_RUN`, `REQUEST_DIAGNOSTIC`, `REFINE_THROAT`, `REFINE_GRADIENT_REGION`, `REPAIR_MESH`, `RESTART_CLEAN`, `REJECT_OUTSIDE_DOMAIN` | `src/contracts/agent_decision.py` (`AgentAction`) |
+| forward step | `ACCEPT`, `CONTINUE_RUN`, `EXTEND_END_TIME`, `REDUCE_MAX_CO`, `REFINE_MESH`, `REBUILD_FROM_VALIDATED_SPEC`, `REQUEST_CLARIFICATION`, `REJECT_UNSUPPORTED`, `FAIL_SAFELY` | `src/reasoning/forward_step_actions.py` (`ForwardStepAction`) |
+
+For the step family, `CONTINUE_RUN` is refused once the requested horizon has
+been reached (more physical time requires `EXTEND_END_TIME`), `ACCEPT` is refused
+unless the registered scientific status is final, and `REFINE_MESH` is refused
+unless the current solution is healthy. The nozzle actions are described below.
 
 ### `ACCEPT`
 
@@ -122,7 +139,11 @@ Discard an untrusted numerical state and regenerate/reinitialize the case. This 
 
 ### `REPAIR_MESH`
 
-The action contract contains this option for mesh-quality failure handling. The current clean nozzle feedback runner emphasizes refinement, continuation, diagnostic acquisition, and clean restart; unsupported mechanical actions fail closed rather than being improvised.
+The action contract contains this option for mesh-quality failure handling. The nozzle feedback runner implements refinement, continuation, diagnostic acquisition, and clean restart; unsupported mechanical actions fail closed rather than being improvised.
+
+### `REJECT_OUTSIDE_DOMAIN`
+
+Stop because the request or state lies outside the nozzle family's registered domain. The action validator approves it only with an `OUTSIDE_VALIDATED_DOMAIN` diagnosis.
 
 ## Why the loop is scientifically useful
 
@@ -132,18 +153,22 @@ Without the loop, the LLM would mostly be a natural-language tool caller and rev
 observe -> diagnose -> propose action -> deterministic gate -> execute -> observe again
 ```
 
-The demonstrated Case A trajectory is:
+The demonstrated trajectory is the Case A continuation run (session N6,
+`nozzle_feedback_v2_hotfix`), a separate run from the canonical Case A run, which
+was accepted after a single execution to 0.006 s (see `docs/CASES.md`):
 
 ```text
 0.001 s state
--> 17/20 checks pass
--> LLM: UNCONVERGED / CONTINUE_RUN
+-> 17/20 checks pass (FAIL: steady_mass_balance, monitors_stationary, fields_stationary)
+-> LLM: UNCONVERGED / CONTINUE_RUN            (initial assessment)
+-> deterministic gate: APPROVED
+-> LLM: UNCONVERGED / CONTINUE_RUN            (feedback iteration 1)
 -> deterministic gate: APPROVED
 -> continue existing CFD state to 0.006 s
 -> new numerical evidence + new images
--> LLM: ACCEPTABLE / ACCEPT
+-> LLM: ACCEPTABLE / ACCEPT                   (feedback iteration 2)
 -> deterministic gate: APPROVED
--> scientific validator: PASS_SINGLE_MESH
+-> scientific validator: PASS_SINGLE_MESH -> ACCEPT
 ```
 
 Cases B and C terminate after one iteration because their first 0.006 s solutions already satisfy all deterministic criteria. The agent is expected to stop when no intervention is needed.

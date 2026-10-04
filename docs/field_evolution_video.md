@@ -1,11 +1,12 @@
-# Real field-evolution videos
+# Field-evolution videos
 
-The shared report builder now attempts plots, static contours, real field movies,
-history animation, then the engineering report. The normal `scripts/run_agent.py`
-CLI already calls this builder after the deterministic authority finishes. Live
-runner evidence supplies `runtime_case`, which is passed to reporting as
-`raw_case`. No family runner, CFD gate, model, boundary condition or discretization
-was changed. Cube remains excluded from live acceptance routing.
+The shared report builder (`src/reporting/`) produces plots, static contours,
+field movies rendered from saved CFD fields, a history animation, and then the
+engineering report. `scripts/run_agent.py` calls this builder after the
+deterministic authority finishes. Live runner evidence supplies `runtime_case`,
+which is passed to reporting as `raw_case`. Rendering does not change any family
+runner, CFD gate, model, boundary condition or discretization. The cube is a
+diagnostic study and is not routable for live acceptance.
 
 ## Outputs and status
 
@@ -64,10 +65,21 @@ decision. An artifact failure does not erase the scientific decision.
 ## Dependencies and reproduction
 
 On Linux install ParaView's `pvpython`, FFmpeg and, for GLX builds without a usable
-display, Xvfb. On Windows with native WSL cases the wrapper calls
-`wsl -d Ubuntu-24.04 -- xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 pvpython ...`.
-`CFD_WSL_DISTRO` selects another distribution. `CFD_PVPYTHON` overrides the native
-renderer; `CFD_FFMPEG` supplies a renderer-side encoder path. Python dependencies
+display, Xvfb. On Windows with native WSL cases the wrapper
+(`src/reporting/field_video.py`) calls
+`wsl -d <distro> -- xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 pvpython ...`.
+
+Two environment variables name a WSL distribution, both defaulting to
+`Ubuntu-24.04`:
+
+| Variable | Read by | Used for |
+|---|---|---|
+| `CFD_WSL_DISTRO` | `src/reporting/field_video.py` (also `src/pipeline/airfoil/cgns.py`) | launching ParaView for field videos |
+| `OPENFOAM_WSL_DISTRO` | `src/openfoam/executor.py`, `src/pipeline/foam_runtime.py`, `src/cfd/diagnostics.py` | running OpenFOAM (with `OPENFOAM_BASHRC`) |
+
+Set both to the same distribution when ParaView and OpenFOAM are installed
+together. `CFD_PVPYTHON` overrides the native renderer; `CFD_FFMPEG` supplies a
+renderer-side encoder path. Python dependencies
 are in `requirements.txt`; optional `imageio-ffmpeg` supplies the host-side history
 encoder when FFmpeg is absent from PATH. Missing tools are reported, not installed
 automatically during a user run.

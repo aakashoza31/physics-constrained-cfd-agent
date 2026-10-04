@@ -1,8 +1,11 @@
-# Physics Scope and Boundary Conditions
+# Physics scope and boundary conditions: nozzle family
+
+This page covers the nozzle family. For the two-dimensional forward-facing-step
+family see the note at the end.
 
 ## Supported physical problem
 
-The validated research problem is internal flow through an axisymmetric conical converging-diverging nozzle.
+The registered problem is internal flow through an axisymmetric conical converging-diverging nozzle.
 
 The current pipeline assumes:
 
@@ -85,7 +88,7 @@ The startup fields are read back before execution to verify that the intended in
 
 ## What is not covered
 
-The present validation does not establish accuracy for:
+The registered checks and the reference refinement campaign do not establish accuracy for:
 
 - viscous wall layers
 - turbulence
@@ -96,3 +99,15 @@ The present validation does not establish accuracy for:
 - external supersonic jets / shock cells
 - non-axisymmetric three-dimensional flow
 - arbitrary nozzle families
+
+## Forward-facing-step family (note)
+
+The step family is a 2-D planar, transient, inviscid compressible flow
+(`shockFluid`) with a Mach-2 canonical configuration (the Mach-3 case is the
+OpenFOAM tutorial recipe), Δx = Δy = 0.0125 (16,128 cells for h = 0.2,
+x = 0.6). Its scope gate has 14 checks (`src/reasoning/forward_step_scope_gate.py`);
+acceptance uses 17 hard checks and 3 compression checks with a storage-aware mass
+closure limit of 1e-6 and no stationarity criterion
+(`src/pipeline/forward_step_2d/validate.py`). Its parameters are defined in
+`src/pipeline/forward_step_2d/spec.py`; see the CFD Forge paper's setup appendix
+for the full specification.

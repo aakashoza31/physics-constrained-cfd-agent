@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Mandatory zero-CFD mesh audit for Family 3. NEVER launches the flow solver.
+"""Mandatory zero-CFD mesh audit for the airfoil family. NEVER launches the flow solver.
+
+Not part of the CFD Forge paper; development tooling for the airfoil mesh
+qualification.
 
     python scripts/audit_airfoil_mesh.py                       # Stage A only
     python scripts/audit_airfoil_mesh.py --with-openfoam       # Stage A + Stage B

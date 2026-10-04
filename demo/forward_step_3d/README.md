@@ -1,1 +1,0 @@
-Current status: BLOCKED_PLANAR_INVARIANCE. See REPORT.md. FS-B/C/D are configs only. Full fields, figures and logs are preserved in the linked task output package, not represented as successful campaign results here.

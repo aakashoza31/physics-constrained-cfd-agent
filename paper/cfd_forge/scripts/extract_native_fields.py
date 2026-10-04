@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """Extract real mesh geometry and field values from native OpenFOAM cases.
 
-Read-only. Needs only Python 3 + NumPy, so it runs inside WSL next to the
-native cases. It writes compact .npz files that scripts/make_mesh_field_figures.py
+Read-only. Needs only Python 3 + NumPy, so it can run next to the native
+cases (for example inside WSL). It writes compact .npz files that scripts/make_mesh_field_figures.py
 turns into the paper figures. Nothing is interpolated or smoothed: 2-D cases
 store the actual cell polygons of the front patch with the cell values; the
 cube stores the actual grid coordinates, boundary-face polygons, and the cell
 values of the cells whose extent contains the requested plane.
 
-Usage (WSL):
-  python3 extract_native_fields.py --out "/mnt/c/Backup from one drive/Desktop/Research/physics-constrained-cfd-agent/paper/cfd_forge/data/native" \
-      --nozzle /home/aakash/.cache/nozzle-e2e/20260921T041731Z-case_A_reference/conical_nozzle_200kpa_30kpa \
-      --step   /home/aakash/.cache/nozzle-e2e/20260922T193651Z-forward-step-2d/case \
-      --cube   /home/aakash/family3_cube_sst_literature_audit_t4_retry2
-Any subset of --nozzle/--step/--cube may be given.
+Usage:
+  python3 extract_native_fields.py --out <repo>/paper/cfd_forge/data/native \
+      --nozzle <native nozzle case, e.g. .../conical_nozzle_200kpa_30kpa> \
+      --step   <native Mach-2 forward-step case> \
+      --cube   <native cube case>
+Any subset of --nozzle/--step/--cube may be given. The native field directories
+are not part of the repository or the session archive; data/cube/cube_mesh_only.npz
+was extracted with this script (see data/DATA_MANIFEST.json).
 """
 from __future__ import annotations
 

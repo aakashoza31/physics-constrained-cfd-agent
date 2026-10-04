@@ -12,9 +12,9 @@
                           comparison is revealed, and it is revealed to the
                           reporter, never to the decision loop.
 
-Both reuse the existing Gemini structured-output pattern and both return an
-explicit LLMCallRecord so a deterministic fallback can never be mistaken for
-the model.
+The mesh review uses a structured response schema; the summary is plain text.
+Both run at temperature 0 and return an explicit LLMCallRecord so a
+deterministic fallback can never be mistaken for the model.
 """
 from __future__ import annotations
 
@@ -287,6 +287,17 @@ def summarize_case(
     *,
     allow_fallback: bool = False,
 ) -> Tuple[str, LLMCallRecord]:
+    """Write the post-verdict engineering summary.
+
+    The summary is plain text: the call sets a system instruction and
+    temperature 0 but no response schema, so its content is not
+    schema-checked.  It never feeds back into a decision.
+
+    ``REPORT_SYSTEM_PROMPT`` is nozzle-specific (quasi-1D comparison, wedge,
+    pressure-free outlet).  ``scripts/run_forward_step_2d.py`` reuses this
+    function, and therefore the nozzle prompt, for the forward-step family.
+    This is a known limitation, reported in the paper walkthrough.
+    """
     started = time.monotonic()
 
     if gemini_key_present():

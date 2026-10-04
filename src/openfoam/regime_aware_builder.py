@@ -1,4 +1,11 @@
-﻿from __future__ import annotations
+﻿"""Legacy prototype (CAD->Gmsh path, paper Appendix C "Prototype before the
+registered contracts"); not the registered nozzle family; not used for any
+reported result except that prototype record.
+
+Prototype regime-aware case builder. Not imported by the registered family
+runners or by src/pipeline.
+"""
+from __future__ import annotations
 
 import json
 import re

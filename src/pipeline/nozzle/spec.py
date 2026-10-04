@@ -10,9 +10,9 @@ The quasi-1D state function reproduces ``validation/canonical_reference/build.py
 ``state()`` exactly, with the hard-coded throat radius, reservoir pressure and
 reservoir temperature replaced by specification fields.  The gamma-dependent
 numeric forms are retained verbatim, and the specification therefore REFUSES any
-gas other than the validated calorically-perfect-air envelope
-(gamma = 1.4, R = 287 J/(kg K)).  Generalizing gamma would change the validated
-numerical path and is deliberately outside tonight's scope.
+gas other than the registered calorically-perfect-air envelope
+(gamma = 1.4, R = 287 J/(kg K)).  Generalizing gamma would change the registered
+numerical path and is deliberately outside the scope of this module.
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple
 
 
-# The validated physics envelope. These are not free parameters.
+# The registered physics envelope. These are not free parameters.
 VALIDATED_GAMMA = 1.4
 VALIDATED_R = 287.0
 
@@ -79,7 +79,7 @@ class NozzleCaseSpec:
     gamma: float = VALIDATED_GAMMA
     gas_constant_j_per_kg_k: float = VALIDATED_R
 
-    # Numerical controls (validated recipe defaults).
+    # Numerical controls (registered recipe defaults).
     scale: float = 1.0
     wedge_angle_deg: float = 5.0
     max_courant: float = 0.4
@@ -99,13 +99,13 @@ class NozzleCaseSpec:
     def validate(self) -> None:
         if self.gamma != VALIDATED_GAMMA:
             raise ValueError(
-                "Validated envelope is calorically perfect air with "
+                "Registered envelope is calorically perfect air with "
                 f"gamma = {VALIDATED_GAMMA}; got {self.gamma}."
             )
 
         if self.gas_constant_j_per_kg_k != VALIDATED_R:
             raise ValueError(
-                "Validated envelope is calorically perfect air with "
+                "Registered envelope is calorically perfect air with "
                 f"R = {VALIDATED_R} J/(kg K); got "
                 f"{self.gas_constant_j_per_kg_k}."
             )
@@ -150,7 +150,7 @@ class NozzleCaseSpec:
 
         if self.ambient_imposed_at_exit:
             raise ValueError(
-                "The validated outlet is pressure-free and verified by computed "
+                "The registered outlet is pressure-free and verified by computed "
                 "supersonicity. Ambient pressure must not be imposed at the "
                 "computational outlet."
             )

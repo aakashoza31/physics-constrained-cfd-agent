@@ -72,7 +72,7 @@ def test_orchestrator_decision_matches_the_family_disposition(
 def test_frozen_family_can_still_accept_despite_a_blocked_capability(
     fs_adapter, fs_spec, fs_evidence
 ):
-    """A validated family must not be blocked by an OPTIONAL capability's TODO.
+    """A registered family must not be blocked by an OPTIONAL capability's TODO.
 
     forward_step_2d is frozen and registered for acceptance, while
     REFINE_REGION remains unavailable. Those are different things and the

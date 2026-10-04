@@ -1,10 +1,14 @@
 case_id: "step_height_030_x060"
 original_id: "case_F_step030"
 family: "forward_step"
-title: "Step height 0.30, short horizon"
-purpose: "the INADMISSIBLE variation: the run stopped safely instead of being accepted"
+title: "Step height 0.30, step at x=0.6"
+purpose: "Step-height variation (paper ledger S5): Mach 3, h=0.3, step at x=0.6, run to t=4. The compression front was displaced toward the inlet, to x=0.025, and no front could be measured; the model proposed FAIL_SAFELY, the validator returned FAIL (compression_front_measurable), and the decision is REJECT. The run was preserved and rejected rather than tuned"
 evidence_root: "demo/forward_step_2d/case_F_step030"
-evidence_present: true
+evidence_present: false
+archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_F_step030; they are not in this repository."
+evidence_in_clone:
+  - "evidence/forward_step/step_height_030_x060"
+paper_ledger: "S5"
 config: null
 related_campaigns: []
 solver: "OpenFOAM Foundation v14"

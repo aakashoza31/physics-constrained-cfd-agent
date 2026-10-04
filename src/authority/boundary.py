@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The agent / authority boundary, written down once and enforced in code.
+"""The agent / authority boundary for the generic pipeline, enforced in code.
 
 The system's whole safety argument is one sentence:
 
@@ -12,8 +12,14 @@ answer. A proposal that names an authority-owned question is refused by
 `assert_llm_may`, and `final_decision` will not accept a verdict that carries a
 model's fingerprints.
 
-Nothing in here is advisory. `AuthorityTrace` is the artefact a reviewer reads to
-confirm that each gate was evaluated by code, with its inputs and its threshold.
+Nothing in here is advisory. `AuthorityTrace` is the record to read to confirm
+that each gate was evaluated by code, with its inputs and its threshold.
+
+Scope: this module produces a terminal ACCEPT / REJECT / INCONCLUSIVE trace for
+the generic pipeline's replay and dry-run modes (`src/agent/pipeline.py`). It
+does not implement the paper's four-decision mapping. That mapping, including
+the non-terminal CORRECT_AND_RERUN, is implemented in `src/orchestrator`
+(`loop.py`) together with the family adapters in `src/families`.
 """
 from __future__ import annotations
 
@@ -105,7 +111,7 @@ class Gate:
 
 @dataclass
 class AuthorityTrace:
-    """The record a reviewer reads to see who decided what.
+    """The record of who decided what.
 
     Model contributions are recorded as PROPOSALS, in their own list, and can
     never become gates. The verdict is computed from the gates alone.
@@ -176,7 +182,7 @@ class AuthorityTrace:
 
 @dataclass
 class Decision:
-    """The single final answer, with the reason a reviewer needs."""
+    """The single final answer, with its reason."""
 
     verdict: str
     reason: str

@@ -3,7 +3,7 @@
 **Family:** `nozzle` &nbsp;|&nbsp; **Case:** `geometry_variation` &nbsp;|&nbsp;
 **Original id:** `case_B_geometry` &nbsp;|&nbsp; **Archived verdict:** `ACCEPT`
 
-Same physics, altered nozzle geometry.
+Same physics, altered nozzle geometry (paper ledger N2: exit radius 37 mm; repeated as N7).
 
 ## Reproduce
 
@@ -17,8 +17,9 @@ Same physics, altered nozzle geometry.
 .\reproduce.ps1 -Live       # re-execute
 ```
 
-Replay reads the archived evidence under `demo/nozzle_e2e/case_B_geometry` and re-derives the
-deterministic decision from it. It never claims a solver was executed.
+Replay re-derives the deterministic decision from the archived record in
+`expected_result.json` (and any series in `reference/`). It never claims a solver
+was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/nozzle_e2e/case_B_geometry`; they are not in this repository.
 
 ## Archived outcome
 

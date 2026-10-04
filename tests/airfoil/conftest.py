@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixtures for Family 3. No OpenFOAM, no CFD, no network."""
+"""Fixtures for the airfoil family (not part of the CFD Forge paper). No OpenFOAM, no CFD, no network."""
 from __future__ import annotations
 
 import json
@@ -50,6 +50,7 @@ def _install(root: Path, key: str) -> Path:
         if not source.exists():
             write_plot3d(source, n_wake=8, n_surface=24, nj=11, span=1.0)
         mesh = p3d.convert(p3d.read_plot3d(source), span=1.0)
+        pytest.importorskip("h5py")       # CGNS files are HDF5 containers
         write_cgns_hex(path, mesh.points, mesh.hexes)
     elif key == A.REF_LADSON_FORCES:
         # Native TMR .dat shape: title lines plus whitespace numeric columns.
