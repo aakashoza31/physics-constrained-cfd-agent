@@ -177,10 +177,10 @@ default only for the step report summary, and no fallback occurred in the
 archived sessions. Each call is logged with its
 stage, model identifier, latency, number of attempts, and parsed output.
 The runs also use a multimodal observer on rendered field images. It does not
-write the model identifier into its own record. The provider's per-model
-usage records show that its 15 calls in the step sessions went to
+write the model identifier into its own record. We infer its model from the provider's
+daily per-model usage records, which are included in the data deposit: its 15 calls in the step sessions went to
 \texttt{gemini-3.6-flash}, its code default when the model variable is
-unset, and that no \texttt{gemini-3.6-flash} requests were made on the day
+unset, and no \texttt{gemini-3.6-flash} requests were made on the day
 of the nozzle sessions, so its 8 nozzle calls used
 \texttt{gemini-3.5-flash-lite}. Five of its 23 calls, all in the step
 sessions, failed with an HTTP 503 (service
@@ -197,7 +197,7 @@ budgets are listed in Appendix~\ref{app:repro}.
     green: registered tools. A proposed correction is executed only after the
     action validator approves it, and the run then returns to the solver; a
     proposed \texttt{ACCEPT} is passed to the scientific validator, whose
-    verdict is binding. Call counts and rulings are totals over the 19
+    verdict is binding. Call counts and rulings are recorded totals over the 19
     archived nozzle and step sessions (Sec.~\ref{sec:agent_results}). Mesh
     review is used in the nozzle family; field observation is advisory and
     feeds no gate.}
@@ -421,13 +421,13 @@ Table~\ref{tab:assessment} summarizes the registered outcomes. The archived
 campaigns comprise 19 agent sessions (8 nozzle, 11 step). These are 16 runs,
 because one step run was resumed across four sessions, and 11 distinct
 requests, because the nozzle requests were repeated while the nozzle
-pipeline was being developed (Appendix~\ref{app:repro}). Across them the
-model was called 97 times: 16 request interpretations, 8 mesh reviews, 28
+pipeline was being developed (Appendix~\ref{app:repro}). Across them the call
+records contain 97 model calls: 16 request interpretations, 8 mesh reviews, 28
 diagnoses, 23 field observations, and 22 summaries. All 74 text calls
 succeeded on the first attempt, with median latencies between 1.9 and 4.9\,s
 per stage; 5 of the 23 field-observation calls failed with a provider error
 (Sec.~\ref{sec:model}). Token counts were not logged in these campaigns. The
-28 diagnoses produced 28 action proposals: 14 \texttt{ACCEPT}, 5
+28 recorded diagnoses produced 28 recorded action proposals: 14 \texttt{ACCEPT}, 5
 \texttt{CONTINUE\_RUN}, 4 \texttt{EXTEND\_END\_TIME}, 3
 \texttt{FAIL\_SAFELY}, 1 \texttt{REFINE\_MESH}, and 1
 \texttt{REQUEST\_DIAGNOSTIC}. The validator approved 25 and refused 3
@@ -445,7 +445,8 @@ therefore not included in the counts above.
     \includegraphics[width=\linewidth]{Figures/fig_agent_stats.pdf}
     \caption{Model activity in the 19 archived agent sessions, counted from
     every call record in the session archive and deduplicated per run
-    (Appendix~\ref{app:repro}). (a) Model calls by stage; 5 of the 23
+    (Appendix~\ref{app:repro}); the one unrecorded repair call is not
+    included. (a) Model calls by stage; 5 of the 23
     field-observation calls failed with a provider-side HTTP 503 error.
     (b) Action proposals by type and the action validator's ruling.}
     \label{fig:agent_stats}
@@ -1454,7 +1455,7 @@ and its proposal is executed only after the action validator approves it.}
 \centering
 \caption{Timeline of the walkthrough session, from the archived event log.
 ``LLM'' marks a model call (the image observer is a multimodal call whose
-model identifier was not recorded; provider usage records show
+model identifier was not recorded; provider usage records indicate
 \texttt{gemini-3.6-flash} for the step sessions).}
 \label{tab:timeline}
 \small
@@ -1486,7 +1487,7 @@ Time (s) & Stage & Performed by & Outcome \\
 (\texttt{google-genai} Python SDK) at temperature 0, with a Pydantic response
 schema passed as the structured-output schema for every stage except the
 plain-text summary. The field observer does not
-record its model; from the provider's usage records it used
+record its model; from the provider's usage records we infer that it used
 \texttt{gemini-3.6-flash} in the step sessions and
 \texttt{gemini-3.5-flash-lite} in the nozzle sessions (Sec.~\ref{sec:model}). The
 nozzle sessions ran on 21 September 2026 and the step sessions on 22
@@ -1524,8 +1525,9 @@ calls, 23 proposals) missed the iterations of the nozzle feedback loop and
 is superseded by the numbers in Sec.~\ref{sec:agent_results}.
 
 \paragraph{What is reproducible.} The archive reproduces the analyses,
-figures, and tables from the recorded evidence, and the case files allow each
-CFD run to be repeated. The historical agent sessions ran from uncommitted
+figures, and tables from the recorded evidence, and the native case files
+(initial or restart state, mesh, settings, and logs) allow each CFD run to be
+repeated with OpenFOAM Foundation v14. The historical agent sessions ran from uncommitted
 development trees, so the release does not reproduce the historical agent
 execution byte for byte. Model outputs are not reproducible either:
 temperature 0 does not make the provider deterministic, as the cube
@@ -1629,13 +1631,15 @@ S8 \texttt{case\_I} (1) & Mach 3, $h=0.2$, sensitivity request & \texttt{REFINE\
 \end{table}
 
 \section*{Code and Data Availability}
-The CFD Forge source code, family recipes, validators, prompts, and response
-schemas are available at\\
-\url{https://github.com/aakashoza31/physics-constrained-cfd-agent}.\\ The
-archived session records, case files (including the precursor channel
-case that supplies the cube inflow), solver logs, evidence packets, source
-snapshots, and the scripts that produce every figure and table in this paper
-will be deposited on Zenodo with the release of this preprint.
+The CFD Forge source code, family recipes, validators, prompts, response
+schemas, controller-comparison records, and the scripts that produce the
+figures and tables of this paper are available at\\
+\url{https://github.com/aakashoza31/physics-constrained-cfd-agent}.\\
+The archived session records, the native case files of every run (including
+the precursor channel case that supplies the cube inflow), source snapshots,
+solver logs, evidence packets, field-evolution videos, and the provider usage
+records are deposited on Zenodo at
+\url{https://doi.org/10.5281/zenodo.23148676}.
 
 
 \begin{thebibliography}{99}
