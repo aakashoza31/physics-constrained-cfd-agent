@@ -31,7 +31,7 @@
 \maketitle
 
 \begin{abstract}
-Setting up, running, and assessing a computational fluid dynamics (CFD) simulation requires substantial manual effort, from meshing and solver setup to diagnosis and interpretation, and repeating it across design variants slows engineering iteration. We present CFD Forge, an agentic framework built around OpenFOAM that carries an engineering request through case construction, meshing, solver execution, diagnostics, and reporting. A large language model interprets the request, assesses flow behavior from simulation evidence, identifies likely causes of problems, and proposes corrective actions from a closed set. Acceptance is not left to the model: deterministic, family-specific checks measure registered criteria and retain final acceptance authority. We demonstrate the framework on a converging--diverging nozzle and a two-dimensional forward-facing step, including new cases built from text requests with different geometry and operating conditions. A turbulent cube, run outside the agent loop, serves as a diagnostic study: the solver completed and the mean drag settled, but the amplitude of lateral-force oscillations continued to grow, so a retrospective assessment withheld acceptance because the flow statistics had not stabilized. In a controller comparison over 36 archived, defective, and planted-fault states, the model, given the evidence without the check results, proposed acceptance for 12 of the 13 detectable planted faults in all three repeats; given the check results, it proposed no false acceptance. Case files, model-call records, and decisions are retained for audit.
+Setting up, running, and assessing a computational fluid dynamics (CFD) simulation requires substantial manual effort, from meshing and solver setup to diagnosis and interpretation, and repeating it across design variants slows engineering iteration. We present CFD Forge, an agentic framework built around OpenFOAM that carries an engineering request through case construction, meshing, solver execution, diagnostics, and reporting. A large language model interprets the request, assesses flow behavior from simulation evidence, identifies likely causes of problems, and proposes corrective actions from a closed set. Acceptance is not left to the model: deterministic, family-specific checks measure registered criteria and retain final acceptance authority. We demonstrate the framework on a converging--diverging nozzle and a two-dimensional forward-facing step, including new cases built from text requests with different geometry and operating conditions. A turbulent cube, run outside the agent loop, serves as a diagnostic study: the solver completed and the mean drag settled, but the amplitude of lateral-force oscillations continued to grow, so a retrospective assessment withheld acceptance because the flow statistics had not stabilized. A controller comparison over 36 archived, defective, and planted-fault states contrasted two configurations of the same model. A model-only configuration, given a filtered evidence packet without the check results, proposed acceptance for 12 of the 13 detectable planted faults in all three repeats; the CFD Forge configuration, in which the model diagnoses the check results and validators decide, accepted none. The configurations also differ in prompting, so the comparison does not isolate the effect of the check results, and a fixed rule reached the same verdicts as CFD Forge. Case files, recorded model calls, and decisions are retained for audit.
 \end{abstract}
 
 \section{Introduction}
@@ -101,7 +101,7 @@ The present implementation uses parameterized geometries and registered CFD fami
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{Figures/fig1_workflow.pdf}
-    \caption{Conventional CFD workflow (top) compared with CFD Forge (bottom). Blue: language-model calls, which only propose; green: deterministic tools; orange: deterministic gates, which decide admissibility and acceptance; gray: human steps. Notes between the rows mark where CFD Forge differs. Bottom: fields from the archived runs, each with its own color scale. (a) Nozzle and (b) Mach-2 forward-facing step are agent runs accepted under their family contracts; (c) the turbulent cube is a diagnostic study run outside the agent loop and not accepted (Sec.~\ref{sec:cube_results}).}
+    \caption{An illustrative manual CFD workflow (top) compared with CFD Forge (bottom). The manual row is a simplified illustration; conventional practice can also use scripted case construction and numerical diagnostics. Blue: language-model calls, which only propose; green: deterministic tools; orange: deterministic gates, which decide admissibility and acceptance; gray: human steps. Bottom: fields from the archived runs, each with its own color scale. (a) Nozzle and (b) Mach-2 forward-facing step are agent runs accepted under their family contracts; (c) the turbulent cube is a diagnostic study run outside the agent loop and not accepted (Sec.~\ref{sec:cube_results}).}
     \label{fig:flowpilot_architecture}
 \end{figure}
 
@@ -170,12 +170,14 @@ response schema; it uses
 temperature 0, and the structured response is parsed into a typed record
 before any code acts on it. The archived campaigns used
 \texttt{gemini-3.5-flash-lite} for interpretation, mesh review, diagnosis,
-and reporting, and the identifier is recorded with every call. If the model is unavailable or its response fails the schema, the stage
+and reporting, and the identifier is recorded with every logged call. If the model is unavailable or its response fails the schema, the stage
 stops, unless a deterministic fallback has been explicitly enabled; any such
 fallback is recorded as non-LLM in the call log. The fallback is enabled by
 default only for the step report summary, and no fallback occurred in the
 archived sessions. Each call is logged with its
-stage, model identifier, latency, number of attempts, and parsed output.
+stage, model identifier, latency, number of attempts, and parsed output. In
+the archived sessions one repair call was not logged
+(Sec.~\ref{sec:agent_results}); the released code records it.
 The runs also use a multimodal observer on rendered field images. It does not
 write the model identifier into its own record. We infer its model from the provider's
 daily per-model usage records, which are included in the data deposit: its 15 calls in the step sessions went to
@@ -389,7 +391,8 @@ geometry, meshes, boundary conditions, and numerics; the complete setup and
 acceptance criteria are given in Appendix~\ref{app:setup}.
 
 The nozzle and step runs were executed by the agent from natural-language
-requests, and every model call is recorded. The cube campaign was executed
+requests, and their model calls are recorded, except for one repair call
+disclosed in Sec.~\ref{sec:agent_results}. The cube campaign was executed
 outside the agent loop; afterwards we applied the agent's diagnosis stage to
 its archived evidence three times and ruled on each proposal with the
 stationarity gate, which was registered retrospectively, after the cube
@@ -726,7 +729,8 @@ geometry left the exit Mach number unchanged (1.513) and scaled the exit
 pressure and the mass flow by 1.100, as expected for a choked perfect-gas
 nozzle; enlarging the exit raised the exit Mach number to 1.652, within
 $0.39\%$ of quasi-one-dimensional theory. All three nozzle variants passed
-the twenty registered checks with differences from theory below $2\%$. In the
+the twenty registered checks, with exit Mach number, exit pressure, and mass
+flow within $2\%$ of theory. In the
 step family, the pressure rise across the detected front exceeded the
 stationary normal-shock ratio at every Mach number by 4--15\%, which is
 consistent with fronts that are still moving upstream, and the storage-aware
@@ -809,9 +813,12 @@ mesh, which is still within the $5\%$ limit. This trend may reflect multidimensi
 one-dimensional model omits; we have not established the cause. No formal grid-convergence index is reported.
 
 Table~\ref{tab:nozzle} lists the deterministic comparison with theory.
-All differences are below $2\%$; the largest is the exit static pressure
-($-1.83\%$, limit $5\%$), and the mass flow is $1.11\%$ below the ideal
-choked value. These differences are consistent with a two-dimensional
+The percentage differences for the exit Mach number, exit static pressure,
+exit temperature, exit velocity, and mass flow are all below $2\%$; the
+largest is the exit static pressure ($-1.83\%$, limit $5\%$), and the mass
+flow is $1.11\%$ below the ideal choked value. The throat Mach number, 1.029,
+is assessed against its registered band ($0.9<M_t<1.1$) rather than as a
+percentage difference. These differences are consistent with a two-dimensional
 axisymmetric solution that departs from strictly one-dimensional flow near
 the conical corners. The inlet total conditions are reproduced to a relative
 error of $2.5\times10^{-8}$ in $p_0$ and $7.2\times10^{-9}$ in $T_0$. Over
@@ -1024,8 +1031,9 @@ continuing a run. Each call took about 2\,s and used about 4,800 tokens.
 Two conclusions follow. Temperature 0 did not make the model's output
 repeatable: identical inputs produced two different diagnoses. And the
 model's diagnosis is useful but not reliable on its own. Here the
-consequence of the inconsistent call was a conservative stop, not a false
-acceptance, because acceptance is decided by the registered gate.
+inconsistent call proposed a conservative action, \texttt{FAIL\_SAFELY},
+rather than acceptance; no action was executed in this replay, and acceptance
+is decided by the registered gate.
 
 \begin{table}[!htbp]
 \centering
@@ -1077,8 +1085,12 @@ out. Finally, the controller comparison (Section~\ref{sec:controller}) uses one
 model, replays archived states rather than new runs, and plants faults in one
 family. In the check-informed B/B$'$ configuration the model never proposed
 acceptance contrary to a failed check, so the enforcement layer was not
-tested against a model that proposes an unjustified acceptance; comparisons across models and on held-out requests remain future
-work.
+tested against a model that proposes an unjustified acceptance. The
+comparison also does not establish an incremental benefit of the model over a
+fixed rule: the rule reached the same verdicts as CFD Forge and proposed the
+same actions at every archived point, and the corrections the model proposed
+for planted faults were not executed. Comparisons across models, on held-out
+requests, and with executed corrections remain future work.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -1089,7 +1101,8 @@ acceptance in deterministic, family-specific contracts. Language-model
 reasoning interprets requests and evidence and proposes bounded actions;
 validators decide whether those actions are admissible and whether a result
 is accepted. Under this division, a converging--diverging nozzle was accepted
-with sub-$2\%$ agreement with quasi-one-dimensional theory after its
+with exit-state and mass-flow differences from quasi-one-dimensional theory
+below $2\%$ after its
 stationarity evidence, not its reference agreement, determined when the run
 was complete. A transient Mach-2 forward-facing-step flow was accepted with
 storage-aware mass closure at round-off. Within both families, the agent also built and
@@ -1098,11 +1111,16 @@ operating conditions, and their results followed the expected physical
 trends. For a three-dimensional turbulent cube run outside the agent loop, a
 retrospectively registered stationarity gate withheld acceptance because a
 growing lateral mode showed that solver completion and a settled mean drag
-did not establish a developed flow. A controller comparison showed why the
-division matters: without the deterministic results, the same model accepted
-most of the planted faults, and with them it accepted none. Case files, model
-calls, action rulings, and field-evolution records keep each decision
-auditable. These elements provide a basis for high-throughput simulation,
+did not establish a developed flow. In a controller comparison of two configurations of the same model, a
+model-only configuration given a filtered evidence packet accepted most of the
+planted faults, whereas the CFD Forge configuration, with the check results
+and the validators, accepted none; because the configurations also differ in
+prompting, this does not isolate the effect of the check results. A fixed rule
+reached the same verdicts as CFD Forge, so these results do not establish an
+incremental benefit of the model in acceptance decisions. Case files,
+recorded model calls, action rulings, and field-evolution records keep each
+decision auditable; the one unrecorded repair call is disclosed in
+Sec.~\ref{sec:agent_results}. These elements provide a basis for high-throughput simulation,
 active learning, and design-optimization loops in which automated
 evaluations must remain scientifically accountable.
 
@@ -1367,7 +1385,7 @@ least-squares drift of each force component across the window remain below
 $2\%$ of the mean streamwise force, that the mean lateral force remain below
 $5\%$ of the streamwise force, and that the mean of $|F_z|$ over the second
 half of the window not exceed $1.25$ times its first-half value. A
-supplementary, predeclared audit examines complete lateral-force cycles
+supplementary audit, which is not part of the registered gate, examines complete lateral-force cycles
 between successive upward zero crossings of $F_z$. For cycle $n$, the
 amplitude is
 \begin{equation}
@@ -1561,10 +1579,10 @@ mass-closure residual only within a restart segment. Its $10^{-6}$ closure
 limit is a declared tolerance; the observed residuals are near $10^{-11}$.
 The cube stationarity gate (\texttt{cube-stationarity/1.0.0}) was registered
 on 28 September 2026, after the cube calculation had been run. Its
-thresholds are stated as physical bounds (Sec.~\ref{sec:cube_setup}), and the
-measured growth ratio, 2.10 against 1.25, is far enough from the bound that
-the verdict does not depend on where within a plausible range it was set.
-The gate was nonetheless not frozen before the data existed.
+thresholds are stated as physical bounds (Sec.~\ref{sec:cube_setup}). The
+measured growth ratio is 2.10, so the gate returns the same verdict for any
+growth limit below 2.10, including the registered 1.25. The gate was
+nonetheless not frozen before the data existed.
 
 \paragraph{Prototype before the registered contracts.} The registered nozzle family replaced an earlier, less constrained
 prototype that is preserved in the archive, and its record shows why the

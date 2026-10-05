@@ -38,7 +38,7 @@ They read only `data/` and write to `figures/`; no CFD is run.
 
 | Figure file(s) | Paper figure | Script |
 |---|---|---|
-| `fig1_workflow.pdf` | Conventional workflow vs. CFD Forge (schematic) | none in the repository (drawn separately) |
+| `fig1_workflow.pdf` | Illustrative manual workflow vs. CFD Forge, with archived fields | `scripts/make_fig1_workflow.py` |
 | `fig_agent_loop.pdf` | Agent loop as implemented, with call counts | `scripts/make_agent_loop_figure.py` |
 | `fig_agent_stats.pdf` | Model calls by stage; proposals and rulings | `scripts/make_mesh_field_figures.py` |
 | `fig_mesh_nozzle.pdf` | Nozzle wedge mesh and prototype Gmsh surface | `scripts/make_mesh_field_figures.py` |
