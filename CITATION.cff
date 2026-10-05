@@ -14,6 +14,10 @@ authors:
     affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
 license: MIT
 repository-code: "https://github.com/aakashoza31/physics-constrained-cfd-agent"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23148676
+    description: "Data: archived session records, native case files, verification package and field videos"
 keywords:
   - computational fluid dynamics
   - OpenFOAM

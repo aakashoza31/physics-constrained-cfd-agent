@@ -6,7 +6,7 @@ What can be reproduced, and how:
 |---|---|---|
 | Registered-case replay | Python only | 0 |
 | Paper figures | Python only | 0 |
-| Controller comparison | Zenodo session archive, `GEMINI_API_KEY` | 0 |
+| Controller comparison | Zenodo data archive (DOI 10.5281/zenodo.23148676), `GEMINI_API_KEY` | 0 |
 | Nozzle and forward-step agent runs | `GEMINI_API_KEY`, OpenFOAM Foundation v14 | 1-7 |
 
 **Model outputs are not reproducible exactly.** Temperature 0 does not make the
@@ -29,11 +29,15 @@ python paper/cfd_forge/scripts/make_mesh_field_figures.py
 python paper/cfd_forge/scripts/make_agent_loop_figure.py
 
 # controller comparison (needs the Zenodo session archive and a key)
-python paper/cfd_forge/scripts/controller_comparison.py --demo-root <session-archive>/demo
+python paper/cfd_forge/scripts/controller_comparison.py --demo-root <session-archive>/demo \
+    --cube-logs <session-archive>/CFD_Verification_Package_20260929/03_cube/logs
 ```
 
 The archived controller-comparison run is
-`evidence/controller_comparison/20261001T213031Z/`. The default backend of
+`evidence/controller_comparison/20261001T213031Z/`. The native OpenFOAM case
+files of every run in the paper (initial or restart state, final state, mesh,
+settings and logs) are in `native_cases/` of the Zenodo data archive; see its
+`native_cases/README.md`. The default backend of
 `scripts/run_demo.py` and `scripts/run_agent.py` is a deterministic, no-key demo
 mode; it is not the configuration of the paper's agent runs.
 

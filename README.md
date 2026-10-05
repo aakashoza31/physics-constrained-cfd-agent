@@ -24,8 +24,9 @@ Department of Mechanical Engineering, Carnegie Mellon University
 - Code: <https://github.com/aakashoza31/physics-constrained-cfd-agent>
 - Manuscript source, figure data and figure scripts:
   [`paper/cfd_forge/`](paper/cfd_forge/)
-- Session archive (agent session records, case files, solver logs, evidence
-  packets): Zenodo (https://doi.org/10.5281/zenodo.23148676).
+- Data archive (agent session records, native OpenFOAM case files of every run,
+  solver logs, evidence packets, field videos, provider usage records): Zenodo
+  (https://doi.org/10.5281/zenodo.23148676).
 
 ## Architecture
 

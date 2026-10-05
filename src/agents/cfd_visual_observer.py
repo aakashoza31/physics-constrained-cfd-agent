@@ -18,8 +18,6 @@ import os
 from pathlib import Path
 from typing import Any
 
-from google import genai
-from google.genai import types
 from pydantic import BaseModel
 
 from src.agents.llm_provenance import gemini_model_name
@@ -148,6 +146,10 @@ def observe_cfd_images(
                 "GEMINI_API_KEY is not set."
             ),
         }
+
+    # Imported here so that the module can be imported without google-genai.
+    from google import genai
+    from google.genai import types
 
 
     contents: list[
