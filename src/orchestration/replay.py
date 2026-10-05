@@ -277,11 +277,7 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
                         or expected.get("archived_status"),
                         "failed_checks": failed},
               threshold="every registered validation check must pass",
-              detail=("archived validator status and failed checks; the "
-                      "archived message is the model's non-binding summary: "
-                      + (expected.get("message", "") or "none")
-                      if expected.get("message") else
-                      "archived validator status and failed checks")),
+              detail=_validation_detail(expected)),
     ]
     if expected.get("solver_invoked_in_archive") is False:
         decisive = expected.get("decisive_failure") or {}
@@ -384,3 +380,16 @@ def replay_case(family: str, case: Optional[str],
     return ReplayOutcome(family=family, case=meta.get("case_id", case or ""),
                          reason=reason, stages=stages, gates=gates,
                          proposals=proposals, artifacts=artifacts)
+
+
+def _validation_detail(expected: Dict[str, Any]) -> str:
+    """Describe the validation gate without passing model text off as a
+    deterministic result: an archived message that is just a status string is
+    shown as such; free text is labelled as the model's non-binding summary."""
+    base = "archived validator status and failed checks"
+    message = (expected.get("message") or "").strip()
+    statuses = {str(expected.get("archived_status") or ""),
+                str(expected.get("validation_status") or "")}
+    if not message or message in statuses or " " not in message:
+        return base
+    return base + "; archived message (model's non-binding summary): " + message

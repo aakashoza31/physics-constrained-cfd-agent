@@ -101,9 +101,9 @@ the orchestrator, not here. No argument to `final_decision` can raise a verdict,
 and a model's diagnosis is not one of its inputs. A run in which no evidence
 exists (a dry-run, a refused live run) leaves the evidence gates unresolved and
 therefore returns INCONCLUSIVE, never an accidental ACCEPT. Because replay
-re-derives the gates from each case's archived record, it reports the refused
-`ACCEPT` of the step mesh-sensitivity case (S8) as REJECT; under the four
-decisions above that outcome is `INCONCLUSIVE`.
+re-derives the gates from each case's archived record, it leaves the validation
+gate unresolved for the refused `ACCEPT` of the step mesh-sensitivity case (S8)
+and reports `INCONCLUSIVE`, matching the four decisions above.
 
 ## What this buys, concretely
 

@@ -296,7 +296,7 @@ def augment_evidence(
     # provenance key named ``theory_blind``; embedding that key paradoxically
     # trips the repository's theory-leak guard because it contains "theory".
     safe_profile = _reasoning_safe_copy(profile_diagnostics)
-    safe_visual = _reasoning_safe_copy(visual_observation)
+    safe_visual = _reasoning_safe_copy(_without_provenance(visual_observation))
     safe_diagnostic = (
         _reasoning_safe_copy(diagnostic_result)
         if diagnostic_result is not None

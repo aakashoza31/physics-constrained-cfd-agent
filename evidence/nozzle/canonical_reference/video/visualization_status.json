@@ -1,0 +1,10 @@
+{
+  "family": "nozzle",
+  "case": "canonical_reference",
+  "verdict": "ACCEPT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields",
+  "status": "VISUALIZATION_INCOMPLETE",
+  "output_files": [],
+  "reason": "No raw OpenFOAM case located; histories are not field movies."
+}

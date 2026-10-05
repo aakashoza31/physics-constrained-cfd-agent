@@ -1,0 +1,10 @@
+{
+  "family": "cube",
+  "case": "drifting_wake",
+  "verdict": "REJECT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields",
+  "status": "VISUALIZATION_INCOMPLETE",
+  "output_files": [],
+  "reason": "ParaView pvpython/pvbatch is unavailable."
+}

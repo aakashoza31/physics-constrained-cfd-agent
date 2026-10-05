@@ -8,6 +8,6 @@ solver output, field image or animation exists.
   convergence history (`plots_status.json` records that no force series or solver
   log exists)
 - `../contours/contours_status.json` — records that no field contours exist
-- `../video/video_status.json` — records that no animation exists
+- `../video/history_status.json` — records that no animation exists
 
 Nothing here is synthesised.

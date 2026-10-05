@@ -88,7 +88,7 @@ The WSL distribution is read from `OPENFOAM_WSL_DISTRO` (default `Ubuntu-24.04`)
 
 ## 3. Configure the LLM backend
 
-The agent runs use the Google Gemini API through the `google-genai` SDK, configured by environment variables. Set `GEMINI_MODEL` explicitly: the paper's text calls used `gemini-3.5-flash-lite`, and several modules (including the multimodal field observer) default to `gemini-3.6-flash` when it is unset.
+The agent runs use the Google Gemini API through the `google-genai` SDK, configured by environment variables. All stages read the model from `GEMINI_MODEL` through `src/agents/llm_provenance.py` (default `gemini-3.5-flash-lite`, the model of the paper's text calls). In the archived step sessions the field observer still had its own default and used `gemini-3.6-flash`; the released observer records the model it uses.
 
 PowerShell:
 

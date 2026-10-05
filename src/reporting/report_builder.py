@@ -8,7 +8,7 @@ Given a finished `AgentRun`, it writes the standard artifact directory:
     diagnostics/{llm_trace,proposed_actions,authority_trace}.json
     plots/*.png
     contours/*.png
-    video/simulation.mp4
+    video/history_evolution.mp4 (integral history; transient families)
     provenance.json
     final_decision.json
 

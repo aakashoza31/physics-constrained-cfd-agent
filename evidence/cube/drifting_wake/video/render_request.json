@@ -1,0 +1,7 @@
+{
+  "family": "cube",
+  "case": "drifting_wake",
+  "verdict": "REJECT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields"
+}

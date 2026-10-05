@@ -138,9 +138,9 @@ sessions are development cases, not a held-out evaluation. Details:
 Replaying the registered cases with `scripts/run_demo.py --mode replay`
 reproduces their archived deterministic outcomes without running a solver. This
 is a replay-consistency check, not an evaluation of the model. The replay trace
-reports three terminal verdicts and maps the refused-action outcome of the
-mesh-sensitivity case to `REJECT`; the paper's decision for that case is
-`INCONCLUSIVE`.
+reports terminal verdicts (ACCEPT, REJECT, INCONCLUSIVE) and maps the
+refused-action outcome of the mesh-sensitivity case (S8) to `INCONCLUSIVE`, as in
+the paper.
 
 ## Controller comparison
 
@@ -244,7 +244,7 @@ The paper's agent sessions were run with the family runners:
 
 ```bash
 export GEMINI_API_KEY=...
-export GEMINI_MODEL=gemini-3.5-flash-lite   # set explicitly; some modules default to another model
+export GEMINI_MODEL=gemini-3.5-flash-lite   # the default; set explicitly for clarity
 
 # nozzle: reference request, and the continuation loop from an incomplete 1 ms window
 python scripts/run_nozzle_e2e.py --case A
@@ -266,7 +266,7 @@ exact model outputs.
 ```bash
 --agent-backend deterministic   # default. No API key. NOT an LLM run.
 --agent-backend gemini          # a real model call; needs GEMINI_API_KEY
---agent-backend replay          # a recorded model response
+--agent-backend replay          # demo mode; behaves like deterministic (recorded responses are not replayed)
 ```
 
 The deterministic backend of `scripts/run_demo.py` and `scripts/run_agent.py` is a

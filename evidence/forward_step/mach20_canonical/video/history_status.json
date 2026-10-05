@@ -2,10 +2,10 @@
   "visuals_version": "visuals/1.0.0",
   "status": "RENDERED",
   "transient_family": true,
-  "file": "simulation.mp4",
+  "file": "history_evolution.mp4",
   "represents": "SOLVER TIME (transient run)",
   "quantity": "shock front",
   "is_flow_field_animation": false,
   "note": "this animates the shock front history written by the solver's function objects. It is NOT a flow-field visualisation, and no flow field was fabricated.",
-  "frames": 39
+  "frames": 40
 }

@@ -1,7 +1,7 @@
 {
   "family": "forward_step_2d",
   "case": "step_height_030_x060",
-  "started_utc": "2026-10-04T23:43:30Z",
+  "started_utc": "2026-10-05T00:05:42Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -86,7 +86,7 @@
         ]
       },
       "threshold": "every registered validation check must pass",
-      "detail": "archived validator status and failed checks; the archived message is the model's non-binding summary: Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upstream to the inlet boundary. Consequently, no valid measurable compression structure remains inside the domain.",
+      "detail": "archived validator status and failed checks; archived message (model's non-binding summary): Although the solver completed successfully and satisfied most checks, the deterministic check for the compression front failed because the primary shock structure has migrated upstream to the inlet boundary. Consequently, no valid measurable compression structure remains inside the domain.",
       "decided_by": "deterministic"
     },
     {

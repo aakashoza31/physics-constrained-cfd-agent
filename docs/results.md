@@ -59,9 +59,8 @@ transient family includes no stationarity criterion.
 the model's subsequent `ACCEPT` was refused by the action validator because no
 cross-grid tolerance is registered for the step family. Both solutions were
 healthy, but the requested sensitivity assessment could not be certified, so the
-decision is INCONCLUSIVE. The replay trace of `scripts/run_demo.py` has no
-mapping for a refused action and records this case as REJECT
-(`cases/forward_step/mesh_sensitivity/expected_result.json`).
+decision is INCONCLUSIVE, and the replay of `scripts/run_demo.py` reports it as
+INCONCLUSIVE (`cases/forward_step/mesh_sensitivity/expected_result.json`).
 
 `live_run` (S1): the archived validator matched the OpenFOAM start-up line that
 enables floating-point trapping as a fatal error. The archived verdict remains
@@ -194,5 +193,5 @@ Replaying the registered cases through `scripts/run_demo.py --mode replay`
 reproduces every archived verdict stored in `cases/*/*/expected_result.json`.
 This is a replay-consistency check, not an evaluation: no model decides anything
 in a replay and no new case is attempted. The replay trace reports three
-terminal verdicts (ACCEPT, REJECT, INCONCLUSIVE), so it records the S8
-refused-action case as REJECT where the paper's decision is INCONCLUSIVE.
+terminal verdicts (ACCEPT, REJECT, INCONCLUSIVE) and records the S8
+refused-action case as INCONCLUSIVE, as in the paper.

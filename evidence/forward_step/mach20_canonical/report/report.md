@@ -48,7 +48,7 @@ Every row below was decided by code. No model output appears in this table.
 |---|---|---|
 | convergence | PASS | "" |
 | conservation | PASS | "re-read from the archived validation record" |
-| validation | PASS | "archived validator status and failed checks; the archived message is the model's non-binding summary: PASS_2D |
+| validation | PASS | "archived validator status and failed checks" |
 
 ## 5. Model contributions (non-binding)
 
@@ -58,6 +58,9 @@ Every row below was decided by code. No model output appears in this table.
 
 ## 6. Media
 
+- plot: `plots/physics_specific_shock_front.png`
+- plot: `plots/conservation.png`
+- plot: `plots/residuals.png`
 - plot: `plots/convergence.png`
 - contour: `contours/density.png`
 - contour: `contours/mach.png`
@@ -74,7 +77,7 @@ Every row below was decided by code. No model output appears in this table.
 ```json
 {
   "report_version": "report-builder/1.0.0",
-  "generated_utc": "2026-10-04T23:43:30Z",
+  "generated_utc": "2026-10-05T00:05:42Z",
   "prompt": "run the registered forward_step case mach20_canonical",
   "mode": "replay",
   "family": "forward_step_2d",
@@ -85,7 +88,7 @@ Every row below was decided by code. No model output appears in this table.
   "case_directory": "cases/forward_step/mach20_canonical",
   "python": "3.11.15",
   "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
-  "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
+  "git_commit": "4dc256aca609f742ccb3162cbc5aa3a5c339ff9d",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",

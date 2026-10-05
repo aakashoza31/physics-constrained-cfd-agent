@@ -16,7 +16,7 @@
   },
   "run": {
     "pipeline_version": "agent-pipeline/1.0.0",
-    "started_utc": "2026-10-04T23:43:15Z",
+    "started_utc": "2026-10-05T00:05:23Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",
@@ -100,7 +100,7 @@
         "status": "OK",
         "decided_by": "deterministic",
         "detail": {
-          "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact"
+          "evidence_root": "CFD_Verification_Package_20260929/03_cube"
         }
       },
       {
@@ -124,7 +124,7 @@
     "authority_trace": {
       "family": "cube",
       "case": "drifting_wake",
-      "started_utc": "2026-10-04T23:43:15Z",
+      "started_utc": "2026-10-05T00:05:23Z",
       "authority_questions": [
         "family_compatibility",
         "geometry_admissibility",
@@ -370,7 +370,7 @@
         "register_status": "SUPPORTING",
         "adapter_error": "KeyError: \"'cube' has no adapter (status SUPPORTING)\""
       },
-      "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+      "evidence_root": "CFD_Verification_Package_20260929/03_cube",
       "force_history": "cases/cube/drifting_wake/reference/force_history.json",
       "force_samples": 2003,
       "stationarity": {
@@ -487,7 +487,7 @@
         "family": "cube",
         "title": "Surface-mounted cube with a drifting lateral wake",
         "purpose": "Diagnostic study of a 3-D URANS (k-omega SST) surface-mounted cube, run outside the agent loop. The stationarity gate cube-stationarity/1.0.0 was registered retrospectively and applied to the archived force history; it returns STILL_DEVELOPING, so the decision is REJECT",
-        "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+        "evidence_root": "CFD_Verification_Package_20260929/03_cube",
         "evidence_present": false,
         "archived_records": "The archived run is in the Zenodo archive (DOI to be added on release) under CFD_Verification_Package_20260929/03_cube (originally handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact); it is not in this repository.",
         "evidence_in_clone": [
@@ -505,6 +505,8 @@
           "expected": {
             "verdict": "REJECT",
             "archived_status": "RETROSPECTIVE_GATE_STILL_DEVELOPING",
+            "gate_version": "cube-stationarity/1.0.0",
+            "gate_registered_on": "2026-09-28",
             "rejected_on": "STILL_DEVELOPING",
             "failed_checks": [
               "lateral_force_growth"
@@ -552,7 +554,7 @@
             "solver_invoked_in_archive": true,
             "note": "the solver ran to the requested end time and reported no numerical failure; the rejection is on flow development"
           },
-          "source_of_truth": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+          "source_of_truth": "CFD_Verification_Package_20260929/03_cube",
           "note": "this is the result the archived evidence records; a replay that disagrees with it is a regression"
         }
       }
@@ -689,23 +691,23 @@
     "source_kind": "archived_raw_fields",
     "status": "VISUALIZATION_INCOMPLETE",
     "output_files": [],
-    "reason": "No raw OpenFOAM case located; histories are not field movies."
+    "reason": "ParaView pvpython/pvbatch is unavailable."
   },
   "artifact_complete": false,
   "provenance": {
     "report_version": "report-builder/1.0.0",
-    "generated_utc": "2026-10-04T23:43:29Z",
+    "generated_utc": "2026-10-05T00:05:37Z",
     "prompt": "run the registered cube case drifting_wake",
     "mode": "replay",
     "family": "cube",
     "case": "drifting_wake",
     "solver_invoked": false,
     "solver": "OpenFOAM Foundation v14",
-    "evidence_root": "handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact",
+    "evidence_root": "CFD_Verification_Package_20260929/03_cube",
     "case_directory": "cases/cube/drifting_wake",
     "python": "3.11.15",
     "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
-    "git_commit": "116ecbc55e950dca75aed88c637928999b1a2a58",
+    "git_commit": "4dc256aca609f742ccb3162cbc5aa3a5c339ff9d",
     "pipeline_stages": [
       "request_interpretation",
       "geometry_characterization",

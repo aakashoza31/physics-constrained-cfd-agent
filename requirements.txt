@@ -19,8 +19,7 @@ google-genai
 #                      not part of the paper)
 #   gmsh>=4.11         CAD->Gmsh prototype stack and airfoil meshing (not part
 #                      of the paper)
-#   pillow             CAD->Gmsh prototype visualization and case-A media
-#                      scripts (scripts/make_case_a_*_media.py)
+#   pillow             CAD->Gmsh prototype visualization
 #   pyvista            CAD->Gmsh prototype visualization and results packaging
 #   imageio-ffmpeg     MP4 history encoder when ffmpeg is not on the host PATH
 #   pytest             running the test suite

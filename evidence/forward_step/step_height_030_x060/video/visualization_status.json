@@ -1,0 +1,10 @@
+{
+  "family": "forward_step_2d",
+  "case": "step_height_030_x060",
+  "verdict": "REJECT",
+  "solver_invoked": false,
+  "source_kind": "archived_raw_fields",
+  "status": "VISUALIZATION_INCOMPLETE",
+  "output_files": [],
+  "reason": "No raw OpenFOAM case located; histories are not field movies."
+}
