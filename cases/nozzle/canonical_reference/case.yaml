@@ -5,7 +5,7 @@ title: "Canonical converging-diverging nozzle"
 purpose: "Canonical reference case (PASS_SINGLE_MESH under the registered contract), paper ledger N1: reference nozzle, p0=200 kPa, 6 ms. The related sessions N4, N5 and N6 repeat this request with a 1 ms initial horizon"
 evidence_root: "demo/nozzle_e2e/case_A_reference"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/nozzle_e2e/case_A_reference; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/nozzle_e2e/case_A_reference; they are not in this repository."
 evidence_in_clone:
   - "evidence/nozzle/canonical_reference"
   - "demo/published_campaign/case_A_reference"

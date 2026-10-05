@@ -25,7 +25,7 @@ Department of Mechanical Engineering, Carnegie Mellon University
 - Manuscript source, figure data and figure scripts:
   [`paper/cfd_forge/`](paper/cfd_forge/)
 - Session archive (agent session records, case files, solver logs, evidence
-  packets): Zenodo (DOI to be added on release).
+  packets): Zenodo (https://doi.org/10.5281/zenodo.23148676).
 
 ## Architecture
 

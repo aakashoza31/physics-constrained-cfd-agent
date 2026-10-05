@@ -198,7 +198,7 @@ Important files:
 | `demo/published_campaign/CAMPAIGN_SUMMARY.json` | Sanitized compact nozzle A/B/C result summary with no machine paths or API credentials. |
 | `demo/published_campaign/README.md` | Explains what the summary contains and which raw runtime artifacts are omitted. |
 
-The full agent session records are in the Zenodo session archive (DOI to be added on release).
+The full agent session records are in the Zenodo session archive (https://doi.org/10.5281/zenodo.23148676).
 
 ## Present but not part of the paper
 

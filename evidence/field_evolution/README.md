@@ -3,7 +3,7 @@
 These records were produced from archived native OpenFOAM fields on 2026-09-28.
 No CFD was rerun. The field-evolution MP4s (pressure, velocity, temperature or
 turbulence, Mach and summary movies) are not committed to Git; they are
-to be distributed through the Zenodo archive (DOI to be added on release). SHA-256
+to be distributed through the Zenodo archive (https://doi.org/10.5281/zenodo.23148676). SHA-256
 hashes in these manifests bind the movies to this audit.
 Reproduction instructions: `docs/field_evolution_video.md`.
 

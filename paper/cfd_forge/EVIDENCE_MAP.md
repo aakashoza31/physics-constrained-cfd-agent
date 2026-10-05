@@ -3,7 +3,7 @@
 The `data/` paths are verbatim copies; `data/DATA_MANIFEST.json` gives each copy's source and SHA-256.
 Source labels:
 - repo: this repository.
-- archive (Zenodo): the session archive deposited on Zenodo (DOI to be added on release); `demo/` holds the archived agent sessions.
+- archive (Zenodo): the session archive deposited on Zenodo (https://doi.org/10.5281/zenodo.23148676); `demo/` holds the archived agent sessions.
 - verification package (Zenodo): `CFD_Verification_Package_20260929/` inside the same Zenodo archive.
 - AUD: read-only cube audit output (`audit_t80/`, workstation output, not released); copies of `cycle_gates.json`, `forces_merged.csv` and `cube_wall_t80.csv` are in `data/cube/`.
 

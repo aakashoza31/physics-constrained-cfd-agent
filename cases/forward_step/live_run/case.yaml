@@ -5,7 +5,7 @@ title: "Live end-to-end run (Mach 2.5, h=0.15)"
 purpose: "First live forward-step session (paper ledger S1): Mach 2.5, h=0.15. It was stopped by a false-positive fatal-error check; the archived decision is REJECT, and a corrected deterministic reanalysis returns PASS_2D_FORWARD_STEP"
 evidence_root: "demo/forward_step_2d/live_run_01"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/live_run_01; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/forward_step_2d/live_run_01; they are not in this repository."
 evidence_in_clone:
   - "demo/forward_step_2d/live_run_01/REANALYSIS.json"
   - "demo/forward_step_2d/live_run_01/iteration_01/reanalysis"

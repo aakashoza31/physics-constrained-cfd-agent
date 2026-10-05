@@ -5,7 +5,7 @@ title: "Mesh-sensitivity request"
 purpose: "Mach 3, h=0.2 numerical-sensitivity request (paper ledger S8). REFINE_MESH was approved (4,032 to 16,128 cells, fresh solve) and both grids passed their hard checks; the model then proposed ACCEPT, which the validator refused because no cross-grid tolerance is registered for the step family. Final status STOPPED_ACTION_REFUSED -> INCONCLUSIVE"
 evidence_root: "demo/forward_step_2d/case_I_mesh_sensitivity"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_I_mesh_sensitivity; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/forward_step_2d/case_I_mesh_sensitivity; they are not in this repository."
 evidence_in_clone: []
 paper_ledger: "S8"
 config: null

@@ -81,7 +81,7 @@ Two files are derived from the session archive rather than copied:
 ## Scripts that need the session archive
 
 The agent sessions, the cube solver logs and the verification package are in
-the session archive on Zenodo (DOI to be added on release). These scripts read
+the session archive on Zenodo (https://doi.org/10.5281/zenodo.23148676). These scripts read
 it:
 
 | Script | Needs | Purpose |

@@ -10,7 +10,7 @@ Where labels are stripped: compact_feedback(), compact_validation() and
 sanitize_visual() copy only an explicit allow-list of fields, so the "model",
 "source" and "provider" entries of the session records are not published, and
 images_examined keeps file names only. The model identities remain in the full
-session records (Zenodo archive, DOI to be added on release).
+session records (Zenodo archive, https://doi.org/10.5281/zenodo.23148676).
 """
 from __future__ import annotations
 

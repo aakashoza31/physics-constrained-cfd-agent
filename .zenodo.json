@@ -23,5 +23,13 @@
     "scientific agents",
     "verification"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.23148676",
+      "relation": "isSupplementedBy",
+      "scheme": "doi",
+      "resource_type": "dataset"
+    }
+  ]
 }

@@ -5,7 +5,7 @@ title: "Correction loop completed in supervised resumed sessions"
 purpose: "Mach 3, h=0.2, staged horizon to t=4 (paper ledger S7). Seven proposals, two of them refused (CONTINUE_RUN after the requested horizon was reached; a further EXTEND_END_TIME after the iteration budget was exhausted), over four supervised resumed sessions. The run was accepted (PASS_2D_FORWARD_STEP -> ACCEPT) after the restart-seam treatment in the mass-closure diagnostic was corrected, so this acceptance is not an unattended result"
 evidence_root: "demo/forward_step_2d/case_H_iterative_short_run"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_H_iterative_short_run; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/forward_step_2d/case_H_iterative_short_run; they are not in this repository."
 evidence_in_clone: []
 paper_ledger: "S7"
 config: null

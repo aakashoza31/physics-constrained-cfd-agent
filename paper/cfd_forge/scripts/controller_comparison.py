@@ -29,7 +29,7 @@ and a key):
     python paper/cfd_forge/scripts/controller_comparison.py --dry-run
     python paper/cfd_forge/scripts/controller_comparison.py --repeats 5 --fault-repeats 3
 
-Inputs from the session archive on Zenodo (DOI to be added on release):
+Inputs from the session archive on Zenodo (https://doi.org/10.5281/zenodo.23148676):
   --demo-root  (or CFD_FORGE_DEMO)       the archive's demo/ directory;
   --cube-logs  (or CFD_FORGE_CUBE_LOGS)  CFD_Verification_Package_20260929/03_cube/logs,
                                          read by the cube point through
@@ -62,8 +62,8 @@ from pydantic import BaseModel  # noqa: E402
 from src.families.base import ACCEPT, CORRECT_AND_RERUN, INCONCLUSIVE, REJECT, Proposal  # noqa: E402
 from src.orchestrator.loop import decide_once  # noqa: E402
 
-# Archived agent sessions: demo/ of the session archive on Zenodo (DOI to be added
-# on release). Set with --demo-root or CFD_FORGE_DEMO; the default is the location
+# Archived agent sessions: demo/ of the session archive on Zenodo
+# (https://doi.org/10.5281/zenodo.23148676). Set with --demo-root or CFD_FORGE_DEMO; the default is the location
 # used for the archived run (a sibling checkout holding demo/).
 DEFAULT_DEMO = Path(os.environ.get(
     "CFD_FORGE_DEMO", REPO.parent / "physics-constrained-cfd-agent-e2e" / "demo"))

@@ -4,7 +4,7 @@ The nozzle family's demonstrated requests. Each passes through the same
 request → mesh → OpenFOAM → evidence → LLM → deterministic-validation pipeline
 (`scripts/run_nozzle_e2e.py`, `scripts/run_nozzle_feedback.py`). The registered
 cases are in `cases/nozzle/`; the full session records are in the Zenodo session
-archive (DOI to be added on release) under `demo/nozzle_e2e/` and
+archive (https://doi.org/10.5281/zenodo.23148676) under `demo/nozzle_e2e/` and
 `demo/nozzle_feedback*/`. For the forward-facing-step cases see
 `docs/results.md`.
 

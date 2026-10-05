@@ -2,7 +2,7 @@
 """Regenerate the evidence-derived records in cases/ from the archived sessions.
 
 The archived session records are not in this repository: they are distributed
-in the Zenodo archive (DOI to be added on release), whose top level holds
+in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676), whose top level holds
 `demo/...` (the agent sessions) and `CFD_Verification_Package_20260929/...`
 (the verification package, including the cube run). Each catalogue entry below
 names its evidence by that archive-relative path; pass the directory where the
@@ -542,8 +542,8 @@ def _archive_sentence(meta: Dict[str, Any]) -> str:
                 "the corrected record is in this directory.")
     original = (f" (originally `{meta['original_path']}`)"
                 if meta.get("original_path") else "")
-    return ("The archived records are in the Zenodo archive (DOI to be added on "
-            f"release) under `{meta['evidence']}`{original}; they are not in "
+    return ("The archived records are in the Zenodo archive "
+            f"(https://doi.org/10.5281/zenodo.23148676) under `{meta['evidence']}`{original}; they are not in "
             "this repository.")
 
 
@@ -591,8 +591,8 @@ def main() -> int:
                         rewrite_narrative=args.rewrite_narrative)
     except ArchiveMissing as exc:
         print(f"{exc}\nNothing was {'checked' if args.check else 'written'}: "
-              "the archived evidence is in the Zenodo archive (DOI to be added "
-              "on release); pass its location with --archive-root.")
+              "the archived evidence is in the Zenodo archive "
+              "(https://doi.org/10.5281/zenodo.23148676); pass its location with --archive-root.")
         return 2
     if args.check and changed:
         print("cases/ is out of date:")

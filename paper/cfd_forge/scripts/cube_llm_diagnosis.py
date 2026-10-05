@@ -21,7 +21,7 @@ Usage (repository root, in an environment with google-genai and a key):
         [--logs <archive>/CFD_Verification_Package_20260929/03_cube/logs]
 
 The solver logs come from the verification package in the session archive on
-Zenodo (DOI to be added on release); give their location with --logs or the
+Zenodo (https://doi.org/10.5281/zenodo.23148676); give their location with --logs or the
 environment variable CFD_FORGE_CUBE_LOGS. Without them the packet records
 "logs not available to this script" in place of the solver-health block.
 """
@@ -49,7 +49,7 @@ GATE = REPO / "src/families/cube/stationarity.py"
 OUT = REPO / "evidence/cube/drifting_wake/llm_diagnosis"
 # Solver logs of the cube run: 03_cube/logs/ of the verification package
 # CFD_Verification_Package_20260929/, which is part of the session archive on
-# Zenodo (DOI to be added on release). Set with --logs or CFD_FORGE_CUBE_LOGS;
+# Zenodo (https://doi.org/10.5281/zenodo.23148676). Set with --logs or CFD_FORGE_CUBE_LOGS;
 # the default is a copy of the package placed next to the repository.
 DEFAULT_LOGS = Path(os.environ.get(
     "CFD_FORGE_CUBE_LOGS", REPO.parent / "CFD_Verification_Package_20260929/03_cube/logs"))

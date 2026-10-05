@@ -5,7 +5,7 @@ title: "Reduced step height 0.10"
 purpose: "Step-height variation (paper ledger S4): Mach 3, h=0.1; PASS_2D_FORWARD_STEP -> ACCEPT in one iteration"
 evidence_root: "demo/forward_step_2d/case_E_step010"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_E_step010; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/forward_step_2d/case_E_step010; they are not in this repository."
 evidence_in_clone: []
 paper_ledger: "S4"
 config: null

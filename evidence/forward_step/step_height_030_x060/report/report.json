@@ -371,7 +371,7 @@
         "purpose": "Step-height variation (paper ledger S5): Mach 3, h=0.3, step at x=0.6, run to t=4. The compression front was displaced toward the inlet, to x=0.025, and no front could be measured; the model proposed FAIL_SAFELY, the validator returned FAIL (compression_front_measurable), and the decision is REJECT. The run was preserved and rejected rather than tuned",
         "evidence_root": "demo/forward_step_2d/case_F_step030",
         "evidence_present": false,
-        "archived_records": "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/forward_step_2d/case_F_step030; they are not in this repository.",
+        "archived_records": "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/forward_step_2d/case_F_step030; they are not in this repository.",
         "evidence_in_clone": [
           "evidence/forward_step/step_height_030_x060"
         ],

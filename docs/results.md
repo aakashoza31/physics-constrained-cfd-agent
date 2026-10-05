@@ -4,7 +4,7 @@ The two registered families (nozzle, 2-D forward-facing step), the turbulent-cub
 diagnostic study, and the controller comparison, as reported in the CFD Forge
 paper. A supplementary airfoil mesh study, which is not part of the paper, is
 recorded at the end. Every row is read from archived evidence in this repository
-or the session archive (Zenodo, DOI to be added on release); nothing here is
+or the session archive (Zenodo, https://doi.org/10.5281/zenodo.23148676); nothing here is
 projected or expected. All archived agent sessions are development cases, not a
 held-out evaluation.
 

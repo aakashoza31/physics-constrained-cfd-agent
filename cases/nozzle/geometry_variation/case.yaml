@@ -5,7 +5,7 @@ title: "Geometry variation"
 purpose: "Same physics, altered nozzle geometry (paper ledger N2: exit radius 37 mm; repeated as N7)"
 evidence_root: "demo/nozzle_e2e/case_B_geometry"
 evidence_present: false
-archived_records: "The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, demo/nozzle_e2e/case_B_geometry; they are not in this repository."
+archived_records: "The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, demo/nozzle_e2e/case_B_geometry; they are not in this repository."
 evidence_in_clone:
   - "demo/published_campaign/case_B_geometry"
 paper_ledger: "N2 (related: N7)"

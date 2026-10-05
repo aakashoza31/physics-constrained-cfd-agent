@@ -29,7 +29,7 @@ one `CONTINUE_RUN` and Cases B and C show one `ACCEPT`.
 Raw OpenFOAM runtime directories, full logs and machine-specific paths are not
 committed here. Model-provider labels were stripped from these summaries; the
 full session records, including the model identifiers of every call, are in the
-Zenodo archive (DOI to be added on release) under the paths above.
+Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the paths above.
 
 Running `scripts/run_repro_campaign.ps1` (or `.sh`) re-runs the campaign and writes
 a new local evidence tree under `demo/runs/`; model outputs may differ from the

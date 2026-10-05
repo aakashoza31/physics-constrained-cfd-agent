@@ -19,7 +19,7 @@ Step-height variation (paper ledger S4): Mach 3, h=0.1; `PASS_2D_FORWARD_STEP` -
 
 Replay re-derives the deterministic decision from the archived record in
 `expected_result.json` (and any series in `reference/`). It never claims a solver
-was executed. The archived session records are in the Zenodo archive (DOI to be added on release) under the same relative path, `demo/forward_step_2d/case_E_step010`; they are not in this repository.
+was executed. The archived session records are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under the same relative path, `demo/forward_step_2d/case_E_step010`; they are not in this repository.
 
 ## Archived outcome
 

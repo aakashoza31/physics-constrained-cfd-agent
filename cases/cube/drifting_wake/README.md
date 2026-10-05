@@ -37,7 +37,7 @@ Live execution is refused for this family; only replay is available.
 
 Replay re-derives the deterministic decision from the archived record in
 `expected_result.json` (and any series in `reference/`). It never claims a solver
-was executed. The archived run is in the Zenodo archive (DOI to be added on release) under `CFD_Verification_Package_20260929/03_cube` (originally `handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact`); it is not in this repository.
+was executed. The archived run is in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under `CFD_Verification_Package_20260929/03_cube` (originally `handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact`); it is not in this repository.
 
 ## Archived outcome
 

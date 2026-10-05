@@ -6,7 +6,7 @@ statistics (97 calls: 16 interpretation, 8 mesh review, 28 diagnosis, 23 field
 observation of which 5 failed, 22 summary; 74 text calls; 28 proposals).
 
 Inputs: the archived agent sessions, `demo/` in the session archive on Zenodo
-(DOI to be added on release). Only the nozzle and 2-D forward-step campaigns are
+(https://doi.org/10.5281/zenodo.23148676). Only the nozzle and 2-D forward-step campaigns are
 counted; `reanalysis*` copies are skipped.
 
 Method:

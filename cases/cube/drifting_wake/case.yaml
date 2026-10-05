@@ -5,7 +5,7 @@ title: "Surface-mounted cube with a drifting lateral wake"
 purpose: "Diagnostic study of a 3-D URANS (k-omega SST) surface-mounted cube, run outside the agent loop. The stationarity gate cube-stationarity/1.0.0 was registered retrospectively and applied to the archived force history; it returns STILL_DEVELOPING, so the decision is REJECT"
 evidence_root: "CFD_Verification_Package_20260929/03_cube"
 evidence_present: false
-archived_records: "The archived run is in the Zenodo archive (DOI to be added on release) under CFD_Verification_Package_20260929/03_cube (originally handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact); it is not in this repository."
+archived_records: "The archived run is in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676) under CFD_Verification_Package_20260929/03_cube (originally handoff/CFD_Agent_Handoff_20260924_1610/family3_baseline_compact); it is not in this repository."
 evidence_in_clone:
   - "evidence/cube/drifting_wake"
 paper_ledger: "cube study (not a ledger session)"

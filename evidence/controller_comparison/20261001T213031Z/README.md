@@ -122,5 +122,5 @@ session S2, and comparison point `N4` is a state of ledger session N6.
 | CUBE | archived | cube force history and logs (`paper/cfd_forge/scripts/cube_llm_diagnosis.py`) | cube diagnostic study (run outside the agent loop; not a ledger session) |
 | F01-F18 | fault | point S1's evidence with one planted fault (`src/eval/faults.py`; the name is in `label`) | none: planted faults on the ledger S2 state |
 
-The archived sessions are in the Zenodo archive (DOI to be added on release)
+The archived sessions are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676)
 under `demo/`.

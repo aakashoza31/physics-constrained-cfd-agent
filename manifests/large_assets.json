@@ -1,5 +1,5 @@
 {
-  "note": "Large archived evidence is not committed. This manifest is the inventory: counts, byte totals and digests of the key files each registered case points at. The counts and byte totals of the gitignored directories were measured on the development machine when the repository was consolidated and are approximate; those directories are not part of the public repository. The agent session records are deposited in the Zenodo session archive (DOI to be added on release). Digests are of the files as they were when recorded; regenerate them if a listed file changes.",
+  "note": "Large archived evidence is not committed. This manifest is the inventory: counts, byte totals and digests of the key files each registered case points at. The counts and byte totals of the gitignored directories were measured on the development machine when the repository was consolidated and are approximate; those directories are not part of the public repository. The agent session records are deposited in the Zenodo session archive (https://doi.org/10.5281/zenodo.23148676). Digests are of the files as they were when recorded; regenerate them if a listed file changes.",
   "directories": {
     "handoff": {
       "files": 823,

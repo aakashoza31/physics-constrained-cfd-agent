@@ -22,5 +22,5 @@ deterministic checks, which is not a claim of validation.
 | `CASE_H_ITERATIVE_SHORT_RUN.txt` | `case_H_iterative_short_run` | S7 | `cases/forward_step/iterative_correction` |
 | `REQUEST_MESH_SENSITIVITY.txt` | `case_I_mesh_sensitivity` | S8 | `cases/forward_step/mesh_sensitivity` |
 
-The archived sessions are in the Zenodo archive (DOI to be added on release)
+The archived sessions are in the Zenodo archive (https://doi.org/10.5281/zenodo.23148676)
 under `demo/forward_step_2d/<session>/`.
