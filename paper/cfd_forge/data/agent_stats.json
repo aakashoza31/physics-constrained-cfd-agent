@@ -42,5 +42,5 @@
   "REFINE_MESH|APPROVED": 1,
   "REQUEST_DIAGNOSTIC|APPROVED": 1
  },
- "model": "gemini-3.5-flash-lite (all recorded text calls); the field observer did not record its model in these runs: provider usage records show gemini-3.6-flash for its 15 step-session calls and gemini-3.5-flash-lite for its 8 nozzle-session calls"
+ "model": "gemini-3.5-flash-lite (all recorded text calls); the field observer did not record its model in these runs: from provider usage records we infer gemini-3.6-flash for its 15 step-session calls and gemini-3.5-flash-lite for its 8 nozzle-session calls"
 }

@@ -178,8 +178,8 @@
     },
     "agent_stats.json": {
       "source": "scripts/recount_agent_calls.py --demo <archive (Zenodo): demo/>: recount from every LLM call record of the nozzle and step sessions, deduplicated per run by (stage, latency); fields 'note' and 'model' written by hand",
-      "sha256": "879846676a6ec7a1f4930c2436ab1b84c4cfaee1c5d41e91d41206d5a7d25c27",
-      "bytes": 1764
+      "sha256": "6c0bec2da0ce133e3961ef2fc99be5532375eb78cfce209ce78f12be9a3f5e73",
+      "bytes": 1773
     },
     "cube/cube_mesh_only.npz": {
       "source": "scripts/extract_native_fields.py on the native cube polyMesh (no fields)",

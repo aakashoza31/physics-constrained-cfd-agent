@@ -91,7 +91,7 @@ it:
 | `scan_agent_sessions.py` | archive `demo/` | Superseded event-stream count (82 calls / 23 proposals); kept for reference. |
 | `cube_llm_diagnosis.py --logs <archive>/CFD_Verification_Package_20260929/03_cube/logs` | verification package, Gemini API key | Model diagnosis of the cube evidence (records in `evidence/cube/drifting_wake/llm_diagnosis/`). |
 | `controller_comparison.py --demo-root <archive>/demo --cube-logs <...>/03_cube/logs` | archive `demo/`, verification package, Gemini API key | Controller comparison (records in `evidence/controller_comparison/`). |
-| `extract_native_fields.py` | native OpenFOAM cases (not released) | Extracts mesh geometry used for `data/cube/cube_mesh_only.npz`. |
+| `extract_native_fields.py` | native cube case (Zenodo data archive, `native_cases/cube/campaign_t4_retry2/`) | Extracts mesh geometry used for `data/cube/cube_mesh_only.npz`. |
 
 `cube_llm_diagnosis.py` and `controller_comparison.py` also accept the
 locations through the environment variables `CFD_FORGE_CUBE_LOGS` and

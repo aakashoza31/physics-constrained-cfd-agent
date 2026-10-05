@@ -13,9 +13,10 @@ Usage:
       --nozzle <native nozzle case, e.g. .../conical_nozzle_200kpa_30kpa> \
       --step   <native Mach-2 forward-step case> \
       --cube   <native cube case>
-Any subset of --nozzle/--step/--cube may be given. The native field directories
-are not part of the repository or the session archive; data/cube/cube_mesh_only.npz
-was extracted with this script (see data/DATA_MANIFEST.json).
+Any subset of --nozzle/--step/--cube may be given. The native case directories
+are not part of the repository; they are in native_cases/ of the Zenodo data
+archive. data/cube/cube_mesh_only.npz was extracted with this script (see
+data/DATA_MANIFEST.json).
 """
 from __future__ import annotations
 
