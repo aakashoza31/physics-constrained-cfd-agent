@@ -26,14 +26,14 @@
     {
       "activity": "diagnose_evidence",
       "content": "ACCEPTABLE",
-      "model": "archived diagnosis",
+      "model": "gemini:gemini-3.5-flash-lite (archived record)",
       "accepted_by_authority": true,
       "binding": false
     },
     {
       "activity": "propose_bounded_action",
       "content": "ACCEPT",
-      "model": "archived diagnosis",
+      "model": "gemini:gemini-3.5-flash-lite (archived record)",
       "accepted_by_authority": true,
       "binding": false
     }

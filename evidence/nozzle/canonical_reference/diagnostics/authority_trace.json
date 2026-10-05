@@ -1,7 +1,7 @@
 {
   "family": "nozzle",
   "case": "canonical_reference",
-  "started_utc": "2026-10-05T00:05:37Z",
+  "started_utc": "2026-10-05T00:47:30Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
@@ -137,14 +137,14 @@
     {
       "activity": "diagnose_evidence",
       "content": "ACCEPTABLE",
-      "model": "archived diagnosis",
+      "model": "gemini:gemini-3.5-flash-lite (archived record)",
       "accepted_by_authority": true,
       "binding": false
     },
     {
       "activity": "propose_bounded_action",
       "content": "ACCEPT",
-      "model": "archived diagnosis",
+      "model": "gemini:gemini-3.5-flash-lite (archived record)",
       "accepted_by_authority": true,
       "binding": false
     }

@@ -1,7 +1,7 @@
 {
   "family": "forward_step_2d",
   "case": "step_height_030_x060",
-  "started_utc": "2026-10-05T00:05:42Z",
+  "started_utc": "2026-10-05T00:47:35Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",

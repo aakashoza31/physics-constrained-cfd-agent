@@ -310,14 +310,14 @@ def _archived_gates(meta: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
         proposals.append({
             "activity": "diagnose_evidence",
             "content": expected["llm_diagnosis"],
-            "model": "archived diagnosis",
+            "model": expected.get("llm_model", "gemini:gemini-3.5-flash-lite (archived record)"),
             "accepted_by_authority": bool(expected.get("llm_action_approved")),
         })
     if expected.get("llm_proposed_action"):
         proposals.append({
             "activity": "propose_bounded_action",
             "content": expected["llm_proposed_action"],
-            "model": "archived diagnosis",
+            "model": expected.get("llm_model", "gemini:gemini-3.5-flash-lite (archived record)"),
             "accepted_by_authority": bool(expected.get("llm_action_approved")),
         })
     artifacts = {

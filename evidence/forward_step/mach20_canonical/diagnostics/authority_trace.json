@@ -1,7 +1,7 @@
 {
   "family": "forward_step_2d",
   "case": "mach20_canonical",
-  "started_utc": "2026-10-05T00:05:38Z",
+  "started_utc": "2026-10-05T00:47:31Z",
   "authority_questions": [
     "family_compatibility",
     "geometry_admissibility",
