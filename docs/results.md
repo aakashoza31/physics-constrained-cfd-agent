@@ -81,7 +81,7 @@ calculation completed its bounded extension to t* = 80 without numerical failure
 | **Half-window mean \|Fz\| ratio** | **2.10** | **≤ 1.25** | **FAIL** |
 
 The gate returns `STILL_DEVELOPING` and the result is REJECT. The lateral force
-oscillates with a period of about 10.1 time units while its envelope grows. A
+oscillates with a period of about 10.15 time units while its envelope grows. A
 separate read-only complete-cycle audit, which is not part of the gate, finds
 successive complete-cycle amplitude growth of 209%, 137% and 113%: the growth
 rate is declining, but the mode has not saturated. Between the t* = 60-70 and
