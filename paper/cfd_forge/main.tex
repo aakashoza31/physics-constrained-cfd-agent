@@ -1,6 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{graphicx}
-\graphicspath{{./}{Figures/}{Figures/figures/}}
+\graphicspath{{./}{Figures/}}
 \usepackage[section]{placeins}
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.8}
@@ -34,11 +34,11 @@ Setting up, running, and assessing a computational fluid dynamics (CFD) simulati
 
 Computational fluid dynamics (CFD) is central to engineering analysis, but obtaining a useful result requires a sequence of decisions and operations. An analyst prepares a CAD model or parameterized geometry, defines the domain, generates a mesh, selects physical models, and assigns boundary and initial conditions. Solver execution is then followed by diagnostics and interpretation, with the final aim of reporting results that range from scientific discovery to engineering decisions. Although individual steps can be scripted, coordinating them requires extensive experience, so much so that the need for workflow automation was identified in the NASA CFD Vision 2030 study to support routine computational analysis and design~\cite{slotnick2014vision}.
 
-The effort required for CFD analysis creates a bottleneck in high-throughput screening and iterative design, where many geometries or operating conditions must be evaluated consistently \cite{forrester2009surrogate,brunton2020mlfluids}. A programmable CFD workflow could translate an engineering objective into a sequence of reusable operations and return simulation results with an interpretation of their significance. System response quantities (SRQs), such as drag, lift, or pressure loss, could then guide subsequent evaluations within an active-learning or optimization loop, as illustrated by recent work on LLM-assisted CFD optimization \cite{chen2026optmeta}.
+The effort required for CFD analysis creates a bottleneck in high-throughput screening and iterative design, where many geometries or operating conditions must be evaluated consistently \cite{forrester2009surrogate,brunton2020mlfluids}. A programmable CFD workflow could translate an engineering objective into a sequence of reusable operations and return simulation results with an interpretation of their significance. System response quantities, such as drag, lift, or pressure loss, could then guide subsequent evaluations within an active-learning or optimization loop, as illustrated by recent work on language-model-assisted CFD optimization \cite{chen2026optmeta}.
 
-Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM provides an accessible, open-source CFD framework with a programmable interface that facilitates integration with LLM-based approaches \cite{weller1998tensorial}. Several agents now generate and run OpenFOAM cases from natural language: MetaOpenFOAM and MetaOpenFOAM 2.0 \cite{chen2024metaopenfoam,chen2025metaopenfoam2}, OpenFOAMGPT and OpenFOAMGPT 2.0 \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}, fine-tuned case generators \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd}. Their evaluations mainly measure whether a generated case executes and how closely its configuration or its computed fields match a reference. A run is treated as successful when the solver finishes without error or reports convergence, or when an LLM or a human reviewer judges the result. Language-guided multi-agent automation has also been applied to complex flow simulation \cite{xu2025cfdagent}. Two recent systems address physical correctness more directly. PhyNiKCE separates neural planning from symbolic constraint enforcement: before the LLM writes the case files, it retrieves configuration templates, boundary-condition knowledge, and solver constraints that are consistent with the requested physics \cite{fan2026phynikce}. AI CFD Scientist adds checks after execution, a mesh-independence gate and a vision-language physics check, and it evaluates the visual check on deliberately planted failures \cite{somasekharan2026aicfd}.
+Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM \cite{weller1998tensorial} provides an accessible, open-source CFD framework with a programmable interface that facilitates integration with LLM-based approaches. Several agents now generate and run OpenFOAM cases from natural language: MetaOpenFOAM and MetaOpenFOAM 2.0 \cite{chen2024metaopenfoam,chen2025metaopenfoam2}, OpenFOAMGPT and OpenFOAMGPT 2.0 \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}, fine-tuned case generators \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd}. Their evaluations mainly measure whether a generated case executes and how closely its configuration or its computed fields match a reference. A run is treated as successful when the solver finishes without error or reports convergence, or when an LLM or a human reviewer judges the result. Language-guided multi-agent automation has also been applied to complex flow simulation \cite{xu2025cfdagent}. Two recent systems address physical correctness more directly. PhyNiKCE separates neural planning from symbolic constraint enforcement: before the LLM writes the case files, it retrieves configuration templates, boundary-condition knowledge, and solver constraints that are consistent with the requested physics \cite{fan2026phynikce}. AI CFD Scientist adds checks after execution, a mesh-independence gate and a vision-language physics check, and it evaluates the visual check on deliberately planted failures \cite{somasekharan2026aicfd}.
 
-In this work, we introduce CFD Forge, an agentic framework built around OpenFOAM. Starting from a plain-language engineering request, it builds the case, generates the mesh, runs the solver, diagnoses the result, and reports what it found, using an LLM to plan and propose while deterministic code carries out each step and checks the result. This division of labor builds on simulation agents developed for structural design \cite{jadhav2026mechdesigner}, protein molecular dynamics \cite{baratifarimani2025namdagent}, and adsorption calculations \cite{ock2026adsorbagent}. The closest precedent is PolyJarvis \cite{zhao2026polyjarvis}, which executes all-atom polymer molecular dynamics using a validated run plan, deterministic stage scripts, and equilibration gates. It invokes a recovery agent only when structured failures occur, with a fixed decision budget and a closed set of recovery actions. CFD Forge extends this approach to CFD, including validator-controlled mesh refinement. Whereas MeshDQN uses reinforcement learning to coarsen a mesh while preserving a target quantity \cite{lorsung2023meshdqn}, CFD Forge restricts mesh changes to bounded refinements that follow a registered rule, are proposed by the model, and require validator approval.
+In this work, we introduce CFD Forge, an agentic framework built around OpenFOAM. Starting from a plain-language engineering request, it builds the case, generates the mesh, runs the solver, diagnoses the result, and reports what it found, using an LLM to plan and propose while deterministic code carries out each step and checks the result. This division of labor builds on simulation agents developed for structural design \cite{jadhav2026mechdesigner}, protein molecular dynamics (MD) \cite{baratifarimani2025namdagent}, and adsorption calculations \cite{ock2026adsorbagent}. The closest precedent is PolyJarvis \cite{zhao2026polyjarvis}, which executes all-atom polymer MD using a validated run plan, deterministic stage scripts, and equilibration gates. It invokes a recovery agent only when structured failures occur, with a fixed decision budget and a closed set of recovery actions. CFD Forge extends this approach to CFD, including validator-controlled mesh refinement. Whereas MeshDQN uses reinforcement learning to coarsen a mesh while preserving a target quantity \cite{lorsung2023meshdqn}, CFD Forge restricts mesh changes to bounded refinements that follow a registered rule, are proposed by the model, and require validator approval.
 
 CFD Forge occupies a complementary design point: deterministic, family-specific numerical acceptance of CFD results after execution, coupled to validator-controlled corrective actions (Table~\ref{tab:related}). Separating model proposals from deterministic checks is not new, and we do not claim it as such. What this paper contributes is how that separation is built and tested for CFD acceptance, summarized at the end of this section.
 
@@ -69,14 +69,14 @@ PhyNiKCE~\cite{fan2026phynikce} & Execution without failure; accuracy scored aft
 AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (rerun controller revises the request) & -- & -- & 5 tasks; 16 planted failures \\
 PolyJarvis~\cite{zhao2026polyjarvis} (MD) & Deterministic gates & Yes & Yes (recovery set, fixed budget) & Yes (drift, block error) & n/a & 7 polymers, 3 replicates, vs.\ experiment \\
 \midrule
-CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (all force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; controller comparison, repeated calls \\
+CFD Forge & Deterministic family contract & Yes & Yes (per-family vocabulary) & Yes (nozzle monitors and fields; cube force components) & Yes & 2 agent families (19 sessions) plus one offline cube study; controller comparison, repeated calls \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 Automating these steps is only useful if the results can be trusted, and in CFD that is harder than it sounds. A solver can finish, residuals can fall, and contours can look plausible while the boundary conditions are wrong, numerical errors remain, or the flow is still developing. This is why verification and validation draw on several kinds of evidence \cite{oberkampf2002vv,celik2008discretization}. A language model asked to judge such a run can be misled by the same surface signs: in our controller comparison, a model given the evidence without the check results proposed acceptance for 12 of the 13 detectable planted faults.
 
-CFD Forge is built around this observation. The language model does the open-ended work: it turns a request into a case specification, reads solver logs, conservation measures, and flow histories, proposes what to try next, and writes the engineering report. Deterministic checks, registered for each flow family, measure explicit criteria and alone return \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE}. The model is deliberately not used where a rule suffices (Section~\ref{sec:controller}), and new flow families are added through their own contracts. In this paper, geometry enters through parameterized families; an earlier CAD$\rightarrow$Gmsh prototype is described in Appendix~\ref{app:repro}.
+CFD Forge is built around this observation. The language model does the open-ended work: it turns a request into a case specification, reads solver logs, conservation measures, and flow histories, proposes what to try next, and writes the engineering report. Deterministic checks, registered for each flow family, measure explicit criteria and alone return \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE}. The model is deliberately not used to decide acceptance, where a rule suffices (Sec.~\ref{sec:controller}), and new flow families are added through their own contracts. In this paper, geometry enters through parameterized families; an earlier CAD$\rightarrow$Gmsh prototype is described in Appendix~\ref{app:repro}.
 
 We demonstrate the workflow with a compressible nozzle assessed against quasi-one-dimensional theory and a forward-facing step assessed for transient numerical health and storage-aware mass conservation (Appendix~\ref{sec:step_setup}), including new cases that the agent built from text requests with different geometry and operating conditions. A three-dimensional turbulent cube provides a diagnostic stress test. Although execution completes and mean drag becomes comparatively stable, quantitative force and wake diagnostics reveal continuing lateral-mode growth. Applied retrospectively, a check for statistically steady flow withholds acceptance on this evidence, illustrating why several physical signals must be examined together.
 
@@ -99,7 +99,7 @@ CFD Forge organizes CFD analysis as a programmable workflow, driven by a languag
 
 The workflow begins with a natural-language engineering request describing the intended flow problem and relevant geometry or operating parameters. The request is interpreted and matched to a registered simulation family. Each family supplies a scientific contract defining the physical assumptions, admissible inputs, numerical recipe, required diagnostics, and permitted corrective actions.
 
-For an admissible request, a family-specific runner constructs the case, generates the mesh, assigns boundary and initial conditions, and executes OpenFOAM. Diagnostic routines then extract evidence from the mesh, solver logs, saved fields, and time histories. This evidence supports both model-assisted interpretation and deterministic scientific assessment. Where an allowed corrective action is justified, the runner can update the permitted settings or continue execution before reassessing the result. Otherwise, the workflow terminates with a recorded decision and supporting artifacts.
+For an admissible request, a family-specific runner constructs the case, generates the mesh, assigns boundary and initial conditions, and executes OpenFOAM (Fig.~\ref{fig:flowpilot_architecture}). Diagnostic routines then extract evidence from the mesh, solver logs, saved fields, and time histories. This evidence supports both model-assisted interpretation and deterministic scientific assessment. Where an allowed corrective action is justified, the runner can update the permitted settings or continue execution before reassessing the result. Otherwise, the workflow terminates with a recorded decision and supporting artifacts.
 
 \begin{figure}[!htbp]
     \centering
@@ -380,8 +380,8 @@ acceptance criteria are given in Appendix~\ref{app:setup}.
 The nozzle and step runs were executed by the agent from natural-language
 requests, and their model calls are recorded, except for one repair call
 disclosed in Sec.~\ref{sec:agent_results}. The cube campaign was executed
-outside the agent loop; afterwards we applied the agent's diagnosis stage to
-its archived evidence three times and ruled on each proposal with the
+outside the agent loop; afterwards we applied a diagnosis call in the style of
+the agent's diagnosis stage to its archived evidence three times and ruled on each proposal with the
 stationarity gate, which was registered retrospectively, after the cube
 data existed (Sec.~\ref{sec:cube_results}, Appendix~\ref{app:repro}). Archived-case replay is used only to check
 that recorded verdicts are reproduced, never as evidence of new execution.
@@ -451,7 +451,7 @@ could be measured; the model attributed this to upstream migration of the
 shock system (Sec.~\ref{sec:variants}) and proposed \texttt{FAIL\_SAFELY}. That run was preserved and
 rejected rather than tuned.
 
-The three refused proposals show the validator correcting the model. In the
+The three recorded refusals show the validator correcting the model. In the
 iterative Mach-3 run, the model proposed \texttt{CONTINUE\_RUN} after the
 requested horizon had been reached, which was refused because more physical
 time requires \texttt{EXTEND\_END\_TIME}; a later \texttt{EXTEND\_END\_TIME}
@@ -477,9 +477,10 @@ deterministic reanalysis of the unchanged run returned
 \texttt{PASS\_2D\_FORWARD\_STEP} without a new solve. Deterministic authority
 is therefore only as reliable as the checks it applies.
 
-In every recorded case the terminal verdict was computed by the validators,
-and a rule keyed to the failed check would have chosen the same action; the
-five failed observer calls changed no outcome.
+In every recorded case the terminal verdict was computed by the validators.
+For the continuation, extension, and safe-stop decisions above, a rule keyed to
+the failed check would have chosen the same action, and the five failed
+observer calls changed no outcome.
 
 \begin{table}[!htbp]
 \centering
@@ -562,7 +563,7 @@ times and each fault three times; arms B and B$'$ share one model call per
 repeat.
 
 The decision points are of three kinds. Sixteen archived points cover nine
-forward-step states, six nozzle states and the cube
+forward-facing-step states, six nozzle states and the cube
 (Table~\ref{tab:controller}). The reference answer for each is the
 registered decision: \texttt{ACCEPT} when every check passes,
 \texttt{CORRECT\_AND\_RERUN} when only the target time or settling checks
@@ -660,14 +661,14 @@ The comparison also bounds what the model contributes. At these decision
 points the tested fixed-rule controller reached the same verdicts as CFD Forge,
 and at every archived point it proposed the same action as the model. The two
 differed only on planted faults, where the rule always failed safely and the
-model, at 8 of 18 faults, proposed a targeted correction in at least one
+model, at 8 of 18 faults, proposed a correction other than a safe stop in at least one
 repeat, such as \texttt{REDUCE\_MAX\_CO} for a non-finite Courant number or
 \texttt{REBUILD\_FROM\_VALIDATED\_SPEC} for a cell-count mismatch; whether those
 corrections would have succeeded was not tested. The model's role is therefore
 not to improve acceptance decisions but to do the open-ended work that the
 tested rule cannot: interpret a free-text request into a registered
 specification, construct new cases within a family
-(Section~\ref{sec:variants}), explain the evidence, and propose among several
+(Sec.~\ref{sec:variants}), explain the evidence, and propose among several
 admissible corrections. The comparison does not measure those contributions.
 \par}
 \subsection{New Cases Within the Registered Families}
@@ -815,8 +816,8 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
     \includegraphics[width=\linewidth]{Figures/fig3_nozzle.pdf}
     \caption{Nozzle results. (a,b) Axial profiles of the canonical run at
     $t=6$\,ms (solid) and the isentropic quasi-one-dimensional solution for
-    the registered area distribution (dashed). (c) The three stationarity
-    checks of the separate continuation run, expressed as measured value over
+    the registered area distribution (dashed). (c) The three checks that failed
+    at 1\,ms in the separate continuation run (mass balance, monitor drift, field change), expressed as measured value over
     registered limit, at the initial 1\,ms endpoint (failed) and after the
     approved continuation to 6\,ms (passed).}
     \label{fig:nozzle}
@@ -828,7 +829,7 @@ Mass flow (kg\,s$^{-1}$) & 1.541 & 1.558 & $-1.11\%$ & $<3\%$ \\
     \caption{Canonical agent nozzle run at $t=6$\,ms: Mach number, static
     pressure, and static temperature from the archived ParaView renderings of
     the native fields (fixed color ranges recorded in the field-evolution
-    manifest), re-axed from the recorded camera. The axisymmetric wedge
+    manifest), with new axes, from the recorded camera view. The axisymmetric wedge
     solution is mirrored about the axis (dashed). The sonic line sits at the
     throat entrance and the diverging section is supersonic throughout.}
     \label{fig:nozzle_fields}
@@ -940,7 +941,7 @@ $t^*=60$--70 and 70--80 averages the mean drag changes by only $0.04\%$ and
 wake-probe means by at most $0.002\,U_b$, while the root-mean-square lateral
 force increases by $110\%$. Instantaneous lateral-velocity fields on the plane
 $y/H=0.5$ at $t^*=20$, 40, 60, and 80 are almost indistinguishable on a common
-color range (not shown), so contours alone would not reveal the growing mode
+color range (only $t^*=80$ is shown, in Fig.~\ref{fig:flowpilot_architecture}c), so contours alone would not reveal the growing mode
 that the force history exposes.
 
 \begin{figure}[!htbp]
@@ -958,8 +959,11 @@ that the force history exposes.
 \end{figure}
 
 \paragraph{Agent diagnosis of the cube evidence.} Because the cube campaign
-ran outside the agent loop, we applied the agent's diagnosis stage to its
-archived evidence afterwards, without running any CFD. The evidence packet
+ran outside the agent loop, we applied a diagnosis call written for this
+replay, in the style of the agent's diagnosis stage, to its archived evidence
+afterwards, without running any CFD. Its system instruction states that solver
+completion does not prove a developed flow and asks the model to consider every
+force component, not only the drag. The evidence packet
 contained solver health from the seven run segments (all ended normally;
 maximum Courant number 0.80; maximum global continuity error
 $5.4\times10^{-11}$), force statistics in six 10-unit blocks, and the
@@ -968,7 +972,8 @@ was called three times with the same packet at temperature 0
 (Table~\ref{tab:cube_llm}). Twice it diagnosed \texttt{STILL\_DEVELOPING} and
 proposed \texttt{CONTINUE\_RUN}, noting that $F_x$ and $F_y$ had settled while
 the $F_z$ extrema grew in every half-cycle; this agrees with the registered
-gate, which the model never saw. Once it read the same growth as a numerical
+gate, which the model never saw, although its instruction pointed to all force
+components. Once it read the same growth as a numerical
 instability, diagnosed \texttt{NUMERICALLY\_UNHEALTHY}, and proposed
 \texttt{FAIL\_SAFELY}, although the solver-health evidence was clean; the six
 warning messages counted in the packet are routine OpenFOAM time-precision
@@ -1020,21 +1025,24 @@ oscillation, enough to show continued growth but too short for a statistical
 stationarity claim. A provisional comparison of its evolving mean wake with
 ERCOFTAC centerline profiles is not satisfactory, so no experimental
 validation is claimed. The model's diagnoses are not guaranteed to be repeatable: in the cube
-diagnosis (Sec.~\ref{sec:cube_results}) one of three identical calls gave a different diagnosis, whereas five
-repeats agreed in the controller comparison, and the proposed corrective
+diagnosis (Sec.~\ref{sec:cube_results}) one of three identical calls gave a different diagnosis, whereas all five
+arm-B repeats on the same cube evidence agreed in the controller comparison, and the proposed corrective
 action varied across repeats at five of 18 planted faults
-(Section~\ref{sec:controller}). General CAD/STEP-to-CFD execution is not
+(Sec.~\ref{sec:controller}). General CAD/STEP-to-CFD execution is not
 demonstrated. All archived agent sessions are development cases, run while
 the corresponding pipeline was being built, and the cube gate was registered
 after the cube data existed (Appendix~\ref{app:repro}); no request was held
-out. Finally, the controller comparison (Section~\ref{sec:controller}) uses one
+out. Finally, the controller comparison (Sec.~\ref{sec:controller}) uses one
 model, replays archived states rather than new runs, and plants faults in one
 family. In the check-informed B/B$'$ configuration the model never proposed
 acceptance contrary to a failed check, so the enforcement layer was not
 tested against a model that proposes an unjustified acceptance. Nor does
 the comparison establish an incremental benefit of the model over a fixed
-rule (Section~\ref{sec:controller}), and the corrections the model proposed
-for planted faults were not executed. Comparisons across models, on held-out
+rule (Sec.~\ref{sec:controller}), its two configurations also differ in
+prompting, and the corrections the model proposed for planted faults were not
+executed. In the agent sessions, one repair call (N4) was not recorded, and one
+accepted step run (S7) required supervised resumption after a mid-campaign
+validator fix. Comparisons across models, on held-out
 requests, and with executed corrections remain future work.
 
 \section{Conclusion}
@@ -1091,7 +1099,7 @@ initial-condition audit of its predecessor pilot.}
 \midrule
 Model & Inviscid compressible Euler, perfect gas ($\gamma=1.4$, $R=287$\,J\,kg$^{-1}$\,K$^{-1}$); \texttt{shockFluid}
  & Inviscid compressible Euler, normalized perfect gas ($\gamma=1.4$, sound speed 1); \texttt{shockFluid}
- & Incompressible URANS, $k$--$\omega$ SST~\cite{menter1994sst}, $\nu=2.5\times10^{-5}$, $Re_H=40{,}000$; \texttt{incompressibleFluid} \\
+ & Incompressible unsteady Reynolds-averaged Navier--Stokes (URANS), $k$--$\omega$ shear-stress transport (SST)~\cite{menter1994sst}, $\nu=2.5\times10^{-5}$, $Re_H=40{,}000$; \texttt{incompressibleFluid} \\
 Mesh & 5$^\circ$ wedge, $132\times16=2{,}112$ cells (1,980 hexahedra and 132 axis-adjacent prisms); max.\ aspect ratio 2.46, non-orthogonality $9.6^\circ$, skewness 0.33
  & Three blocks, uniform $\Delta x=\Delta y=0.0125$, 16,128 hexahedra, one \texttt{empty} spanwise layer
  & Rectilinear, $116\times40\times124$ minus the $20^3$ cube cells $=567{,}360$ hexahedra; max.\ aspect ratio 18.4, six partitions \\
@@ -1516,20 +1524,19 @@ Computational Aerosciences}.
 NASA, Technical Report NASA/CR-2014-218178, 2014.
 \url{https://ntrs.nasa.gov/citations/20140003093}.
 
-\bibitem{weller1998tensorial}
-H.~G. Weller, G. Tabor, H. Jasak, and C. Fureby,
-``A tensorial approach to computational continuum mechanics
-using object-oriented techniques,''
-\textit{Computers in Physics}, vol.~12, no.~6,
-pp.~620--631, 1998.
-DOI: \url{https://doi.org/10.1063/1.168744}.
-
 \bibitem{forrester2009surrogate}
 A.~I.~J. Forrester and A.~J. Keane,
 ``Recent advances in surrogate-based optimization,''
 \textit{Progress in Aerospace Sciences}, vol.~45, nos.~1--3,
 pp.~50--79, 2009.
 DOI: \url{https://doi.org/10.1016/j.paerosci.2008.11.001}.
+
+\bibitem{brunton2020mlfluids}
+S.~L. Brunton, B.~R. Noack, and P. Koumoutsakos,
+``Machine learning for fluid mechanics,''
+\textit{Annual Review of Fluid Mechanics}, vol.~52,
+pp.~477--508, 2020.
+DOI: \url{https://doi.org/10.1146/annurev-fluid-010719-060214}.
 
 \bibitem{chen2026optmeta}
 Y. Chen, L. Zhang, X. Zhu, H. Zhou, and Z. Ren,
@@ -1538,13 +1545,6 @@ parameter optimization in computational fluid dynamics,''
 \textit{Theoretical and Applied Mechanics Letters},
 vol.~16, no.~5, Article~100660, 2026.
 DOI: \url{https://doi.org/10.1016/j.taml.2026.100660}.
-
-\bibitem{brunton2020mlfluids}
-S.~L. Brunton, B.~R. Noack, and P. Koumoutsakos,
-``Machine learning for fluid mechanics,''
-\textit{Annual Review of Fluid Mechanics}, vol.~52,
-pp.~477--508, 2020.
-DOI: \url{https://doi.org/10.1146/annurev-fluid-010719-060214}.
 
 \bibitem{yao2023react}
 S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran,
@@ -1571,6 +1571,14 @@ T. Rockt{\"a}schel, S. Riedel, and D. Kiela,
 in \textit{Advances in Neural Information Processing Systems},
 vol.~33, 2020.
 Available at \url{https://arxiv.org/abs/2005.11401}.
+
+\bibitem{weller1998tensorial}
+H.~G. Weller, G. Tabor, H. Jasak, and C. Fureby,
+``A tensorial approach to computational continuum mechanics
+using object-oriented techniques,''
+\textit{Computers in Physics}, vol.~12, no.~6,
+pp.~620--631, 1998.
+DOI: \url{https://doi.org/10.1063/1.168744}.
 
 \bibitem{chen2024metaopenfoam}
 Y. Chen, X. Zhu, H. Zhou, and Z. Ren,
@@ -1628,6 +1636,62 @@ knowledge and reasoning,''
 Article~e202500174, 2026.
 DOI: \url{https://doi.org/10.1002/aidi.202500174}.
 
+\bibitem{xu2025cfdagent}
+Z. Xu, L. Wang, C. Wang, Y. Chen, Q. Luo, H. Yao, S. Wang, and G. He,
+``CFDAgent: A language-guided, zero-shot multi-agent system for complex flow
+simulation,''
+\textit{Physics of Fluids}, vol.~37, no.~11, Article~117124, 2025.
+DOI: \url{https://doi.org/10.1063/5.0294696}.
+
+\bibitem{fan2026phynikce}
+E. Fan, L. Shi, Z. Li, and C.-y. Wen,
+``PhyNiKCE: A neurosymbolic agentic framework for
+autonomous computational fluid dynamics,''
+\textit{arXiv preprint arXiv:2602.11666}, 2026.
+DOI: \url{https://doi.org/10.48550/arXiv.2602.11666}.
+
+\bibitem{somasekharan2026aicfd}
+N. Somasekharan, R. Pathak, M. Dhanakoti,
+T. Zhang, L. Yue, A. Zhu, and S. Pan,
+``AI CFD Scientist: Toward open-ended computational fluid
+dynamics discovery with physics-aware AI agents,''
+\textit{arXiv preprint arXiv:2605.06607}, 2026.
+DOI: \url{https://doi.org/10.48550/arXiv.2605.06607}.
+
+\bibitem{jadhav2026mechdesigner}
+Y. Jadhav and A. Barati Farimani,
+``Large language model agent as a mechanical designer,''
+\textit{Journal of Engineering Design}, vol.~37, no.~8, pp.~2904--2940, 2026.
+DOI: \url{https://doi.org/10.1080/09544828.2026.2624356}.
+
+\bibitem{baratifarimani2025namdagent}
+O. Barati Farimani, A. Chandrasekhar, and A. Barati Farimani,
+``Automating {MD} simulations for proteins using large language models:
+{NAMD-Agent},''
+\textit{arXiv preprint arXiv:2507.07887}, 2025.
+DOI: \url{https://doi.org/10.48550/arXiv.2507.07887}.
+
+\bibitem{ock2026adsorbagent}
+J. Ock, R.~S. Meda, T. Vinchurkar, Y. Jadhav, and A. Barati Farimani,
+``Adsorb-Agent: Autonomous identification of stable adsorption
+configurations via a large language model agent,''
+\textit{Digital Discovery}, vol.~5, no.~2, pp.~617--629, 2026.
+DOI: \url{https://doi.org/10.1039/D5DD00298B}.
+
+\bibitem{zhao2026polyjarvis}
+A. Zhao, A. Chandrasekhar, and A. Barati Farimani,
+``{PolyJarvis}: An {LLM}-orchestrated agent for automated all-atom molecular
+dynamics of amorphous homopolymers,''
+\textit{arXiv preprint arXiv:2604.02537}, 2026.
+DOI: \url{https://doi.org/10.48550/arXiv.2604.02537}.
+
+\bibitem{lorsung2023meshdqn}
+C. Lorsung and A. Barati Farimani,
+``Mesh deep {Q} network: A deep reinforcement learning framework for
+improving meshes in computational fluid dynamics,''
+\textit{AIP Advances}, vol.~13, no.~1, Article~015026, 2023.
+DOI: \url{https://doi.org/10.1063/5.0138039}.
+
 \bibitem{oberkampf2002vv}
 W.~L. Oberkampf and T.~G. Trucano,
 ``Verification and validation in computational fluid dynamics,''
@@ -1644,27 +1708,12 @@ due to discretization in CFD applications,''
 Article~078001, 2008.
 DOI: \url{https://doi.org/10.1115/1.2960953}.
 
-\bibitem{somasekharan2026aicfd}
-N. Somasekharan, R. Pathak, M. Dhanakoti,
-T. Zhang, L. Yue, A. Zhu, and S. Pan,
-``AI CFD Scientist: Toward open-ended computational fluid
-dynamics discovery with physics-aware AI agents,''
-\textit{arXiv preprint arXiv:2605.06607}, 2026.
-DOI: \url{https://doi.org/10.48550/arXiv.2605.06607}.
-
-\bibitem{fan2026phynikce}
-E. Fan, L. Shi, Z. Li, and C.-y. Wen,
-``PhyNiKCE: A neurosymbolic agentic framework for
-autonomous computational fluid dynamics,''
-\textit{arXiv preprint arXiv:2602.11666}, 2026.
-DOI: \url{https://doi.org/10.48550/arXiv.2602.11666}.
-
-\bibitem{xu2025cfdagent}
-Z. Xu, L. Wang, C. Wang, Y. Chen, Q. Luo, H. Yao, S. Wang, and G. He,
-``CFDAgent: A language-guided, zero-shot multi-agent system for complex flow
-simulation,''
-\textit{Physics of Fluids}, vol.~37, no.~11, Article~117124, 2025.
-DOI: \url{https://doi.org/10.1063/5.0294696}.
+\bibitem{menter1994sst}
+F.~R. Menter,
+``Two-equation eddy-viscosity turbulence models for engineering
+applications,''
+\textit{AIAA Journal}, vol.~32, no.~8, pp.~1598--1605, 1994.
+DOI: \url{https://doi.org/10.2514/3.12149}.
 
 \bibitem{kurganov2000central}
 A. Kurganov and E. Tadmor,
@@ -1682,13 +1731,6 @@ strong shocks,''
 pp.~115--173, 1984.
 DOI: \url{https://doi.org/10.1016/0021-9991(84)90142-6}.
 
-\bibitem{menter1994sst}
-F.~R. Menter,
-``Two-equation eddy-viscosity turbulence models for engineering
-applications,''
-\textit{AIAA Journal}, vol.~32, no.~8, pp.~1598--1605, 1994.
-DOI: \url{https://doi.org/10.2514/3.12149}.
-
 \bibitem{martinuzzi1993cube}
 R. Martinuzzi and C. Tropea,
 ``The flow around surface-mounted, prismatic obstacles placed in a
@@ -1696,40 +1738,6 @@ fully developed channel flow,''
 \textit{Journal of Fluids Engineering}, vol.~115, no.~1,
 pp.~85--92, 1993.
 DOI: \url{https://doi.org/10.1115/1.2910118}.
-
-\bibitem{zhao2026polyjarvis}
-A. Zhao, A. Chandrasekhar, and A. Barati Farimani,
-``{PolyJarvis}: An {LLM}-orchestrated agent for automated all-atom molecular
-dynamics of amorphous homopolymers,''
-\textit{arXiv preprint arXiv:2604.02537v3}, 2026.
-DOI: \url{https://doi.org/10.48550/arXiv.2604.02537}.
-
-\bibitem{jadhav2026mechdesigner}
-Y. Jadhav and A. Barati Farimani,
-``Large language model agent as a mechanical designer,''
-\textit{Journal of Engineering Design}, vol.~37, no.~8, pp.~2904--2940, 2026.
-DOI: \url{https://doi.org/10.1080/09544828.2026.2624356}.
-
-\bibitem{baratifarimani2025namdagent}
-O. Barati Farimani, A. Chandrasekhar, and A. Barati Farimani,
-``Automating {MD} simulations for proteins using large language models:
-{NAMD-Agent},''
-\textit{arXiv preprint arXiv:2507.07887}, 2025.
-DOI: \url{https://doi.org/10.48550/arXiv.2507.07887}.
-
-\bibitem{lorsung2023meshdqn}
-C. Lorsung and A. Barati Farimani,
-``Mesh deep {Q} network: A deep reinforcement learning framework for
-improving meshes in computational fluid dynamics,''
-\textit{AIP Advances}, vol.~13, no.~1, Article~015026, 2023.
-DOI: \url{https://doi.org/10.1063/5.0138039}.
-
-\bibitem{ock2026adsorbagent}
-J. Ock, R.~S. Meda, T. Vinchurkar, Y. Jadhav, and A. Barati Farimani,
-``Adsorb-Agent: Autonomous identification of stable adsorption
-configurations via a large language model agent,''
-\textit{Digital Discovery}, vol.~5, no.~2, pp.~617--629, 2026.
-DOI: \url{https://doi.org/10.1039/D5DD00298B}.
 
 \end{thebibliography}
 
