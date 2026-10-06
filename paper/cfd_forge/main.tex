@@ -36,7 +36,7 @@ Computational fluid dynamics (CFD) is central to engineering analysis, but obtai
 
 The effort required for CFD analysis creates a bottleneck in high-throughput screening and iterative design, where many geometries or operating conditions must be evaluated consistently \cite{forrester2009surrogate,brunton2020mlfluids}. A programmable CFD workflow could translate an engineering objective into a sequence of reusable operations and return simulation results with an interpretation of their significance. System response quantities (SRQs), such as drag, lift, or pressure loss, could then guide subsequent evaluations within an active-learning or optimization loop, as illustrated by recent work on LLM-assisted CFD optimization \cite{chen2026optmeta}.
 
-Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM provides an accessible, open-source CFD framework with a programmable interface that facilitates integration with LLM-based approaches \cite{weller1998tensorial}. Several agents now generate and run OpenFOAM cases from natural language: MetaOpenFOAM and MetaOpenFOAM 2.0 \cite{chen2024metaopenfoam,chen2025metaopenfoam2}, OpenFOAMGPT and OpenFOAMGPT 2.0 \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}, fine-tuned case generators \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd}. Their evaluations mainly measure whether a generated case executes and how closely its configuration matches a reference setup. A run is treated as successful when the solver finishes without error or reports convergence, or when an LLM or a human reviewer judges the result. Two recent systems address physical correctness more directly. PhyNiKCE separates neural planning from symbolic constraint enforcement: before the LLM writes the case files, it retrieves configuration templates, boundary-condition knowledge, and solver constraints that are consistent with the requested physics \cite{fan2026phynikce}. AI CFD Scientist adds checks after execution, a mesh-independence gate and a vision-language physics check, and it evaluates the visual check on deliberately planted failures \cite{somasekharan2026aicfd}.
+Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM provides an accessible, open-source CFD framework with a programmable interface that facilitates integration with LLM-based approaches \cite{weller1998tensorial}. Several agents now generate and run OpenFOAM cases from natural language: MetaOpenFOAM and MetaOpenFOAM 2.0 \cite{chen2024metaopenfoam,chen2025metaopenfoam2}, OpenFOAMGPT and OpenFOAMGPT 2.0 \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}, fine-tuned case generators \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd}. Their evaluations mainly measure whether a generated case executes and how closely its configuration or its computed fields match a reference. A run is treated as successful when the solver finishes without error or reports convergence, or when an LLM or a human reviewer judges the result. Language-guided multi-agent automation has also been applied to complex flow simulation \cite{xu2025cfdagent}. Two recent systems address physical correctness more directly. PhyNiKCE separates neural planning from symbolic constraint enforcement: before the LLM writes the case files, it retrieves configuration templates, boundary-condition knowledge, and solver constraints that are consistent with the requested physics \cite{fan2026phynikce}. AI CFD Scientist adds checks after execution, a mesh-independence gate and a vision-language physics check, and it evaluates the visual check on deliberately planted failures \cite{somasekharan2026aicfd}.
 
 In this work, we introduce CFD Forge, an agentic framework built around OpenFOAM. Starting from a plain-language engineering request, it builds the case, generates the mesh, runs the solver, diagnoses the result, and reports what it found, using an LLM to plan and propose while deterministic code carries out each step and checks the result. This division of labor builds on simulation agents developed for structural design \cite{jadhav2026mechdesigner}, protein molecular dynamics \cite{baratifarimani2025namdagent}, and adsorption calculations \cite{ock2026adsorbagent}. The closest precedent is PolyJarvis \cite{zhao2026polyjarvis}, which executes all-atom polymer molecular dynamics using a validated run plan, deterministic stage scripts, and equilibration gates. It invokes a recovery agent only when structured failures occur, with a fixed decision budget and a closed set of recovery actions. CFD Forge extends this approach to CFD, including validator-controlled mesh refinement. Whereas MeshDQN uses reinforcement learning to coarsen a mesh while preserving a target quantity \cite{lorsung2023meshdqn}, CFD Forge restricts mesh changes to bounded refinements that follow a registered rule, are proposed by the model, and require validator approval.
 
@@ -63,7 +63,7 @@ System & Acceptance decided by & Registered numerical criteria & Bounded actions
 \midrule
 MetaOpenFOAM 2.0~\cite{chen2025metaopenfoam2} & Execution checks, then LLM reviewer, then human judgment & -- & -- & -- & -- & 13 requests, 10 runs each, ablation \\
 OpenFOAMGPT 2.0~\cite{feng2026openfoamgpt2} & Error-free completion & -- & -- & -- & -- & Case studies, over 450 simulations \\
-Foam-Agent~\cite{yue2026foamagent} & Error-free execution & -- & -- & -- & -- & 110 basic tasks plus an advanced tier \\
+Foam-Agent~\cite{yue2026foamagent} & Error-free execution; field-level fidelity scored afterwards & -- & -- & -- & -- & 110 basic and 16 advanced tasks with field-level fidelity \\
 ChatCFD~\cite{fan2026chatcfd} & Error-free, converged execution; fidelity scored afterwards & -- & -- & -- & -- & 315 cases with fidelity scoring \\
 PhyNiKCE~\cite{fan2026phynikce} & Execution without failure; accuracy scored afterwards & -- & -- & -- & -- & 13 setups, repeated runs, ablation \\
 AI CFD Scientist~\cite{somasekharan2026aicfd} & Vision-language verdict with a mesh-independence flag & Mesh threshold only & -- (rerun controller revises the request) & -- & -- & 5 tasks; 16 planted failures \\
@@ -104,8 +104,9 @@ For an admissible request, a family-specific runner constructs the case, generat
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{Figures/fig1_workflow.pdf}
-    \caption{The CFD Forge workflow. Top: conceptual illustration (AI-generated;
-    its flow pictures are schematic, not simulation output). A language model
+    \caption{The CFD Forge workflow. Top: conceptual illustration (AI-generated, with
+    the step tile redrawn by the authors; its flow pictures are schematic, not
+    simulation output). A language model
     interprets the request and the simulation evidence and proposes actions;
     registered scientific checks, defined by each family's contract, decide
     \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} and permit only
@@ -1657,6 +1658,13 @@ E. Fan, L. Shi, Z. Li, and C.-y. Wen,
 autonomous computational fluid dynamics,''
 \textit{arXiv preprint arXiv:2602.11666}, 2026.
 DOI: \url{https://doi.org/10.48550/arXiv.2602.11666}.
+
+\bibitem{xu2025cfdagent}
+Z. Xu, L. Wang, C. Wang, Y. Chen, Q. Luo, H. Yao, S. Wang, and G. He,
+``CFDAgent: A language-guided, zero-shot multi-agent system for complex flow
+simulation,''
+\textit{Physics of Fluids}, vol.~37, no.~11, Article~117124, 2025.
+DOI: \url{https://doi.org/10.1063/5.0294696}.
 
 \bibitem{kurganov2000central}
 A. Kurganov and E. Tadmor,
