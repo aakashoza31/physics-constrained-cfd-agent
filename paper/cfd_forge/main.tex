@@ -104,7 +104,15 @@ For an admissible request, a family-specific runner constructs the case, generat
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth]{Figures/fig1_workflow.pdf}
-    \caption{An illustrative manual CFD workflow (top) compared with CFD Forge (bottom). The manual row is a simplified illustration; conventional practice can also use scripted case construction and numerical diagnostics. Blue: language-model calls, which only propose; green: deterministic tools; orange: deterministic gates, which decide admissibility and acceptance; gray: human steps. Bottom: fields from the archived runs, each with its own color scale. (a) Nozzle and (b) Mach-2 forward-facing step are agent runs accepted under their family contracts; (c) the turbulent cube is a diagnostic study run outside the agent loop and not accepted (Sec.~\ref{sec:cube_results}).}
+    \caption{The CFD Forge workflow. Top: conceptual illustration (AI-generated;
+    its flow pictures are schematic, not simulation output). A language model
+    interprets the request and the simulation evidence and proposes actions;
+    registered scientific checks, defined by each family's contract, decide
+    \texttt{ACCEPT}, \texttt{REJECT}, or \texttt{INCONCLUSIVE} and permit only
+    listed corrections. Bottom: the corresponding real OpenFOAM fields from the
+    archived runs, each with its own color scale. (a) Nozzle and (b) Mach-2
+    forward-facing step are from agent sessions; (c) the turbulent cube is a
+    diagnostic study run outside the agent loop (Sec.~\ref{sec:cube_results}).}
     \label{fig:flowpilot_architecture}
 \end{figure}
 
@@ -1483,7 +1491,7 @@ S8 \texttt{case\_I} (1) & Mach 3, $h=0.2$, sensitivity request & \texttt{REFINE\
 \end{table}
 
 \section*{Acknowledgements}
-AI assistance was used for drafting, language editing, and parts of the analysis scripts.
+AI assistance was used for drafting, language editing, parts of the analysis scripts, and the conceptual illustration in Fig.~\ref{fig:flowpilot_architecture}.
 
 \section*{Code and Data Availability}
 The CFD Forge source code, family recipes, validators, prompts, response
