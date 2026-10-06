@@ -15,15 +15,11 @@
 \usepackage[T1]{fontenc}
 \usepackage[margin=1in]{geometry}
 \usepackage[hidelinks]{hyperref}
-% Generic preview only; use the conference class for submission.
 \usepackage{xcolor}
-\newcommand{\RJ}[1]{{\color{blue}#1}}
-\definecolor{newcolor}{rgb}{.8,.349,.1}
 \usepackage{authblk} \author[1]{Aakash Shailesh Oza} \author[1]{Ryan F. Johnson} \author[1]{Amir Barati Farimani\thanks{Corresponding author: \href{mailto:barati@cmu.edu}{barati@cmu.edu}.}} \affil[1]{Department of Mechanical Engineering, Carnegie Mellon University, 5000 Forbes Avenue, Pittsburgh, PA 15213, USA} \renewcommand{\Affilfont}{\normalsize}
 
 \title{CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD}
 
-%CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD
 \date{}
 
 \begin{document}
@@ -42,7 +38,7 @@ The effort required for CFD analysis creates a bottleneck in high-throughput scr
 
 Large language models (LLMs) offer a way to coordinate such operations through natural-language interpretation, reasoning, and tool use \cite{yao2023react,schick2023toolformer}, supported by retrieval of technical information \cite{lewis2020rag}. OpenFOAM provides an accessible, open-source CFD framework with a programmable interface that facilitates integration with LLM-based approaches \cite{weller1998tensorial}. Several agents now generate and run OpenFOAM cases from natural language: MetaOpenFOAM and MetaOpenFOAM 2.0 \cite{chen2024metaopenfoam,chen2025metaopenfoam2}, OpenFOAMGPT and OpenFOAMGPT 2.0 \cite{pandey2025openfoamgpt,feng2026openfoamgpt2}, fine-tuned case generators \cite{dong2025autocfd}, Foam-Agent \cite{yue2026foamagent}, and ChatCFD \cite{fan2026chatcfd}. Their evaluations mainly measure whether a generated case executes and how closely its configuration matches a reference setup. A run is treated as successful when the solver finishes without error or reports convergence, or when an LLM or a human reviewer judges the result. Two recent systems address physical correctness more directly. PhyNiKCE separates neural planning from symbolic constraint enforcement: before the LLM writes the case files, it retrieves configuration templates, boundary-condition knowledge, and solver constraints that are consistent with the requested physics \cite{fan2026phynikce}. AI CFD Scientist adds checks after execution, a mesh-independence gate and a vision-language physics check, and it evaluates the visual check on deliberately planted failures \cite{somasekharan2026aicfd}.
 
-In this work, we introduce CFD Forge, an agentic framework built around OpenFOAM. Starting from a plain-language engineering request, it builds the case, generates the mesh, runs the solver, diagnoses the result, and reports what it found, using an LLM to plan and propose while deterministic code carries out each step and checks the result. This division of labor builds on simulation agents developed for structural design \cite{jadhav2026mechdesigner}, protein molecular dynamics \cite{chandrasekhar2025namdagent}, and adsorption calculations \cite{ock2026adsorbagent}. The closest precedent is PolyJarvis \cite{zhao2026polyjarvis}, which executes all-atom polymer molecular dynamics using a validated run plan, deterministic stage scripts, and equilibration gates. It invokes a recovery agent only when structured failures occur, with a fixed decision budget and a closed set of recovery actions. CFD Forge extends this approach to CFD, including validator-controlled mesh refinement. Whereas MeshDQN uses reinforcement learning to coarsen a mesh while preserving a target quantity \cite{lorsung2023meshdqn}, CFD Forge restricts mesh changes to bounded refinements that follow a registered rule, are proposed by the model, and require validator approval.
+In this work, we introduce CFD Forge, an agentic framework built around OpenFOAM. Starting from a plain-language engineering request, it builds the case, generates the mesh, runs the solver, diagnoses the result, and reports what it found, using an LLM to plan and propose while deterministic code carries out each step and checks the result. This division of labor builds on simulation agents developed for structural design \cite{jadhav2026mechdesigner}, protein molecular dynamics \cite{baratifarimani2025namdagent}, and adsorption calculations \cite{ock2026adsorbagent}. The closest precedent is PolyJarvis \cite{zhao2026polyjarvis}, which executes all-atom polymer molecular dynamics using a validated run plan, deterministic stage scripts, and equilibration gates. It invokes a recovery agent only when structured failures occur, with a fixed decision budget and a closed set of recovery actions. CFD Forge extends this approach to CFD, including validator-controlled mesh refinement. Whereas MeshDQN uses reinforcement learning to coarsen a mesh while preserving a target quantity \cite{lorsung2023meshdqn}, CFD Forge restricts mesh changes to bounded refinements that follow a registered rule, are proposed by the model, and require validator approval.
 
 CFD Forge occupies a complementary design point: deterministic, family-specific numerical acceptance of CFD results after execution, coupled to validator-controlled corrective actions (Table~\ref{tab:related}). Separating model proposals from deterministic checks is not new, and we do not claim it as such. What this paper contributes is how that separation is built and tested for CFD acceptance, summarized at the end of this section.
 
@@ -1698,8 +1694,8 @@ Y. Jadhav and A. Barati Farimani,
 \textit{Journal of Engineering Design}, vol.~37, no.~8, pp.~2904--2940, 2026.
 DOI: \url{https://doi.org/10.1080/09544828.2026.2624356}.
 
-\bibitem{chandrasekhar2025namdagent}
-A. Chandrasekhar and A. Barati Farimani,
+\bibitem{baratifarimani2025namdagent}
+O. Barati Farimani, A. Chandrasekhar, and A. Barati Farimani,
 ``Automating {MD} simulations for proteins using large language models:
 {NAMD-Agent},''
 \textit{arXiv preprint arXiv:2507.07887}, 2025.
