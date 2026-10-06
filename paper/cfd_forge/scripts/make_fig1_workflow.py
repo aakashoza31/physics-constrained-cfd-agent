@@ -3,7 +3,9 @@ OpenFOAM fields of the archived runs (bottom).
 
 The top panel is a fixed AI-generated conceptual illustration supplied by the
 authors (data/fig1_concept/concept_illustration.png; see the README there). It
-is schematic and is not simulation output. The bottom panels are the archived
+is schematic and is not simulation output. Its Mach-2 step tile is
+replaced at build time by a forward-facing-step schematic (ffs_tile below), because
+the supplied tile showed a backward-facing step. The bottom panels are the archived
 ParaView frames in data/frames/, cropped as in the earlier Figure 1; colour
 scales are sampled from the colour bars in those frames.
 Run from paper/cfd_forge/:  python scripts/make_fig1_workflow.py
@@ -21,6 +23,39 @@ ROOT=Path(__file__).resolve().parents[1]
 FR=str(ROOT/"data/frames")+"/"
 CONCEPT=ROOT/"data/fig1_concept/concept_illustration.png"
 OUT=ROOT/"figures"
+
+from scipy.ndimage import gaussian_filter
+
+def ffs_tile(wpx,hpx,scale=4):
+    """Schematic Mach field for supersonic flow over a FORWARD-facing step (flow left to right):
+    a curved detached shock stands upstream of the step face, subsonic flow behind it,
+    expansion over the step corner. Purely illustrative (not simulation output)."""
+    W,H=wpx*scale,hpx*scale
+    L,Hc=3.0,1.0; xs=0.6*L/3*3; xs=1.25; hs=0.30   # step face at x=1.25, height 0.3 (illustrative)
+    x=np.linspace(0,L,W); y=np.linspace(0,Hc,H); X,Y=np.meshgrid(x,y)
+    xsh=xs-0.42+0.30*(Y/Hc)**2                      # curved bow shock ahead of the face
+    M=np.full_like(X,2.0)
+    behind=X>xsh
+    d=np.clip((X-xsh)/0.5,0,1)
+    M_sub=0.45+0.35*Y+0.15*d
+    M=np.where(behind,M_sub,M)
+    over=(X>xs)&(Y>hs)
+    acc=np.clip((X-xs)/0.9,0,1)
+    M=np.where(over,0.8+0.9*acc*(0.6+0.4*(Y-hs)/(Hc-hs)),M)
+    # weak reflected oblique shock from the upper wall
+    xr=xs+0.55+0.9*(Hc-Y)
+    M=np.where(over&(X>xr),M-0.35*np.exp(-((X-xr)/0.15)**2)-0.15,M)
+    M=gaussian_filter(M,sigma=scale*1.2)
+    M[(X>=xs)&(Y<=hs)]=np.nan
+    fig=plt.figure(figsize=(W/100,H/100),dpi=100); ax=fig.add_axes([0,0,1,1]); ax.axis("off")
+    cm=plt.get_cmap("jet").copy(); cm.set_bad("#b7bfc8")
+    ax.contourf(X,Y,M,levels=np.linspace(0.2,2.7,40),cmap=cm,extend="both")
+    ax.add_patch(plt.Rectangle((xs,0),L-xs,hs,fc="#b7bfc8",ec="#123a6b",lw=2.2*scale/4))
+    sx=xs-0.42+0.30*(y/Hc)**2; ax.plot(sx,y,color="#b00018",lw=1.2*scale/4,alpha=0.8)
+    ax.plot([0,L,L,0,0],[0,0,Hc,Hc,0],color="#123a6b",lw=3*scale/4)
+    ax.set_xlim(0,L); ax.set_ylim(0,Hc)
+    fig.canvas.draw(); img=np.asarray(fig.canvas.buffer_rgba())[...,:3]; plt.close(fig)
+    return np.asarray(Image.fromarray(img).resize((wpx,hpx),Image.LANCZOS))
 
 def frame(path):
     return np.asarray(Image.open(path).convert("RGB")).astype(int)
@@ -56,7 +91,12 @@ stp=crop_field(stp_im); cub=cub_im[90:420,180:900].astype(np.uint8)
 cmaps=[colorbar_cmap(noz_im),colorbar_cmap(stp_im),colorbar_cmap(cub_im)]
 
 L,T=9,10
-con=np.asarray(Image.open(CONCEPT).convert("RGB"))[T:,L:]
+con0=np.asarray(Image.open(CONCEPT).convert("RGB")).copy()
+# The supplied illustration drew a backward-facing step; replace that schematic tile
+# (pixel box below) with a forward-facing-step schematic matching the simulated case.
+STEP_TILE=(351,709,550,630)
+x0t,x1t,y0t,y1t=STEP_TILE; con0[y0t:y1t,x0t:x1t]=ffs_tile(x1t-x0t,y1t-y0t)
+con=con0[T:,L:]
 H,W=con.shape[:2]
 INK="#1f2328"; LINK="#24476b"
 figw=7.2; top_h=figw*H/W; bot_h=1.95
