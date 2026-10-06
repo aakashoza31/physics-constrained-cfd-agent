@@ -1,20 +1,26 @@
-"""Figure 1: illustrative manual workflow vs. CFD Forge, with fields from the archived runs.
+"""Figure 1: conceptual illustration of the workflow (top) linked to the real
+OpenFOAM fields of the archived runs (bottom).
 
-Reads the archived ParaView frames in data/frames/ (colour scales are sampled from
-the colour bars in those frames) and writes figures/fig1_workflow.{pdf,png}.
+The top panel is a fixed AI-generated conceptual illustration supplied by the
+authors (data/fig1_concept/concept_illustration.png; see the README there). It
+is schematic and is not simulation output. The bottom panels are the archived
+ParaView frames in data/frames/, cropped as in the earlier Figure 1; colour
+scales are sampled from the colour bars in those frames.
 Run from paper/cfd_forge/:  python scripts/make_fig1_workflow.py
+Writes figures/fig1_workflow.{pdf,png}.
 """
 import numpy as np, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle, Rectangle, Polygon, Wedge
+from matplotlib.patches import Polygon, FancyBboxPatch, FancyArrowPatch
 from matplotlib.colors import ListedColormap, Normalize
 from matplotlib.cm import ScalarMappable
 from PIL import Image
-import sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 FR=str(ROOT/"data/frames")+"/"
+CONCEPT=ROOT/"data/fig1_concept/concept_illustration.png"
+OUT=ROOT/"figures"
 
 def frame(path):
     return np.asarray(Image.open(path).convert("RGB")).astype(int)
@@ -46,103 +52,42 @@ def colorbar_cmap(im):
 
 noz_im=frame(FR+"nozzle_mach_t0.006.png"); stp_im=frame(FR+"step_mach_t4.png"); cub_im=frame(FR+"cube_Uz_t80.png")
 noz=crop_field(noz_im); noz=np.concatenate([noz,noz[::-1]],0)
-stp=crop_field(stp_im)
-cub=cub_im[90:420,180:900].astype(np.uint8)
+stp=crop_field(stp_im); cub=cub_im[90:420,180:900].astype(np.uint8)
 cmaps=[colorbar_cmap(noz_im),colorbar_cmap(stp_im),colorbar_cmap(cub_im)]
 
-INK="#1f2328"; GREY="#57606a"
-C_HUM="#8c959f"; C_LLM="#2f6db5"; C_TOOL="#3f9a5b"; C_GATE="#d9822b"
-fig=plt.figure(figsize=(7.2,5.5))
-ax=fig.add_axes([0,0.36,1,0.64]); ax.set_xlim(0,12); ax.set_ylim(0.35,7.0); ax.axis("off"); ax.set_aspect("auto")
-xs=np.linspace(1.05,10.95,6); w=1.66
-
-# ---------- icons ----------
-def icon_request(x,y,c):
-    ax.add_patch(FancyBboxPatch((x-0.34,y-0.18),0.68,0.42,boxstyle="round,pad=0.02,rounding_size=0.08",fc="white",ec=c,lw=1.2))
-    ax.add_patch(Polygon([[x-0.18,y-0.2],[x-0.28,y-0.38],[x-0.04,y-0.2]],closed=True,fc="white",ec=c,lw=1.2))
-    ax.add_patch(Rectangle((x-0.18,y-0.21),0.15,0.04,fc="white",ec="none"))
-    for k,l in enumerate([0.44,0.36,0.26]): ax.plot([x-0.24,x-0.24+l],[y+0.12-k*0.1]*2,color=c,lw=1.1,solid_capstyle="round")
-def icon_mesh(x,y,c):
-    top=lambda t: 0.22-0.09*np.exp(-((t)/0.16)**2)
-    t=np.linspace(-0.36,0.36,60)
-    ax.plot(x+t,y+top(t),color=c,lw=1.2); ax.plot(x+t,y-top(t),color=c,lw=1.2)
-    for tv in np.linspace(-0.36,0.36,7): ax.plot([x+tv,x+tv],[y-top(tv),y+top(tv)],color=c,lw=0.7)
-    for f in [-0.5,0,0.5]: ax.plot(x+t,y+f*top(t),color=c,lw=0.7)
-def icon_solve(x,y,c):
-    for k in range(8):
-        a=k*np.pi/4; ax.add_patch(Rectangle((x+0.25*np.cos(a)-0.05,y+0.25*np.sin(a)-0.05),0.1,0.1,angle=0,fc=c,ec="none"))
-    ax.add_patch(Circle((x,y),0.24,fc=c,ec="none")); ax.add_patch(Circle((x,y),0.1,fc="white",ec="none"))
-def icon_evidence(x,y,c):
-    ax.plot([x-0.32,x-0.32,x+0.34],[y+0.26,y-0.22,y-0.22],color=c,lw=1.1)
-    t=np.linspace(0,1,40); ax.plot(x-0.28+0.6*t,y-0.18+0.4*np.exp(-4*t),color=c,lw=1.3)
-    ax.plot(x-0.28+0.6*t,y-0.18+0.25*np.exp(-2.5*t)+0.03*np.sin(20*t),color=c,lw=0.9,alpha=0.6)
-def icon_decide(x,y,c):
-    ax.add_patch(Polygon([[x-0.26,y+0.24],[x+0.26,y+0.24],[x+0.26,y],[x,y-0.3],[x-0.26,y]],closed=True,fc=c+"22",ec=c,lw=1.2,joinstyle="round"))
-    ax.plot([x-0.12,x-0.02,x+0.14],[y+0.0,y-0.1,y+0.12],color=c,lw=1.6,solid_capstyle="round")
-def icon_report(x,y,c):
-    ax.add_patch(Polygon([[x-0.22,y-0.3],[x+0.22,y-0.3],[x+0.22,y+0.18],[x+0.1,y+0.3],[x-0.22,y+0.3]],closed=True,fc="white",ec=c,lw=1.2))
-    for k,h in enumerate([0.12,0.22,0.16]): ax.add_patch(Rectangle((x-0.14+k*0.1,y-0.22),0.07,h,fc=c,ec="none"))
-    ax.plot([x-0.14,x+0.08],[y+0.16,y+0.16],color=c,lw=0.9)
-stages=["Request","Case & mesh","Solve","Evidence","Decision","Report"]
-icons=[icon_request,icon_mesh,icon_solve,icon_evidence,icon_decide,icon_report]
-for x,s,f in zip(xs,stages,icons):
-    f(x,6.42,"#24476b"); ax.text(x,5.83,s,ha="center",va="center",fontsize=7.6,fontweight="bold",color="#24476b")
-
-def box(x,y,txt,col,h=0.82,lw=1.0,fs=7.0):
-    ax.add_patch(FancyBboxPatch((x-w/2,y-h/2),w,h,boxstyle="round,pad=0.02,rounding_size=0.12",fc=col+"20",ec=col,lw=lw))
-    ax.text(x,y,txt,ha="center",va="center",fontsize=fs,color=INK,linespacing=1.15)
-def arrow(x0,x1,y):
-    ax.add_patch(FancyArrowPatch((x0+w/2,y),(x1-w/2,y),arrowstyle="-|>",mutation_scale=8,lw=0.9,color=INK))
-
-# ---------- manual row ----------
-yM=4.75
-ax.text(0.22,yM+0.62,"Illustrative manual workflow",fontsize=8.2,fontweight="bold",color=INK)
-man=["Engineer sets\ngoals and models","Builds case\nand mesh","Runs solver","Inspects results","Engineer\njudges result","Writes report"]
-for i,(x,t) in enumerate(zip(xs,man)):
-    box(x,yM,t,C_HUM)
-    if i: arrow(xs[i-1],x,yM)
-
-# ---------- CFD Forge row ----------
-yF=2.55
-ax.text(0.22,yF+0.78,"CFD Forge",fontsize=8.2,fontweight="bold",color=INK)
-def split(x,y,top,bot,ctop,cbot,h=1.0):
-    ax.add_patch(FancyBboxPatch((x-w/2,y-h/2),w,h,boxstyle="round,pad=0.02,rounding_size=0.12",fc="white",ec="#8c959f",lw=1.3))
-    ax.add_patch(Rectangle((x-w/2+0.03,y),w-0.06,h/2-0.04,fc=ctop+"20",ec="none"))
-    ax.add_patch(Rectangle((x-w/2+0.03,y-h/2+0.04),w-0.06,h/2-0.04,fc=cbot+"20",ec="none"))
-    ax.text(x,y+h/4,top,ha="center",va="center",fontsize=6.8,color=INK)
-    ax.text(x,y-h/4,bot,ha="center",va="center",fontsize=6.8,color=INK)
-forge=[("LLM turns text\ninto a spec",C_LLM),("Family builder\nwrites case, mesh",C_TOOL),("OpenFOAM",C_TOOL),None,("Validators\ndecide",C_GATE),None]
-for i,x in enumerate(xs):
-    if i==3: split(x,yF,"Code measures","LLM proposes action",C_TOOL,C_LLM)
-    elif i==5: split(x,yF,"LLM summary","Audit record",C_LLM,C_TOOL)
-    else:
-        t,c=forge[i]; box(x,yF,t,c,h=1.0,lw=1.4)
-    if i: arrow(xs[i-1],x,yF)
-# verdict badges
-for k,(lab,sym,col) in enumerate([("ACCEPT","✓","#2e8b57"),("REJECT","✗","#c0392b"),("INCONCLUSIVE","?","#7f8c8d")]):
-    xx=xs[4]+[-0.78,0.0,0.82][k]
-    ax.add_patch(Circle((xx,yF+0.78),0.13,fc=col,ec="none"))
-    ax.text(xx,yF+0.78,sym,ha="center",va="center",fontsize=7,color="white",fontweight="bold")
-    ax.text(xx,yF+1.02,lab,ha="center",va="bottom",fontsize=5.0,color=col,fontweight="bold")
-# correction loop
-ax.add_patch(FancyArrowPatch((xs[4],yF-0.52),(xs[2]-0.35,yF-0.52),connectionstyle="arc3,rad=-0.18",arrowstyle="-|>",mutation_scale=8,lw=1.1,color=C_GATE))
-ax.text((xs[2]+xs[4])/2-0.15,yF-1.42,"approved correction from a closed action set",ha="center",fontsize=6.6,color=C_GATE)
-
-# legend
-for j,(c,l) in enumerate([(C_LLM,"LLM call (proposes)"),(C_TOOL,"deterministic tool"),(C_GATE,"deterministic gate (decides)"),(C_HUM,"human step")]):
-    ax.add_patch(FancyBboxPatch((0.45+j*2.95,0.45),0.3,0.2,boxstyle="round,pad=0.01",fc=c+"20",ec=c,lw=1))
-    ax.text(0.86+j*2.95,0.55,l,va="center",fontsize=6.4,color=INK)
-
-# ---------- fields ----------
-panels=[(noz,cmaps[0],(0.2301,1.5657),"Mach","(a) Nozzle, Mach number, $t=6$ ms"),
-        (stp,cmaps[1],(0.0023,3.484),"Mach","(b) Mach-2 step, Mach number, $t=4$"),
-        (cub,cmaps[2],(-1.0138,1.0138),"$U_z$","(c) Cube, $U_z$ on $y/H=0.5$, $t^*=80$")]
-for k,(img,cm,(lo,hi),q,lab) in enumerate(panels):
-    a=fig.add_axes([0.03+k*0.325,0.105,0.29,0.21]); a.imshow(img,aspect="equal"); a.axis("off")
-    fig.text(0.175+k*0.325,0.322,lab,ha="center",va="bottom",fontsize=6.9,color=INK)
-    cax=fig.add_axes([0.065+k*0.325,0.065,0.22,0.014])
+L,T=9,10
+con=np.asarray(Image.open(CONCEPT).convert("RGB"))[T:,L:]
+H,W=con.shape[:2]
+INK="#1f2328"; LINK="#24476b"
+figw=7.2; top_h=figw*H/W; bot_h=1.95
+fig=plt.figure(figsize=(figw,top_h+bot_h)); FH=top_h+bot_h
+ft=top_h/FH; fb=bot_h/FH
+a0=fig.add_axes([0,fb,1,ft]); a0.imshow(con); a0.axis("off")
+bg=fig.add_axes([0,0,1,fb],zorder=-2); bg.set_facecolor("#f3f6fa"); bg.set_xticks([]); bg.set_yticks([]); [sp.set_visible(False) for sp in bg.spines.values()]
+ov=fig.add_axes([0,0,1,1],zorder=-1); ov.set_xlim(0,1); ov.set_ylim(0,1); ov.axis("off"); ov.patch.set_alpha(0)
+lab=fig.add_axes([0,0,1,1],zorder=6); lab.set_xlim(0,1); lab.set_ylim(0,1); lab.axis("off"); lab.patch.set_alpha(0)
+# schematic tiles in raw-pixel x of the concept image
+tiles=[(40,300),(350,715),(752,1140)]
+panels=[(noz,cmaps[0],(0.2301,1.5657),"Mach","(a) Nozzle: Mach number, $t=6$ ms"),
+        (stp,cmaps[1],(0.0023,3.484),"Mach","(b) Mach-2 step: Mach number, $t=4$"),
+        (cub,cmaps[2],(-1.0138,1.0138),"$U_z$","(c) Cube: $U_z$ on $y/H=0.5$, $t^*=80$")]
+pw=0.26
+ytop=fb*0.70; titles=[]
+for (tx0,tx1),(img,cm,(lo,hi),q,title) in zip(tiles,panels):
+    xc_t=((tx0+tx1)/2-L)/W; x0=min(max(xc_t-pw/2,0.012),0.988-pw)
+    a=fig.add_axes([x0,fb*0.27,pw,fb*0.43],zorder=2); a.imshow(img,aspect="equal"); a.axis("off")
+    a.apply_aspect(); p=a.get_position()
+    sx0=(tx0-L)/W; sx1=(tx1-L)/W; sy=fb+0.002
+    xa=(sx0+sx1)/2
+    lab.add_patch(FancyArrowPatch(((p.x0+p.x1)/2,sy+0.002),((p.x0+p.x1)/2,p.y1+0.009),arrowstyle="-|>",mutation_scale=11,lw=1.5,color=LINK))
+    ov.add_patch(FancyBboxPatch((p.x0-0.004,p.y0-0.006),p.width+0.008,p.height+0.012,boxstyle="round,pad=0,rounding_size=0.006",fc="white",ec=LINK,lw=0.8))
+    titles.append(((p.x0+p.x1)/2,p.y0,title))
+    cax=fig.add_axes([(p.x0+p.x1)/2-0.08,fb*0.075,0.16,0.010],zorder=2)
     cb=fig.colorbar(ScalarMappable(Normalize(lo,hi),cm),cax=cax,orientation="horizontal")
-    cb.set_ticks([lo,(lo+hi)/2,hi]); cb.ax.set_xticklabels([f"{lo:.2g}" if abs(lo)>0.01 else "0",f"{(lo+hi)/2:.2g}",f"{hi:.2g}"],fontsize=5.8)
-    cb.outline.set_linewidth(0.4); cb.solids.set_edgecolor('face'); cb.solids.set_rasterized(True); cb.ax.tick_params(length=2,width=0.4)
-    cb.set_label(q,fontsize=6.2,labelpad=1)
-OUT=ROOT/"figures"; fig.savefig(OUT/"fig1_workflow.pdf"); fig.savefig(OUT/"fig1_workflow.png",dpi=300)
+    cb.set_ticks([lo,hi]); cb.ax.set_xticklabels([f"{lo:.2g}" if abs(lo)>0.01 else "0",f"{hi:.2g}"],fontsize=5.4)
+    cb.outline.set_linewidth(0.4); cb.solids.set_rasterized(True); cb.ax.tick_params(length=1.5,width=0.4,pad=1)
+    cb.ax.text(1.06,0.5,q,transform=cb.ax.transAxes,fontsize=5.6,va="center",ha="left")
+ymin=min(t[1] for t in titles)
+for xc,_,t in titles: lab.text(xc,ymin-0.016,t,ha="center",va="top",fontsize=6.5,color=INK)
+lab.text(0.622,fb-0.018,"Real OpenFOAM results from the archived runs",ha="center",va="top",fontsize=6.2,fontweight="bold",color=LINK)
+fig.savefig(OUT/"fig1_workflow.pdf",dpi=300); fig.savefig(OUT/"fig1_workflow.png",dpi=300)
