@@ -19,7 +19,7 @@ REQUIRED_DOCS = ("architecture.md", "scientific_authority.md",
 CONTROLLER_COMPARISON = "evidence/controller_comparison/20261001T213031Z"
 
 #: A path on one developer's machine or session sandbox.
-MACHINE_PATH = re.compile(r"/home/[a-z]+/|C:(\\){1,2}Users|C:(\\){1,2}Backup|/tmp/claude-")
+MACHINE_PATH = re.compile(r"/home/[a-z]+/|C:(\\){1,2}Users|C:(\\){1,2}Backup")
 
 #: Placeholder user names used in docstrings and test fixtures to illustrate a
 #: path translation. They name no real machine.

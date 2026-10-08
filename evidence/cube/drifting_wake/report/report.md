@@ -83,7 +83,7 @@ Every row below was decided by code. No model output appears in this table.
   "case_directory": "cases/cube/drifting_wake",
   "python": "3.11.15",
   "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
-  "git_commit": "4dc256aca609f742ccb3162cbc5aa3a5c339ff9d",
+  "git_commit": "05eeb79b4fa2eb37faf6b0a4f20d5fd6f55741b3",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",

@@ -88,7 +88,7 @@ Every row below was decided by code. No model output appears in this table.
   "case_directory": "cases/forward_step/step_height_030_x060",
   "python": "3.11.15",
   "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
-  "git_commit": "c7d91ee6e7da39fb3929d32f3c85bc7d19eb5546",
+  "git_commit": "df918947e7b8100a01b2fcdb9fd575e12bc324ef",
   "pipeline_stages": [
     "request_interpretation",
     "geometry_characterization",
