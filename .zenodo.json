@@ -1,11 +1,12 @@
 {
   "title": "CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD (code)",
   "upload_type": "software",
-  "description": "Source code for the CFD Forge preprint (\"CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD\"; arXiv identifier to be added): an OpenFOAM-based agentic framework in which a language model interprets requests, diagnoses simulation evidence and proposes corrective actions from a closed set, while deterministic, family-specific validators decide acceptance. Includes the registered nozzle (axisymmetric 5-degree wedge) and two-dimensional forward-facing-step families, validators, prompts and response schemas, the controller-comparison evidence, and the scripts that produce the paper figures. Archived agent session records, case files and solver logs are deposited as a separate Zenodo dataset.",
+  "description": "Source code for the CFD Forge preprint (\"CFD Forge: A Physics-Constrained Agentic Framework for Autonomous CFD\"; arXiv:2610.14104): an OpenFOAM-based agentic framework in which a language model interprets requests, diagnoses simulation evidence and proposes corrective actions from a closed set, while deterministic, family-specific validators decide acceptance. Includes the registered nozzle (axisymmetric 5-degree wedge) and two-dimensional forward-facing-step families, validators, prompts and response schemas, the controller-comparison evidence, and the scripts that produce the paper figures. Archived agent session records, case files and solver logs are deposited as a separate Zenodo dataset.",
   "creators": [
     {
       "name": "Oza, Aakash Shailesh",
-      "affiliation": "Carnegie Mellon University"
+      "affiliation": "Carnegie Mellon University",
+      "orcid": "0009-0000-6071-648X"
     },
     {
       "name": "Johnson, Ryan F.",
@@ -25,6 +26,12 @@
   ],
   "license": "MIT",
   "related_identifiers": [
+    {
+      "identifier": "arXiv:2610.14104",
+      "relation": "isSupplementTo",
+      "scheme": "arxiv",
+      "resource_type": "publication-preprint"
+    },
     {
       "identifier": "10.5281/zenodo.23148676",
       "relation": "isSupplementedBy",

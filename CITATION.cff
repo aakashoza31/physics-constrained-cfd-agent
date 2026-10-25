@@ -5,6 +5,7 @@ type: software
 authors:
   - family-names: Oza
     given-names: Aakash Shailesh
+    orcid: "https://orcid.org/0009-0000-6071-648X"
     affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
   - family-names: Johnson
     given-names: Ryan F.
@@ -15,6 +16,9 @@ authors:
 license: MIT
 repository-code: "https://github.com/aakashoza31/physics-constrained-cfd-agent"
 identifiers:
+  - type: doi
+    value: 10.48550/arXiv.2610.14104
+    description: "Preprint (arXiv)"
   - type: doi
     value: 10.5281/zenodo.23148676
     description: "Data: archived session records, native case files, verification package and field videos"
@@ -30,6 +34,7 @@ preferred-citation:
   authors:
     - family-names: Oza
       given-names: Aakash Shailesh
+      orcid: "https://orcid.org/0009-0000-6071-648X"
       affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
     - family-names: Johnson
       given-names: Ryan F.
@@ -39,4 +44,10 @@ preferred-citation:
       affiliation: "Department of Mechanical Engineering, Carnegie Mellon University"
   year: 2026
   status: preprint
-  notes: "Preprint; arXiv identifier to be added."
+  doi: 10.48550/arXiv.2610.14104
+  url: "https://arxiv.org/abs/2610.14104"
+  repository: "arXiv"
+  identifiers:
+    - type: other
+      value: "arXiv:2610.14104"
+      description: "arXiv identifier"

@@ -1,5 +1,7 @@
 # CFD Forge
 
+[![arXiv](https://img.shields.io/badge/arXiv-2610.14104-b31b1b.svg)](https://arxiv.org/abs/2610.14104)
+
 CFD Forge is a physics-constrained agentic framework built around OpenFOAM that
 carries an engineering request through case construction, meshing, solver
 execution, diagnostics and reporting. A large language model interprets the
@@ -20,7 +22,7 @@ turbulent-cube diagnostic study, and the controller comparison.
 Aakash Shailesh Oza, Ryan F. Johnson, Amir Barati Farimani
 Department of Mechanical Engineering, Carnegie Mellon University
 
-- Preprint: arXiv (link to be added).
+- Preprint: arXiv:2610.14104 (<https://arxiv.org/abs/2610.14104>)
 - Code: <https://github.com/aakashoza31/physics-constrained-cfd-agent>
 - Manuscript source, figure data and figure scripts:
   [`paper/cfd_forge/`](paper/cfd_forge/)
@@ -361,9 +363,11 @@ anything.
   author        = {Oza, Aakash Shailesh and Johnson, Ryan F. and
                    Barati Farimani, Amir},
   year          = {2026},
-  eprint        = {TBD},
+  eprint        = {2610.14104},
   archivePrefix = {arXiv},
-  note          = {Preprint; arXiv identifier to be added}
+  primaryClass  = {physics.flu-dyn},
+  doi           = {10.48550/arXiv.2610.14104},
+  url           = {https://arxiv.org/abs/2610.14104}
 }
 ```
 
